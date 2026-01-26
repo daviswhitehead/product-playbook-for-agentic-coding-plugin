@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-01-26
+
+### Added
+- **Commands** (6 new):
+  - `/playbook:debug-ci`: Debug CI/CD failures using GitHub CLI
+  - `/playbook:prompt-coaching`: Real-time coaching on prompts
+  - `/playbook:design-critique`: Facilitate design critiques for visual analysis
+  - `/playbook:review-autonomy`: Review project readiness for autonomous execution
+  - `/playbook:work-multiple`: Work autonomously on multiple tasks
+  - `/playbook:identify-improvements`: Identify top 10 improvements from sessions
+
+### Changed
+- Expanded command documentation in README with categorized sections
+- Total commands now: 12 (was 6)
+
 ## [0.4.0] - 2026-01-26
 
 ### Added
@@ -69,6 +84,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 0.5.0 | 2026-01-26 | 6 new commands (debug-ci, prompt-coaching, design-critique, review-autonomy, work-multiple, identify-improvements) |
 | 0.4.0 | 2026-01-26 | Learning search integration, validation script |
 | 0.3.0 | 2026-01-26 | 3 skills, 4 agents |
 | 0.2.0 | 2026-01-25 | 6 commands, 5 templates |

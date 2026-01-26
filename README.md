@@ -33,14 +33,33 @@ This plugin implements a systematic approach to building software with AI assist
 
 ## Commands
 
+### Core Workflow Commands
 | Command | Description |
 |---------|-------------|
 | `/playbook:product-requirements` | Draft product requirements with multi-persona discovery |
 | `/playbook:tech-plan` | Create technical plan with architecture and sequencing |
 | `/playbook:tasks` | Break down work into specific, actionable tasks |
 | `/playbook:work` | Execute the next task from the tasks document |
-| `/playbook:debug` | Systematic debugging workflow |
+| `/playbook:work-multiple` | Work autonomously on multiple tasks without interruption |
 | `/playbook:learnings` | Capture learnings to improve docs and plugin |
+
+### Debugging & CI Commands
+| Command | Description |
+|---------|-------------|
+| `/playbook:debug` | Systematic debugging workflow |
+| `/playbook:debug-ci` | Debug CI/CD failures using GitHub CLI |
+
+### Design Commands
+| Command | Description |
+|---------|-------------|
+| `/playbook:design-critique` | Facilitate a design critique to analyze visual designs |
+
+### Review & Improvement Commands
+| Command | Description |
+|---------|-------------|
+| `/playbook:review-autonomy` | Review project readiness for autonomous execution |
+| `/playbook:identify-improvements` | Identify top 10 improvements from a coding session |
+| `/playbook:prompt-coaching` | Get real-time coaching on your prompts |
 
 ## Agents
 
