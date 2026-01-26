@@ -83,18 +83,19 @@ Works with other plugins by providing wrapper context when invoking external too
 ```
 product-playbook-for-agentic-coding-plugin/
 ├── .claude-plugin/
-│   └── plugin.json
-├── commands/
-│   ├── workflows/           # Core workflow commands
-│   └── debug.md             # Debugging command
-├── agents/
-│   └── workflow/            # Phase-specific agents
-├── skills/
-│   ├── codebase-docs-search/
-│   ├── learning-capture/
-│   └── autonomous-execution/
-└── resources/
-    └── templates/           # Document templates
+│   └── marketplace.json     # Marketplace definition
+├── plugins/
+│   └── product-playbook-for-agentic-coding/
+│       ├── .claude-plugin/
+│       │   └── plugin.json  # Plugin definition
+│       ├── commands/
+│       │   ├── workflows/   # Core workflow commands
+│       │   └── debug.md     # Debugging command
+│       ├── agents/          # Phase-specific agents (coming soon)
+│       ├── skills/          # Domain expertise (coming soon)
+│       └── resources/
+│           └── templates/   # Document templates
+└── README.md
 ```
 
 ## Usage
