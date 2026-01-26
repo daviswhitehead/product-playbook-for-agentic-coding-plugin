@@ -1,10 +1,15 @@
 {
   "name": "product-playbook-marketplace",
-  "description": "Product Playbook for Agentic Coding plugin marketplace",
+  "owner": {
+    "name": "Davis Whitehead",
+    "email": "daviswhitehead@gmail.com"
+  },
   "plugins": [
     {
       "name": "product-playbook-for-agentic-coding",
-      "path": ".."
+      "source": ".",
+      "description": "A structured 4-phase workflow for agentic coding",
+      "version": "0.2.0"
     }
   ]
 }
