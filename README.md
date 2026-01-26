@@ -104,6 +104,8 @@ product-playbook-for-agentic-coding-plugin/
 
 ## Usage
 
+> **Important**: These are slash commands, not skills. Invoke them directly by typing `/playbook:*` in the chat, not via the Skill tool.
+
 ### Complete Workflow Example
 
 ```bash
