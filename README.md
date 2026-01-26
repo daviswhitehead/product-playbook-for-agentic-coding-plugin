@@ -91,8 +91,12 @@ product-playbook-for-agentic-coding-plugin/
 │       ├── commands/
 │       │   ├── workflows/   # Core workflow commands
 │       │   └── debug.md     # Debugging command
-│       ├── agents/          # Phase-specific agents (coming soon)
-│       ├── skills/          # Domain expertise (coming soon)
+│       ├── agents/
+│       │   └── workflow/    # Phase-specific agents
+│       ├── skills/
+│       │   ├── codebase-docs-search/
+│       │   ├── learning-capture/
+│       │   └── autonomous-execution/
 │       └── resources/
 │           └── templates/   # Document templates
 └── README.md
