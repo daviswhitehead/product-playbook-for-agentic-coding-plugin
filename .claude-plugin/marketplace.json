@@ -1,0 +1,10 @@
+{
+  "name": "product-playbook-marketplace",
+  "description": "Product Playbook for Agentic Coding plugin marketplace",
+  "plugins": [
+    {
+      "name": "product-playbook-for-agentic-coding",
+      "path": ".."
+    }
+  ]
+}

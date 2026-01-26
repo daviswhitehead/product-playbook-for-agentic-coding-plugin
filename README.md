@@ -13,18 +13,22 @@ This plugin implements a systematic approach to building software with AI assist
 
 ## Installation
 
-### From Local Path
+### From GitHub (Recommended)
 ```bash
-# Add the plugin directory as a local marketplace
-claude plugin marketplace add /path/to/product-playbook-for-agentic-coding-plugin
+# Add the GitHub repository as a marketplace
+/plugin marketplace add daviswhitehead/product-playbook-for-agentic-coding-plugin
 
 # Install the plugin
-claude plugin install product-playbook-for-agentic-coding
+/plugin install product-playbook-for-agentic-coding@product-playbook-marketplace
 ```
 
-### From Published Marketplace (Future)
+### From Local Path (Development)
 ```bash
-claude plugin install product-playbook-for-agentic-coding@marketplace-name
+# Add the local plugin directory as a marketplace
+/plugin marketplace add /path/to/product-playbook-for-agentic-coding-plugin
+
+# Install the plugin
+/plugin install product-playbook-for-agentic-coding@product-playbook-marketplace
 ```
 
 ## Commands
