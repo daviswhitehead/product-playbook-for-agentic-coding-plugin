@@ -30,9 +30,28 @@ Before starting, search for existing project documentation:
 1. **Find Product Requirements**: This is required input—locate the PRD first
 2. **Search for docs**: Look in `docs/`, `docs/projects/`, `projects/` for relevant context
 3. **Check for instructions**: Look for `CLAUDE.md`, `AGENTS.md`, `README.md`
-4. **Find existing learnings**: Search for prior learnings that might be relevant
 
 Use Glob -> Grep -> Read strategy to find and incorporate relevant context.
+
+## Learning Search (Before Planning)
+
+Search for relevant learnings that might inform this plan:
+
+```bash
+# Search by category
+Grep: "category: architecture" in docs/learnings/
+Grep: "category: performance" in docs/learnings/
+Grep: "category: integration" in docs/solutions/
+
+# Search by relevant tags
+Grep: "tags:.*[relevant-technology]" in docs/
+Grep: "tags:.*[relevant-pattern]" in docs/learnings/
+
+# Search by module (if known)
+Grep: "module: [module-name]" in docs/
+```
+
+Review any relevant learnings before making architectural decisions. Prior solutions may inform current approach.
 
 ## Prerequisites
 

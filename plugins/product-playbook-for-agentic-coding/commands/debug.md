@@ -23,12 +23,34 @@ Before proceeding, inventory available tools:
 ## Project Context Discovery
 
 Before diving into the issue, search for existing solutions:
-1. **Search for prior learnings**: Look in `docs/learnings/`, `docs/solutions/` for similar issues
-2. **Check project docs**: Look for troubleshooting guides
-3. **Find existing debugging sessions**: Look for prior debugging docs
-4. **Review CLAUDE.md**: For architectural context that might help
+1. **Check project docs**: Look for troubleshooting guides
+2. **Find existing debugging sessions**: Look for prior debugging docs
+3. **Review CLAUDE.md**: For architectural context that might help
 
 Use Glob -> Grep -> Read strategy to find relevant context.
+
+## Learning Search (Before Investigating)
+
+**Critical**: Search for prior solutions before debugging from scratch:
+
+```bash
+# Search by error message or symptom
+Grep: "[error-message]" in docs/solutions/
+Grep: "[symptom-keyword]" in docs/learnings/
+
+# Search by category
+Grep: "category: debugging" in docs/learnings/
+Grep: "category: [area]" in docs/solutions/
+
+# Search by severity (for similar critical issues)
+Grep: "severity: critical" in docs/learnings/
+Grep: "severity: high" in docs/solutions/
+
+# Search by module affected
+Grep: "module: [affected-module]" in docs/
+```
+
+If a prior solution exists, apply it. If not, continue with investigation and **capture the learning afterward**.
 
 ## Prerequisites
 

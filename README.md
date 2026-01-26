@@ -104,45 +104,87 @@ product-playbook-for-agentic-coding-plugin/
 
 ## Usage
 
-### Starting a New Project
+### Complete Workflow Example
 
-```
+```bash
+# 1. Start with product discovery
 /playbook:product-requirements
-```
+# Answer questions, define the problem, users, and success criteria
+# Output: docs/projects/my-feature/product-requirements.md
 
-This will guide you through defining what to build and why, using multi-persona perspectives (Product Manager, Business Stakeholder, Domain Expert, etc.).
-
-### Planning the Solution
-
-```
+# 2. Plan the technical approach
 /playbook:tech-plan
-```
+# Design architecture, sequencing, and technical approach
+# Output: docs/projects/my-feature/tech-plan.md
 
-Design the technical architecture and sequencing, drawing from Software Architect and Engineering perspectives.
-
-### Breaking Down Work
-
-```
+# 3. Break down into tasks
 /playbook:tasks
-```
+# Create specific, actionable tasks with acceptance criteria
+# Output: docs/projects/my-feature/tasks.md
 
-Create a detailed task breakdown with acceptance criteria, dependencies, and effort estimates.
-
-### Executing Tasks
-
-```
+# 4. Execute tasks one by one
 /playbook:work
-```
+# Implement, test, and document each task
+# Updates: tasks.md status, code changes
 
-Work through tasks systematically, with quality checks and documentation updates.
+# 5. Debug any issues
+/playbook:debug
+# Systematic debugging with verification-first approach
 
-### Capturing Learnings
-
-```
+# 6. Capture learnings
 /playbook:learnings
+# Document what you learned for future work
+# Output: docs/learnings/YYYY-MM-DD-topic.md
 ```
 
-Capture what you learned to improve future work.
+### Command Details
+
+#### `/playbook:product-requirements`
+Guides you through defining **what** to build and **why**:
+- Multi-persona perspectives (PM, Business, Domain Expert, etc.)
+- Pre-draft clarification gate
+- Probing questions to deepen understanding
+- Output: Product Requirements Document
+
+#### `/playbook:tech-plan`
+Designs **how** to build it:
+- Architecture decisions with rationale
+- Sequencing plan (phases, dependencies)
+- Technology stack evaluation
+- Risk assessment
+- Searches for relevant learnings first
+
+#### `/playbook:tasks`
+Breaks work into actionable tasks:
+- Acceptance criteria for each task
+- Dependencies between tasks
+- AI tool recommendations per task
+- Effort estimates
+
+#### `/playbook:work`
+Executes tasks systematically:
+- Identifies next task based on dependencies
+- Searches for relevant learnings before starting
+- Quality validation against acceptance criteria
+- Updates task status and documentation
+
+#### `/playbook:debug`
+Systematic debugging workflow:
+- **Searches for prior solutions first**
+- Verification-first approach
+- Hypothesis tracking
+- Root cause analysis
+- Captures learning after resolution
+
+#### `/playbook:learnings`
+Captures learnings with three triggers:
+- **Chat session** (lightweight): Quick insights
+- **Project completion** (comprehensive): Full retrospective
+- **Blocker overcome** (targeted): Problem/solution documentation
+
+Two output targets:
+- **Codebase docs**: Project-specific knowledge
+- **Plugin improvements**: Workflow enhancements
 
 ## Philosophy
 
@@ -154,9 +196,72 @@ This plugin embodies several key principles:
 - **Tool Orchestration**: Leverage the best tool for each task
 - **Documentation Discipline**: Keep docs updated as you work
 
+## Development
+
+### Validation
+
+Run the validation script to check plugin structure and content:
+
+```bash
+./scripts/validate-plugin.sh
+```
+
+This checks:
+- Plugin structure (directories, required files)
+- Command frontmatter (name, description fields)
+- Agent frontmatter
+- Skill SKILL.md files
+- Template files
+- marketplace.json configuration
+
+### Local Testing
+
+```bash
+# Add as local marketplace
+/plugin marketplace add /path/to/product-playbook-for-agentic-coding-plugin
+
+# Install
+/plugin install product-playbook-for-agentic-coding@product-playbook-marketplace
+
+# Test a command
+/playbook:hello
+```
+
 ## Contributing
 
-Contributions welcome! Please see the plugin structure and follow existing patterns.
+Contributions welcome! Please follow these guidelines:
+
+1. **Fork the repository** and create a feature branch
+2. **Follow existing patterns** for commands, agents, and skills
+3. **Run validation** before submitting: `./scripts/validate-plugin.sh`
+4. **Update CHANGELOG.md** with your changes
+5. **Submit a pull request** with clear description
+
+### Adding a New Command
+
+1. Create `plugins/product-playbook-for-agentic-coding/commands/your-command.md`
+2. Include required frontmatter:
+   ```yaml
+   ---
+   name: playbook:your-command
+   description: Brief description of what it does
+   argument-hint: "[optional: usage hint]"
+   ---
+   ```
+3. Follow the multi-persona pattern if applicable
+4. Include tool discovery and context gathering sections
+
+### Adding a New Skill
+
+1. Create directory: `plugins/product-playbook-for-agentic-coding/skills/your-skill/`
+2. Create `SKILL.md` with frontmatter:
+   ```yaml
+   ---
+   name: your-skill
+   description: When to use this skill and what it provides
+   ---
+   ```
+3. Include clear guidance and examples
 
 ## License
 

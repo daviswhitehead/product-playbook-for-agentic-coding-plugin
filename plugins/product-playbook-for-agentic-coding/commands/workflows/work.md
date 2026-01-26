@@ -53,9 +53,27 @@ Before starting, search for existing project documentation:
 1. **Find Tasks Document**: This is required—locate it first
 2. **Find Tech Plan**: For architectural guidance
 3. **Find Product Requirements**: For business context
-4. **Find existing learnings**: Search for prior solutions that might help
 
 Use Glob -> Grep -> Read strategy to find and incorporate relevant context.
+
+## Learning Search (Before Each Task)
+
+Before starting work on a task, search for relevant learnings:
+
+```bash
+# Search by task-related category
+Grep: "category: [task-category]" in docs/learnings/
+Grep: "category: [task-category]" in docs/solutions/
+
+# Search by task-related keywords
+Grep: "[task-keyword]" in docs/learnings/
+Grep: "[task-keyword]" in docs/solutions/
+
+# Search by module being modified
+Grep: "module: [module-name]" in docs/
+```
+
+Prior solutions and learnings may save time and prevent repeated mistakes.
 
 ## Prerequisites
 
