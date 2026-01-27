@@ -61,6 +61,21 @@ This plugin implements a systematic approach to building software with AI assist
 | `/playbook:identify-improvements` | Identify top 10 improvements from a coding session |
 | `/playbook:prompt-coaching` | Get real-time coaching on your prompts |
 
+### Git Commands
+| Command | Description |
+|---------|-------------|
+| `/playbook:git-commit` | Analyze changes and create well-structured conventional commits |
+| `/playbook:git-pr` | Create a pull request with clear title and description |
+| `/playbook:git-worktree` | Create a git worktree for isolated parallel development |
+| `/playbook:git-branch-worktree` | Create a new branch and worktree together |
+| `/playbook:git-delete-branch` | Safely delete a branch from local and remote |
+| `/playbook:git-move-changes` | Move uncommitted changes to a new branch |
+
+### Organization Commands
+| Command | Description |
+|---------|-------------|
+| `/playbook:organize-files` | Organize project files into logical subdirectories |
+
 ## Agents
 
 | Agent | Description |

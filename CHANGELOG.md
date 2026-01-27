@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-01-26
+
+### Added
+- **Git Commands** (6 new):
+  - `/playbook:git-commit`: Analyze changes and create conventional commits
+  - `/playbook:git-pr`: Create pull requests with GitHub CLI
+  - `/playbook:git-worktree`: Create git worktrees for parallel development
+  - `/playbook:git-branch-worktree`: Create branch and worktree together
+  - `/playbook:git-delete-branch`: Safely delete branches (local + remote)
+  - `/playbook:git-move-changes`: Move uncommitted changes to new branch
+- **Organization Commands** (1 new):
+  - `/playbook:organize-files`: Organize project files by content analysis
+
+### Changed
+- Total commands now: 19 (was 12)
+- Added Git Commands and Organization Commands sections to README
+
 ## [0.5.0] - 2026-01-26
 
 ### Added
@@ -84,6 +101,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 0.6.0 | 2026-01-26 | 7 new commands (6 git commands, 1 organization command) |
 | 0.5.0 | 2026-01-26 | 6 new commands (debug-ci, prompt-coaching, design-critique, review-autonomy, work-multiple, identify-improvements) |
 | 0.4.0 | 2026-01-26 | Learning search integration, validation script |
 | 0.3.0 | 2026-01-26 | 3 skills, 4 agents |
