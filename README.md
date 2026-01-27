@@ -53,6 +53,7 @@ This plugin implements a systematic approach to building software with AI assist
 | Command | Description |
 |---------|-------------|
 | `/playbook:design-critique` | Facilitate a design critique to analyze visual designs |
+| `/playbook:design-spec` | Create a high-fidelity design specification for complex UI features |
 
 ### Review & Improvement Commands
 | Command | Description |

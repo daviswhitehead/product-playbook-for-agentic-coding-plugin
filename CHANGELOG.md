@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-01-26
+
+### Added
+- **Design Commands** (1 new):
+  - `/playbook:design-spec`: Create high-fidelity design specifications for complex UI features
+- **Templates** (1 new):
+  - `design-spec.md`: Comprehensive design specification template
+
+### Changed
+- Total commands now: 22 (was 21)
+- Total templates now: 6 (was 5)
+- Playbook migration complete: all 103 files processed, playbook can be deprecated
+
 ## [0.7.0] - 2026-01-26
 
 ### Added
@@ -111,6 +124,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 0.8.0 | 2026-01-26 | 1 new command (design-spec), 1 new template, playbook migration complete |
 | 0.7.0 | 2026-01-26 | 1 new command (review-playbook), plugin fully self-sufficient |
 | 0.6.0 | 2026-01-26 | 7 new commands (6 git commands, 1 organization command) |
 | 0.5.0 | 2026-01-26 | 6 new commands (debug-ci, prompt-coaching, design-critique, review-autonomy, work-multiple, identify-improvements) |
