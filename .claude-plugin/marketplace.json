@@ -9,7 +9,7 @@
       "name": "product-playbook-for-agentic-coding",
       "source": "./plugins/product-playbook-for-agentic-coding",
       "description": "A structured 4-phase workflow for agentic coding",
-      "version": "0.6.0"
+      "version": "0.7.0"
     }
   ]
 }

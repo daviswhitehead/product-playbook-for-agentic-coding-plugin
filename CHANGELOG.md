@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-01-26
+
+### Added
+- **Review Commands** (1 new):
+  - `/playbook:review-playbook`: Systematically review and optimize playbook/plugin with scoring rubric
+
+### Changed
+- Total commands now: 21 (was 20)
+- Plugin now fully self-sufficient (playbook review capabilities included)
+
 ## [0.6.0] - 2026-01-26
 
 ### Added
@@ -19,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `/playbook:organize-files`: Organize project files by content analysis
 
 ### Changed
-- Total commands now: 19 (was 12)
+- Total commands now: 20 (was 12)
 - Added Git Commands and Organization Commands sections to README
 
 ## [0.5.0] - 2026-01-26
@@ -101,6 +111,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 0.7.0 | 2026-01-26 | 1 new command (review-playbook), plugin fully self-sufficient |
 | 0.6.0 | 2026-01-26 | 7 new commands (6 git commands, 1 organization command) |
 | 0.5.0 | 2026-01-26 | 6 new commands (debug-ci, prompt-coaching, design-critique, review-autonomy, work-multiple, identify-improvements) |
 | 0.4.0 | 2026-01-26 | Learning search integration, validation script |

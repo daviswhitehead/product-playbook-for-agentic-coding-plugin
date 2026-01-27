@@ -75,6 +75,7 @@ This plugin implements a systematic approach to building software with AI assist
 | Command | Description |
 |---------|-------------|
 | `/playbook:organize-files` | Organize project files into logical subdirectories |
+| `/playbook:review-playbook` | Systematically review and optimize the playbook/plugin |
 
 ## Agents
 
