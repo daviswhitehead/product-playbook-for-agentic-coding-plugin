@@ -78,6 +78,11 @@ This plugin implements a systematic approach to building software with AI assist
 | `/playbook:organize-files` | Organize project files into logical subdirectories |
 | `/playbook:review-playbook` | Systematically review and optimize the playbook/plugin |
 
+### Help
+| Command | Description |
+|---------|-------------|
+| `/playbook:help` | List all commands and find the right one for your task |
+
 ## Agents
 
 | Agent | Description |
@@ -235,6 +240,53 @@ This plugin embodies several key principles:
 - **Documentation Discipline**: Keep docs updated as you work
 
 ## Development
+
+### Local Development Setup (Recommended)
+
+For fast iteration when developing the plugin, set up a local development environment:
+
+#### Option 1: Worktree Alongside Target Project
+
+Keep the plugin repo next to your working project for easy access:
+
+```bash
+# Clone plugin repo alongside your project
+cd /path/to/your-projects
+git clone git@github.com:daviswhitehead/product-playbook-for-agentic-coding-plugin.git
+
+# Your structure:
+# your-projects/
+# ├── my-app/                    # Your working project
+# └── product-playbook-for-agentic-coding-plugin/  # Plugin (edit here)
+```
+
+#### Option 2: Install from Local Path
+
+Install the plugin from your local clone instead of GitHub:
+
+```bash
+# In Claude Code, in your target project:
+/plugin marketplace add /path/to/product-playbook-for-agentic-coding-plugin
+/plugin install product-playbook-for-agentic-coding@product-playbook-marketplace
+```
+
+Now edits to your local plugin are reflected after restarting Claude Code.
+
+#### Development Workflow
+
+1. **Edit** plugin files in your local clone
+2. **Validate** with `./scripts/validate-plugin.sh`
+3. **Test** by restarting Claude Code or reinstalling
+4. **Commit** when changes work
+5. **Push** to GitHub when ready to share
+
+#### Quick Ideas Capture
+
+When working in a target project and you have plugin improvement ideas:
+
+1. Create a `docs/plugin-improvements.md` file in your target project
+2. Append ideas as they come up
+3. Periodically batch-process ideas into the plugin repo
 
 ### Validation
 
