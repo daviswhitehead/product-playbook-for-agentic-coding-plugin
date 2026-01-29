@@ -1,39 +1,102 @@
 ---
 name: playbook:product-requirements
-description: Draft product requirements with multi-persona discovery process
-argument-hint: "[optional: brief project description]"
+description: Draft product requirements with multi-persona discovery process. Supports autonomous and interview modes.
+argument-hint: "[--autonomous] [--context <path>] [brief project description]"
 ---
 
 # Draft Product Requirements
 
-You are facilitating the Product Discovery phase by representing multiple stakeholder perspectives, with **Product Manager** as the lead role coordinating the phase.
+You are facilitating the Product Discovery phase. Your goal is to create a comprehensive, **agent-ready** Product Requirements Document (PRD) that enables autonomous technical planning and implementation.
 
-**Roles in this phase**: Product Manager (lead), Business Stakeholder, Domain Expert, Technical Advisor, User Researcher, Designer, Legal/Compliance.
+## Modes
 
-## Your Goal
+This command supports two modes:
 
-Help the user create a comprehensive Product Requirements Document for a new project. This is a collaborative discovery process—**actively ask probing questions** throughout to help refine and improve the requirements.
+### Interview Mode (Default)
+Guided multi-persona discovery with probing questions. Use when:
+- Requirements are unclear or evolving
+- You need to explore the problem space
+- User wants to be involved in shaping the PRD
 
-## Available Tools Discovery
+### Autonomous Mode (`--autonomous`)
+Generate a complete PRD draft from available context. Use when:
+- Sufficient context already exists (docs, research, data)
+- User wants a first draft to react to
+- Time is limited
 
-Before proceeding, consider what tools are available:
-1. **Commands**: Other `/playbook:*` commands for subsequent phases
-2. **Agents**: Specialized agents via Task tool (if available)
-3. **MCP Tools**: External service integrations via ToolSearch
-4. **Skills**: Domain expertise via Skill tool
+Parse the arguments to determine mode:
+- If `--autonomous` flag is present → Autonomous Mode
+- If `--context <path>` is provided → Use that path for context gathering
+- Otherwise → Interview Mode (default)
 
-Select the most appropriate tools as you work through this process.
+---
 
-## Project Context Discovery
+## Autonomous Mode Process
 
-Before starting, search for existing project documentation:
-1. **Search for docs**: Look in `docs/`, `docs/projects/`, `projects/` for relevant context
-2. **Check for instructions**: Look for `CLAUDE.md`, `AGENTS.md`, `README.md`
-3. **Find existing work**: Search for any prior product requirements or planning docs
+### Step 1: Gather Context
 
-Use Glob -> Grep -> Read strategy to find and incorporate relevant context.
+Search extensively for existing documentation:
 
-## Process
+```
+Context sources (search in order):
+1. --context path (if provided)
+2. docs/, docs/projects/, projects/
+3. CLAUDE.md, AGENTS.md, README.md
+4. Any files mentioned in user's description
+5. Related research, data analysis, meeting notes
+```
+
+Use Glob → Grep → Read strategy to find and read all relevant context.
+
+**Minimum context required for autonomous mode:**
+- Clear problem statement or opportunity
+- Target user/audience information
+- Some form of success criteria or goals
+- Basic scope understanding
+
+If minimum context is not found, inform the user and switch to Interview Mode.
+
+### Step 2: Extract Insights
+
+From gathered context, extract:
+- **Problem/Opportunity:** What problem are we solving? What's the evidence?
+- **Users:** Who has this problem? What are their contexts?
+- **Current State:** How do users solve this today?
+- **Proposed Solution:** What's the high-level approach?
+- **Success Criteria:** How will we measure success?
+- **Constraints:** Technical, timeline, resource limitations
+- **Risks:** What could go wrong?
+
+### Step 3: Draft the PRD
+
+Use the template at `resources/templates/product-requirements-v2.md` to create a complete PRD.
+
+**Agent-Ready Requirements:**
+- Every functional requirement MUST have testable acceptance criteria
+- Use Given/When/Then format for acceptance criteria
+- Include edge cases in scenarios
+- Document all integration points and data requirements
+- Capture decisions with rationale in Decision Log
+- Mark any unresolved questions as Open Questions
+
+### Step 4: Validate Completeness
+
+Run through the Agent-Ready Checklist at the end of the template. For any items that cannot be checked:
+- Mark them explicitly as incomplete
+- Add corresponding Open Questions
+- Recommend follow-up actions
+
+### Step 5: Present for Review
+
+Present the draft to the user with:
+- Summary of context sources used
+- Key decisions made (with rationale)
+- Items marked incomplete or needing validation
+- Recommended next steps
+
+---
+
+## Interview Mode Process
 
 ### Step 1: Understand the Project
 
@@ -43,121 +106,154 @@ Ask the user about their project:
 - Why is this problem important to solve now?
 - What's their initial vision for a solution?
 
-### Pre-Draft Clarification (Gate)
+### Step 2: Search for Existing Context
+
+Before deep discovery, search for existing documentation:
+1. **Search for docs**: Look in `docs/`, `docs/projects/`, `projects/` for relevant context
+2. **Check for instructions**: Look for `CLAUDE.md`, `AGENTS.md`, `README.md`
+3. **Find existing work**: Search for any prior product requirements, research, or planning docs
+
+Use Glob → Grep → Read strategy. Summarize what you found.
+
+### Step 3: Pre-Draft Clarification Gate
 
 **Before creating any document**, ask and capture answers to these clarifying questions:
-- What is the single most important outcome of this project?
-- Who is the primary user and what is their context of use?
-- What constraints (timeline/budget/tech) are already known?
-- What is explicitly out of scope for the first iteration?
-- What does success look like (quantitative and qualitative)?
-- Are there critical dependencies or integrations we must account for?
 
-**Proceed only after these are answered clearly.** Summarize your understanding and confirm alignment.
+| Question | Why It Matters for Agents |
+|----------|---------------------------|
+| What is the single most important outcome? | Defines primary success metric |
+| Who is the primary user and their context? | Enables accurate scenarios |
+| What constraints are already known? | Prevents invalid technical plans |
+| What is explicitly out of scope? | Prevents scope creep |
+| What does success look like (quantitative)? | Enables testable acceptance criteria |
+| What existing systems does this touch? | Enables accurate dependency mapping |
 
-### Step 2: Locate or Create the Template
+**Proceed only after these are answered clearly.** Summarize understanding and confirm alignment.
 
-1. Check if a Product Requirements document already exists for this project
-2. If not, use the template pattern from this plugin's `resources/templates/product-requirements.md`
-3. Create it in an appropriate location (e.g., `docs/projects/[project-name]/product-requirements.md`)
-4. Fill in the Project Overview section:
-   - **Size**: Help determine project size (Small, Medium, Large)
-   - **Status**: Set initial status (typically "In Review")
+### Step 4: Multi-Persona Discovery
 
-### Step 3: Facilitate Discovery
+**Roles**: Product Manager (lead), Business Stakeholder, Domain Expert, Technical Advisor, User Researcher, Designer, Agentic Engineer.
 
-**This is the core of Product Discovery.** For each section, ask probing questions from multiple role perspectives to deepen understanding.
+For each section, ask probing questions from multiple perspectives:
 
-#### 1. Problem Definition
-**From Product Manager + Domain Expert perspectives:**
+#### Opportunity Definition
+**From Product Manager + Domain Expert:**
 - "What's the root cause vs symptoms?"
-- "Who experiences this problem most acutely?"
+- "What data supports this being a problem?"
 - "What happens if we don't solve this?"
 
-#### 2. User Understanding
-**From User Researcher + Designer perspectives:**
-- "Who is the primary user?"
-- "What's their context when they'll use this?"
+#### User Understanding
+**From User Researcher + Designer:**
+- "Walk me through a specific user's day when they encounter this problem"
+- "What are the edge cases—users who don't fit the primary persona?"
 - "What accessibility needs should we consider?"
 
-#### 3. Technical Feasibility
-**From Technical Advisor perspective:**
-- "What technical constraints exist?"
-- "Are there integration considerations?"
-- "What are the technical risks?"
+#### Solution Vision
+**From Product Manager + Technical Advisor:**
+- "What are the possible solution approaches?"
+- "What's the simplest version that would validate our hypothesis?"
+- "What makes this solution unique/defensible?"
 
-#### 4. Solution Vision
-**From Product Manager + Designer + Technical Advisor perspectives:**
-- "What are possible solution approaches?"
-- "What makes this solution unique?"
-- "How does this solve the problem?"
+#### Technical Context (Critical for Agents)
+**From Technical Advisor + Agentic Engineer:**
+- "What existing systems does this need to integrate with?"
+- "What data does this need, and where does it come from?"
+- "What existing patterns in the codebase should this follow?"
+- "What technical constraints will affect implementation?"
 
-#### 5. Success Criteria
-**From Business Stakeholder + Product Manager perspectives:**
-- "What would success look like?"
-- "How will we measure success?"
-- "What metrics matter most?"
+#### Success Criteria
+**From Business Stakeholder + Product Manager:**
+- "What's the primary metric, and what specific target makes this a success?"
+- "How will we measure this metric?"
+- "What guardrail metrics should we monitor?"
 
-#### 6. Design Considerations
-**From Designer perspective:**
-- "What are the UX implications?"
-- "What design constraints exist?"
-- "How should users interact with this?"
+#### Acceptance Criteria (Critical for Agents)
+**From Agentic Engineer:**
+- "For each requirement, what would a test case look like?"
+- "What are the edge cases that need explicit handling?"
+- "What error states need to be defined?"
 
-#### 7. Scope Definition
-**From Business Stakeholder + Legal/Compliance perspectives:**
-- "What's explicitly out of scope?"
-- "What are the constraints?"
-- "What should wait for future iterations?"
+### Step 5: Draft the Document
 
-### Key Questioning Principles
+Create the PRD using `resources/templates/product-requirements-v2.md`.
 
-- Ask follow-up questions based on answers
-- Challenge assumptions gently but persistently
-- Explore edge cases and alternatives
-- Dig deeper when answers seem incomplete
-- Validate understanding by summarizing
+Ensure every section is filled with:
+- **Specific, measurable** content (not placeholders)
+- **Testable acceptance criteria** for all requirements
+- **Explicit scope boundaries**
+- **Technical context** sufficient for tech planning
 
-### Step 4: Complete the Document
+### Step 6: Validate Agent-Readiness
 
-Ensure all sections are filled:
-- Project Overview (Size, Status)
-- Problem Statement (clear and validated)
-- Target Users (well-defined personas)
-- Solution Vision (high-level approach)
-- Success Criteria (measurable metrics)
-- Design Considerations (UX implications)
-- Constraints and Assumptions
-- Non-Goals (explicitly out of scope)
-- User Stories (if applicable)
-- Risks and Mitigation
+Review against the Agent-Ready Checklist:
 
-### Step 5: Validate Completeness
+**Clarity & Completeness**
+- [ ] Problem is quantified with data
+- [ ] Success metric has specific target and measurement method
+- [ ] Scope tables have no ambiguous items
 
-Review the document:
-- [ ] Project Overview includes Size and Status
-- [ ] Problem statement is clear and validated
-- [ ] Target users are well-defined
-- [ ] Success criteria are measurable
-- [ ] Design considerations identified
-- [ ] Non-goals clearly stated
-- [ ] Ready for Solution Planning
+**Technical Readiness**
+- [ ] All integration points documented
+- [ ] Data requirements specified
+- [ ] Constraints are explicit
+- [ ] Existing patterns identified
 
-## Key Principles
+**Acceptance Criteria Quality**
+- [ ] All requirements have acceptance criteria
+- [ ] Given/When/Then format used
+- [ ] Edge cases covered in scenarios
 
-- **Ask Questions Actively**: Your primary role is probing questions, not just filling templates
-- **Multi-Role Perspective**: Draw from all stakeholder perspectives
-- **Follow-Up Questions**: Always dig deeper when answers are vague
-- **Challenge Assumptions**: Ask "Why?" and "What if?" questions
-- **Focus on What & Why**: This document defines the problem and solution, not implementation
-- **Validate Understanding**: Summarize and confirm before moving forward
+**Decision Completeness**
+- [ ] No open blockers
+- [ ] Key decisions logged with rationale
+- [ ] Assumptions have validation methods
 
-## Next Steps
-
-Once the Product Requirements Document is complete, guide the user to:
-1. Review and validate the document
-2. Proceed to Solution Planning phase using `/playbook:tech-plan`
+For any unchecked items, either:
+1. Ask follow-up questions to fill the gap
+2. Mark as Open Questions in the document
 
 ---
 
-*You're representing multiple stakeholder perspectives to help discover and define what to build and why it matters.*
+## Key Principles
+
+### For Both Modes
+
+- **Agent-Ready is the bar**: The PRD must enable autonomous tech planning and task completion
+- **Explicit over implicit**: Nothing should be left to interpretation
+- **Testable criteria**: Every requirement must have verifiable acceptance criteria
+- **Technical context matters**: Integration points, data, constraints must be documented
+
+### For Interview Mode
+
+- **Ask questions actively**: Your primary role is probing questions, not filling templates
+- **Multi-perspective view**: Draw from all stakeholder perspectives
+- **Challenge assumptions**: Ask "Why?" and "What if?" questions
+- **Validate understanding**: Summarize and confirm before moving forward
+
+### For Autonomous Mode
+
+- **Use all available context**: Search thoroughly before drafting
+- **Make decisions explicit**: Document any decisions you made with rationale
+- **Flag uncertainty**: Mark assumptions and open questions clearly
+- **Present for validation**: Always have user review autonomous output
+
+---
+
+## Output
+
+Create the PRD at an appropriate location:
+- Default: `docs/projects/[project-name]/product-requirements.md`
+- Or: Path specified by user
+
+---
+
+## Next Steps
+
+Once the PRD is complete, guide the user to:
+1. **Review the Agent-Ready Checklist** — ensure all items are checked
+2. **Resolve Open Questions** — these are blockers for autonomous work
+3. **Proceed to Tech Planning** — use `/playbook:tech-plan` for the next phase
+
+---
+
+*This command creates PRDs optimized for agentic engineering—enabling autonomous technical planning and implementation.*

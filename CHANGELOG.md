@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2026-01-29
+
+### Added
+- **Agent-Ready PRD System** - Complete overhaul of PRD workflow optimized for agentic engineering:
+  - **New PRD Template** (`product-requirements-v2.md`): Comprehensive template with agent-ready checklist, structured acceptance criteria (Given/When/Then), technical context section, decision log, and explicit scope boundaries
+  - **Two-Mode Command**: `/playbook:product-requirements` now supports `--autonomous` flag for context-based drafting and default interview mode
+  - **PRD Drafting Agent** (`prd-drafting-agent`): Autonomous agent that drafts complete PRDs from available context
+
+### Changed
+- `/playbook:product-requirements` command completely rewritten with:
+  - Autonomous mode for generating PRDs from existing context
+  - Interview mode with "Agentic Engineer" persona for technical context gathering
+  - Agent-Ready Checklist validation step
+  - Technical Context section (integration points, data requirements, constraints, patterns)
+- Total agents now: 9 (was 8)
+- Total templates now: 7 (was 6)
+
+### Rationale
+PRDs must enable autonomous technical planning and implementation. The previous PRD structure left too much implicit—agents couldn't create tech plans without asking clarifying questions, and acceptance criteria weren't testable. The new structure ensures:
+1. Every requirement has verifiable acceptance criteria (Given/When/Then)
+2. Technical context is explicit (integration points, data, constraints, patterns)
+3. Scope is unambiguous (explicit In/Out tables)
+4. Decisions are logged with rationale (agents don't re-litigate)
+5. Open questions are flagged as blockers
+
+This closes the gap between "what to build" and "how to build it"—enabling true end-to-end autonomous engineering from PRD to shipped code.
+
 ## [0.11.0] - 2026-01-29
 
 ### Added
@@ -188,6 +215,7 @@ These tools were identified by analyzing patterns across 30+ coding sessions in 
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 0.12.0 | 2026-01-29 | Agent-ready PRD system: new template, two-mode command, `prd-drafting-agent` |
 | 0.11.0 | 2026-01-29 | Meta-improvement: `/playbook:improve-playbook` command and `playbook-improvement-agent` |
 | 0.10.0 | 2026-01-29 | 3 new document workflow commands (rubric-doc, refine-doc, distill), 3 new agents |
 | 0.9.0 | 2026-01-27 | 1 new command (help), local development documentation |

@@ -36,7 +36,7 @@ This plugin implements a systematic approach to building software with AI assist
 ### Core Workflow Commands
 | Command | Description |
 |---------|-------------|
-| `/playbook:product-requirements` | Draft product requirements with multi-persona discovery |
+| `/playbook:product-requirements` | Draft agent-ready PRDs with autonomous or interview modes |
 | `/playbook:tech-plan` | Create technical plan with architecture and sequencing |
 | `/playbook:tasks` | Break down work into specific, actionable tasks |
 | `/playbook:work` | Execute the next task from the tasks document |
@@ -102,6 +102,7 @@ This plugin implements a systematic approach to building software with AI assist
 | `insight-extractor-agent` | Extract and organize insights from source materials with citations |
 | `cross-reference-validator-agent` | Validate consistency across interconnected documents |
 | `playbook-improvement-agent` | Analyze sessions, identify patterns, and propose playbook improvements |
+| `prd-drafting-agent` | Autonomously draft agent-ready PRDs from available context |
 
 ## Skills
 
@@ -213,11 +214,21 @@ product-playbook-for-agentic-coding-plugin/
 ### Command Details
 
 #### `/playbook:product-requirements`
-Guides you through defining **what** to build and **why**:
-- Multi-persona perspectives (PM, Business, Domain Expert, etc.)
-- Pre-draft clarification gate
-- Probing questions to deepen understanding
-- Output: Product Requirements Document
+Creates **agent-ready PRDs** that enable autonomous technical planning and implementation:
+
+**Two Modes:**
+- **Interview mode** (default): Multi-persona discovery with probing questions
+- **Autonomous mode** (`--autonomous`): Drafts complete PRD from available context
+
+**Agent-Ready Features:**
+- Structured acceptance criteria (Given/When/Then format)
+- Technical context section (integration points, data, constraints, patterns)
+- Decision log with rationale (agents don't re-litigate)
+- Explicit scope boundaries (In/Out tables)
+- Agent-Ready Checklist validation
+
+**Why Agent-Ready Matters:**
+An AI agent should be able to create a tech plan and complete implementation tasks from the PRD alone—without asking clarifying questions.
 
 #### `/playbook:tech-plan`
 Designs **how** to build it:
