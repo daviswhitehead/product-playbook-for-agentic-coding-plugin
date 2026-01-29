@@ -36,7 +36,7 @@ This plugin implements a systematic approach to building software with AI assist
 ### Core Workflow Commands
 | Command | Description |
 |---------|-------------|
-| `/playbook:product-requirements` | Draft product requirements with multi-persona discovery |
+| `/playbook:product-requirements` | Draft agent-ready PRDs with autonomous or interview modes |
 | `/playbook:tech-plan` | Create technical plan with architecture and sequencing |
 | `/playbook:tasks` | Break down work into specific, actionable tasks |
 | `/playbook:work` | Execute the next task from the tasks document |
@@ -61,6 +61,7 @@ This plugin implements a systematic approach to building software with AI assist
 | `/playbook:review-autonomy` | Review project readiness for autonomous execution |
 | `/playbook:identify-improvements` | Identify top 10 improvements from a coding session |
 | `/playbook:prompt-coaching` | Get real-time coaching on your prompts |
+| `/playbook:improve-playbook` | Analyze sessions to identify patterns and implement playbook improvements |
 
 ### Git Commands
 | Command | Description |
@@ -78,6 +79,13 @@ This plugin implements a systematic approach to building software with AI assist
 | `/playbook:organize-files` | Organize project files into logical subdirectories |
 | `/playbook:review-playbook` | Systematically review and optimize the playbook/plugin |
 
+### Document Workflow Commands
+| Command | Description |
+|---------|-------------|
+| `/playbook:rubric-doc` | Generate documents based on a spec file with rubric/excellence criteria |
+| `/playbook:refine-doc` | Incorporate new information into existing documents while maintaining consistency |
+| `/playbook:distill` | Create focused summaries or quick references from longer documents |
+
 ### Help
 | Command | Description |
 |---------|-------------|
@@ -91,6 +99,10 @@ This plugin implements a systematic approach to building software with AI assist
 | `solution-planning-agent` | Technical planning with architect perspective |
 | `delivery-agent` | Task execution with engineering perspective |
 | `debugging-agent` | Systematic debugging with verification-first approach |
+| `insight-extractor-agent` | Extract and organize insights from source materials with citations |
+| `cross-reference-validator-agent` | Validate consistency across interconnected documents |
+| `playbook-improvement-agent` | Analyze sessions, identify patterns, and propose playbook improvements |
+| `prd-drafting-agent` | Autonomously draft agent-ready PRDs from available context |
 
 ## Skills
 
@@ -118,6 +130,25 @@ Learnings can improve either the codebase documentation or the plugin itself.
 
 ### External Plugin Integration
 Works with other plugins by providing wrapper context when invoking external tools, ensuring outputs conform to playbook workflows.
+
+### Self-Improvement from Usage Patterns
+The playbook can analyze your coding sessions to identify repeatable patterns and automatically propose new tools:
+
+```bash
+# Analyze recent sessions and improve the playbook
+/playbook:improve-playbook
+```
+
+This meta-workflow:
+1. **Gathers** sessions from SpecStory history
+2. **Analyzes** patterns in how you work
+3. **Compares** patterns against existing playbook capabilities
+4. **Identifies gaps** where new tools would help
+5. **Proposes** solutions (commands, agents, or skills)
+6. **Implements** approved improvements
+7. **Creates** a pull request
+
+The playbook learns from how you actually use it and grows to better support your workflows.
 
 ## Project Structure
 
@@ -183,11 +214,21 @@ product-playbook-for-agentic-coding-plugin/
 ### Command Details
 
 #### `/playbook:product-requirements`
-Guides you through defining **what** to build and **why**:
-- Multi-persona perspectives (PM, Business, Domain Expert, etc.)
-- Pre-draft clarification gate
-- Probing questions to deepen understanding
-- Output: Product Requirements Document
+Creates **agent-ready PRDs** that enable autonomous technical planning and implementation:
+
+**Two Modes:**
+- **Interview mode** (default): Multi-persona discovery with probing questions
+- **Autonomous mode** (`--autonomous`): Drafts complete PRD from available context
+
+**Agent-Ready Features:**
+- Structured acceptance criteria (Given/When/Then format)
+- Technical context section (integration points, data, constraints, patterns)
+- Decision log with rationale (agents don't re-litigate)
+- Explicit scope boundaries (In/Out tables)
+- Agent-Ready Checklist validation
+
+**Why Agent-Ready Matters:**
+An AI agent should be able to create a tech plan and complete implementation tasks from the PRD alone—without asking clarifying questions.
 
 #### `/playbook:tech-plan`
 Designs **how** to build it:
@@ -228,6 +269,17 @@ Captures learnings with three triggers:
 Two output targets:
 - **Codebase docs**: Project-specific knowledge
 - **Plugin improvements**: Workflow enhancements
+
+#### `/playbook:improve-playbook`
+Meta-workflow that improves the playbook based on your usage patterns:
+- **Analyzes** SpecStory session history for repeatable patterns
+- **Compares** patterns against existing playbook capabilities
+- **Identifies** gaps where new tools would add value
+- **Proposes** solutions with evidence from your sessions
+- **Implements** approved improvements
+- **Creates** a PR to the playbook repository
+
+Checkpoints throughout ensure you control what gets implemented.
 
 ## Philosophy
 
