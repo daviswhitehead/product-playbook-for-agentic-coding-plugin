@@ -59,7 +59,7 @@ Organize findings into PRD sections:
 | **Hypotheses** | Testable assumptions about the solution |
 | **Success Metrics** | Primary, secondary, guardrail metrics |
 | **Requirements** | Functional requirements with acceptance criteria |
-| **Technical Context** | Integration points, data, constraints, patterns |
+| **Technical Context** | Integration points, data, constraints, codebase context |
 | **Scope** | In-scope and out-of-scope items |
 | **Risks** | What could go wrong and mitigations |
 
@@ -106,7 +106,7 @@ Before finalizing, verify:
 - [ ] All systems this touches are listed with interaction details
 - [ ] Data requirements specify source, format, and any transformations
 - [ ] Technical constraints are explicit (not just "must be fast")
-- [ ] Existing codebase patterns to follow are identified
+- [ ] Relevant codebase context is identified
 
 **Acceptance Criteria Quality**
 - [ ] Every functional requirement has at least one acceptance criterion

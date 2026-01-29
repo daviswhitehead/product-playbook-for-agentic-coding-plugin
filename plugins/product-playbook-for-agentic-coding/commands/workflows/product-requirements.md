@@ -158,7 +158,7 @@ For each section, ask probing questions from multiple perspectives:
 **From Technical Advisor + Agentic Engineer:**
 - "What existing systems does this need to integrate with?"
 - "What data does this need, and where does it come from?"
-- "What existing patterns in the codebase should this follow?"
+- "What areas of the codebase are relevant to this feature?"
 - "What technical constraints will affect implementation?"
 
 #### Success Criteria
@@ -196,7 +196,7 @@ Review against the Agent-Ready Checklist:
 - [ ] All integration points documented
 - [ ] Data requirements specified
 - [ ] Constraints are explicit
-- [ ] Existing patterns identified
+- [ ] Codebase context provided
 
 **Acceptance Criteria Quality**
 - [ ] All requirements have acceptance criteria

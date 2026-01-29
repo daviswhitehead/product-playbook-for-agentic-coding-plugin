@@ -203,9 +203,9 @@
 - [Constraint 1]: [Description and rationale]
 - [Constraint 2]: [Description and rationale]
 
-**Existing Patterns to Follow:**
-- [Pattern 1]: [Where it exists, why to follow it]
-- [Pattern 2]: [Where it exists, why to follow it]
+**Codebase Context:**
+- [Relevant area 1]: [What exists, where to look]
+- [Relevant area 2]: [What exists, where to look]
 
 ### Design Considerations
 
@@ -355,7 +355,7 @@
 - [ ] **Integration points documented:** All systems this touches are listed with interaction details
 - [ ] **Data requirements specified:** What data is needed, where it comes from, what format
 - [ ] **Constraints are explicit:** Technical limitations that affect implementation are stated
-- [ ] **Existing patterns identified:** Relevant patterns in the codebase to follow
+- [ ] **Codebase context provided:** Relevant areas of the codebase identified
 
 ### Acceptance Criteria Quality
 - [ ] **All requirements have acceptance criteria:** Every functional requirement has testable criteria
