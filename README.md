@@ -78,6 +78,13 @@ This plugin implements a systematic approach to building software with AI assist
 | `/playbook:organize-files` | Organize project files into logical subdirectories |
 | `/playbook:review-playbook` | Systematically review and optimize the playbook/plugin |
 
+### Document Workflow Commands
+| Command | Description |
+|---------|-------------|
+| `/playbook:rubric-doc` | Generate documents based on a spec file with rubric/excellence criteria |
+| `/playbook:refine-doc` | Incorporate new information into existing documents while maintaining consistency |
+| `/playbook:distill` | Create focused summaries or quick references from longer documents |
+
 ### Help
 | Command | Description |
 |---------|-------------|
@@ -91,6 +98,8 @@ This plugin implements a systematic approach to building software with AI assist
 | `solution-planning-agent` | Technical planning with architect perspective |
 | `delivery-agent` | Task execution with engineering perspective |
 | `debugging-agent` | Systematic debugging with verification-first approach |
+| `insight-extractor-agent` | Extract and organize insights from source materials with citations |
+| `cross-reference-validator-agent` | Validate consistency across interconnected documents |
 
 ## Skills
 

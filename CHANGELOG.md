@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2026-01-29
+
+### Added
+- **Document Workflow Commands** (3 new):
+  - `/playbook:rubric-doc`: Generate documents based on a spec file with rubric/excellence criteria. Searches context directories and produces cited drafts.
+  - `/playbook:refine-doc`: Incorporate new information or feedback into existing documents while maintaining consistency across related docs.
+  - `/playbook:distill`: Create focused summaries or quick references from longer documents, optimized for specific purposes (interviews, presentations, etc).
+- **Document Workflow Agents** (2 new):
+  - `insight-extractor-agent`: Systematically extract and organize insights from source materials (interview notes, research, meeting notes) with proper citations.
+  - `cross-reference-validator-agent`: Validate consistency across interconnected documents, checking links, definitions, and summaries.
+
+### Changed
+- Total commands now: 26 (was 23)
+- Total agents now: 6 (was 4)
+- README expanded with Document Workflow Commands section
+
+### Rationale
+These tools were identified by analyzing patterns across 30+ coding sessions in a job search preparation codebase. Common patterns included:
+- Generating structured documents from specs/rubrics with citations
+- Extracting insights from interview notes with source links
+- Refining documents with stakeholder feedback while maintaining consistency
+- Creating quick references for interviews and presentations
+- Validating cross-references across interconnected documentation
+
 ## [0.9.0] - 2026-01-27
 
 ### Added
@@ -138,6 +162,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 0.10.0 | 2026-01-29 | 3 new document workflow commands (rubric-doc, refine-doc, distill), 2 new agents (insight-extractor, cross-reference-validator) |
+| 0.9.0 | 2026-01-27 | 1 new command (help), local development documentation |
 | 0.8.0 | 2026-01-26 | 1 new command (design-spec), 1 new template, playbook migration complete |
 | 0.7.0 | 2026-01-26 | 1 new command (review-playbook), plugin fully self-sufficient |
 | 0.6.0 | 2026-01-26 | 7 new commands (6 git commands, 1 organization command) |
