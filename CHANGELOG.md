@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] - 2026-01-29
+
+### Added
+- **Meta-Improvement Command** (1 new):
+  - `/playbook:improve-playbook`: Analyze coding sessions to identify patterns, compare against existing playbook capabilities, and implement improvements as a PR. This is a self-improving workflow that learns from how you use AI coding tools.
+- **Meta-Improvement Agent** (1 new):
+  - `playbook-improvement-agent`: Analyzes session history, identifies repeatable patterns, performs gap analysis against existing tools, and proposes well-designed solutions.
+
+### Changed
+- Total commands now: 27 (was 26)
+- Total agents now: 8 (was 7)
+- README expanded with Self-Improvement section explaining the meta-workflow
+- Added command details for `/playbook:improve-playbook`
+
+### Rationale
+This meta-capability enables the playbook to continuously improve based on actual usage. The workflow:
+1. Reads SpecStory session history from the current project
+2. Identifies repeatable patterns in how you work
+3. Compares patterns against existing playbook capabilities
+4. Finds gaps where new tools would add value
+5. Proposes solutions with evidence from sessions
+6. Implements approved improvements
+7. Creates a PR to the playbook repository
+
+This closes the loop: use the playbook → identify patterns → improve the playbook → use the improved playbook.
+
 ## [0.10.0] - 2026-01-29
 
 ### Added
@@ -18,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Total commands now: 26 (was 23)
-- Total agents now: 6 (was 4)
+- Total agents now: 7 (was 4)
 - README expanded with Document Workflow Commands section
 
 ### Rationale
@@ -162,7 +188,8 @@ These tools were identified by analyzing patterns across 30+ coding sessions in 
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 0.10.0 | 2026-01-29 | 3 new document workflow commands (rubric-doc, refine-doc, distill), 2 new agents (insight-extractor, cross-reference-validator) |
+| 0.11.0 | 2026-01-29 | Meta-improvement: `/playbook:improve-playbook` command and `playbook-improvement-agent` |
+| 0.10.0 | 2026-01-29 | 3 new document workflow commands (rubric-doc, refine-doc, distill), 3 new agents |
 | 0.9.0 | 2026-01-27 | 1 new command (help), local development documentation |
 | 0.8.0 | 2026-01-26 | 1 new command (design-spec), 1 new template, playbook migration complete |
 | 0.7.0 | 2026-01-26 | 1 new command (review-playbook), plugin fully self-sufficient |

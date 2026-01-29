@@ -61,6 +61,7 @@ This plugin implements a systematic approach to building software with AI assist
 | `/playbook:review-autonomy` | Review project readiness for autonomous execution |
 | `/playbook:identify-improvements` | Identify top 10 improvements from a coding session |
 | `/playbook:prompt-coaching` | Get real-time coaching on your prompts |
+| `/playbook:improve-playbook` | Analyze sessions to identify patterns and implement playbook improvements |
 
 ### Git Commands
 | Command | Description |
@@ -100,6 +101,7 @@ This plugin implements a systematic approach to building software with AI assist
 | `debugging-agent` | Systematic debugging with verification-first approach |
 | `insight-extractor-agent` | Extract and organize insights from source materials with citations |
 | `cross-reference-validator-agent` | Validate consistency across interconnected documents |
+| `playbook-improvement-agent` | Analyze sessions, identify patterns, and propose playbook improvements |
 
 ## Skills
 
@@ -127,6 +129,25 @@ Learnings can improve either the codebase documentation or the plugin itself.
 
 ### External Plugin Integration
 Works with other plugins by providing wrapper context when invoking external tools, ensuring outputs conform to playbook workflows.
+
+### Self-Improvement from Usage Patterns
+The playbook can analyze your coding sessions to identify repeatable patterns and automatically propose new tools:
+
+```bash
+# Analyze recent sessions and improve the playbook
+/playbook:improve-playbook
+```
+
+This meta-workflow:
+1. **Gathers** sessions from SpecStory history
+2. **Analyzes** patterns in how you work
+3. **Compares** patterns against existing playbook capabilities
+4. **Identifies gaps** where new tools would help
+5. **Proposes** solutions (commands, agents, or skills)
+6. **Implements** approved improvements
+7. **Creates** a pull request
+
+The playbook learns from how you actually use it and grows to better support your workflows.
 
 ## Project Structure
 
@@ -237,6 +258,17 @@ Captures learnings with three triggers:
 Two output targets:
 - **Codebase docs**: Project-specific knowledge
 - **Plugin improvements**: Workflow enhancements
+
+#### `/playbook:improve-playbook`
+Meta-workflow that improves the playbook based on your usage patterns:
+- **Analyzes** SpecStory session history for repeatable patterns
+- **Compares** patterns against existing playbook capabilities
+- **Identifies** gaps where new tools would add value
+- **Proposes** solutions with evidence from your sessions
+- **Implements** approved improvements
+- **Creates** a PR to the playbook repository
+
+Checkpoints throughout ensure you control what gets implemented.
 
 ## Philosophy
 
