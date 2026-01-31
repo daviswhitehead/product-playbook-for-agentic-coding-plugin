@@ -438,6 +438,7 @@ Reference links for plugin development:
 
 ### Official Documentation
 - [Claude Code Plugins Blog Post](https://claude.com/blog/claude-code-plugins) - Official introduction to Claude Code plugins
+- [Composio: Claude Code Plugin Guide](https://composio.dev/blog/claude-code-plugin) - Comprehensive plugin development guide
 
 ### Community Plugins & Examples
 - [claude-code-plugins-plus-skills](https://github.com/jeremylongshore/claude-code-plugins-plus-skills) - Extended plugin collection with skills
