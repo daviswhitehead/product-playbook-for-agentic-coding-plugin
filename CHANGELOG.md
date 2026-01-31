@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0] - 2026-01-30
+
+### Added
+- **Multi-Persona Critique Workflow** - Complete system for running structured document critiques:
+  - `/playbook:critique`: New command for parallel multi-persona document critiques with versioning, synthesis, and issue tracking
+  - **Persona Library** (12 reusable personas):
+    - **Strategy**: `product-manager`, `founder`, `board-member`, `investor`
+    - **Design & Engineering**: `product-designer`, `software-engineer`, `technical-reviewer`, `creative-technologist`
+    - **Marketing & Growth**: `marketing-strategist`, `marketing-manager`, `growth-marketer`
+    - **Domain**: `domain-expert` (customizable for any field)
+  - **Critique Synthesis Template**: P0/P1/P2 prioritization, cross-version comparison, launch readiness checklist, auto-generated tasks
+  - **Issue Tracker Template**: Track issues across critique versions (Open → Fixed → Verified → Regressed)
+
+### Changed
+- Total commands now: 28 (was 27)
+- Total templates now: 9 (was 7)
+- New `resources/personas/` directory for reusable persona definitions
+- README expanded with Multi-Persona Document Critique section
+
+### Rationale
+This workflow was identified by analyzing 5 coding sessions that ran iterative critique workflows on foundation documents (v3 → v4 → v5). Key friction points addressed:
+1. **Persona re-specification**: Had to write out persona descriptions each time instead of referencing by name
+2. **Version management**: Manual version incrementing and file renaming
+3. **No synthesis template**: No standard P0/P1/P2 format with exit criteria
+4. **No issue tracking**: Same issue flagged as "new" in each version
+5. **No task generation**: Synthesis findings not automatically actionable
+
+The new workflow enables: `/playbook:critique docs/foundations/` → parallel agents → synthesis with P0/P1/P2 → implement fixes → `/playbook:critique docs/foundations/ --rerun` → track resolution.
+
 ## [0.12.0] - 2026-01-29
 
 ### Added
@@ -215,6 +244,7 @@ These tools were identified by analyzing patterns across 30+ coding sessions in 
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 0.13.0 | 2026-01-30 | Multi-persona critique: `/playbook:critique` command, 5 personas, synthesis + issue tracker templates |
 | 0.12.0 | 2026-01-29 | Agent-ready PRD system: new template, two-mode command, `prd-drafting-agent` |
 | 0.11.0 | 2026-01-29 | Meta-improvement: `/playbook:improve-playbook` command and `playbook-improvement-agent` |
 | 0.10.0 | 2026-01-29 | 3 new document workflow commands (rubric-doc, refine-doc, distill), 3 new agents |
