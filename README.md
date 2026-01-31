@@ -432,6 +432,25 @@ Contributions welcome! Please follow these guidelines:
    ```
 3. Include clear guidance and examples
 
+## Resources & Inspiration
+
+Reference links for plugin development:
+
+### Official Documentation
+- [Claude Code Plugins Blog Post](https://claude.com/blog/claude-code-plugins) - Official introduction to Claude Code plugins
+
+### Community Plugins & Examples
+- [claude-code-plugins-plus-skills](https://github.com/jeremylongshore/claude-code-plugins-plus-skills) - Extended plugin collection with skills
+- [claude-plugin-suite](https://github.com/rohittcodes/claude-plugin-suite) - Comprehensive plugin suite
+- [agents](https://github.com/wshobson/agents) - Agent-focused plugin examples
+
+### Development Patterns
+When building new commands, agents, or skills, review these repos for:
+- Command structure and frontmatter patterns
+- Agent design and multi-persona approaches
+- Skill organization and documentation
+- Template design and reusability
+
 ## License
 
 MIT
