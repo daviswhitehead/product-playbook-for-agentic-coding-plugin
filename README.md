@@ -129,7 +129,11 @@ Run structured critiques with multiple perspectives:
 - **Synthesis**: P0/P1/P2 prioritization with launch readiness checklist
 - **Task Generation**: Auto-generate tasks from P0 findings
 
-Available personas: marketing-strategist, product-manager, technical-reviewer, domain-expert, investor
+Available personas (12 total):
+- **Strategy**: product-manager, founder, board-member, investor
+- **Design & Engineering**: product-designer, software-engineer, technical-reviewer, creative-technologist
+- **Marketing & Growth**: marketing-strategist, marketing-manager, growth-marketer
+- **Domain**: domain-expert (customizable for any field)
 
 ```bash
 # Basic critique

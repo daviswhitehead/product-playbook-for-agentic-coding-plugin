@@ -10,12 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Multi-Persona Critique Workflow** - Complete system for running structured document critiques:
   - `/playbook:critique`: New command for parallel multi-persona document critiques with versioning, synthesis, and issue tracking
-  - **Persona Library** (5 reusable personas):
-    - `marketing-strategist`: Messaging clarity, positioning, competitive differentiation
-    - `product-manager`: Internal consistency, requirements clarity, prioritization
-    - `technical-reviewer`: Feasibility, architecture, technical accuracy
-    - `domain-expert`: Domain-specific accuracy and credibility (customizable)
-    - `investor`: Business viability, market opportunity, defensibility
+  - **Persona Library** (12 reusable personas):
+    - **Strategy**: `product-manager`, `founder`, `board-member`, `investor`
+    - **Design & Engineering**: `product-designer`, `software-engineer`, `technical-reviewer`, `creative-technologist`
+    - **Marketing & Growth**: `marketing-strategist`, `marketing-manager`, `growth-marketer`
+    - **Domain**: `domain-expert` (customizable for any field)
   - **Critique Synthesis Template**: P0/P1/P2 prioritization, cross-version comparison, launch readiness checklist, auto-generated tasks
   - **Issue Tracker Template**: Track issues across critique versions (Open → Fixed → Verified → Regressed)
 
