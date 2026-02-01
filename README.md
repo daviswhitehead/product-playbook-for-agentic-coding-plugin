@@ -58,6 +58,7 @@ This plugin implements a systematic approach to building software with AI assist
 ### Review & Improvement Commands
 | Command | Description |
 |---------|-------------|
+| `/playbook:critique` | Run parallel multi-persona critiques on documents with versioning and synthesis |
 | `/playbook:review-autonomy` | Review project readiness for autonomous execution |
 | `/playbook:identify-improvements` | Identify top 10 improvements from a coding session |
 | `/playbook:prompt-coaching` | Get real-time coaching on your prompts |
@@ -120,6 +121,31 @@ Commands intelligently discover available tools (commands, agents, MCP tools, sk
 ### Codebase Doc Searching
 Automatically searches project documentation (`docs/`, `projects/`, `CLAUDE.md`, etc.) to incorporate project-specific context.
 
+### Multi-Persona Document Critique
+Run structured critiques with multiple perspectives:
+- **Parallel Execution**: Launch 3-5 persona agents simultaneously
+- **Version Tracking**: Automatic versioning (v1, v2, v3) with cross-version comparison
+- **Issue Persistence**: Track which issues are resolved, regressed, or persistent
+- **Synthesis**: P0/P1/P2 prioritization with launch readiness checklist
+- **Task Generation**: Auto-generate tasks from P0 findings
+
+Available personas (12 total):
+- **Strategy**: product-manager, founder, board-member, investor
+- **Design & Engineering**: product-designer, software-engineer, technical-reviewer, creative-technologist
+- **Marketing & Growth**: marketing-strategist, marketing-manager, growth-marketer
+- **Domain**: domain-expert (customizable for any field)
+
+```bash
+# Basic critique
+/playbook:critique docs/foundations/
+
+# With specific personas
+/playbook:critique docs/api-spec/ --personas technical-reviewer,product-manager
+
+# Re-run after fixes
+/playbook:critique docs/foundations/ --rerun
+```
+
 ### Learning Capture
 Three trigger points for capturing learnings:
 - After chat sessions (lightweight)
@@ -170,7 +196,8 @@ product-playbook-for-agentic-coding-plugin/
 │       │   ├── learning-capture/
 │       │   └── autonomous-execution/
 │       └── resources/
-│           └── templates/   # Document templates
+│           ├── templates/   # Document templates
+│           └── personas/    # Reusable critique personas
 └── README.md
 ```
 
@@ -404,6 +431,26 @@ Contributions welcome! Please follow these guidelines:
    ---
    ```
 3. Include clear guidance and examples
+
+## Resources & Inspiration
+
+Reference links for plugin development:
+
+### Official Documentation
+- [Claude Code Plugins Blog Post](https://claude.com/blog/claude-code-plugins) - Official introduction to Claude Code plugins
+- [Composio: Claude Code Plugin Guide](https://composio.dev/blog/claude-code-plugin) - Comprehensive plugin development guide
+
+### Community Plugins & Examples
+- [claude-code-plugins-plus-skills](https://github.com/jeremylongshore/claude-code-plugins-plus-skills) - Extended plugin collection with skills
+- [claude-plugin-suite](https://github.com/rohittcodes/claude-plugin-suite) - Comprehensive plugin suite
+- [agents](https://github.com/wshobson/agents) - Agent-focused plugin examples
+
+### Development Patterns
+When building new commands, agents, or skills, review these repos for:
+- Command structure and frontmatter patterns
+- Agent design and multi-persona approaches
+- Skill organization and documentation
+- Template design and reusability
 
 ## License
 
