@@ -1,6 +1,6 @@
 {
   "name": "product-playbook-for-agentic-coding",
-  "version": "0.12.0",
+  "version": "0.14.0",
   "description": "A structured 4-phase workflow for agentic coding: Product Discovery, Solution Planning, Delivery, and Retrospective. Provides commands, agents, and skills for systematic software development with AI.",
   "author": {
     "name": "Davis Whitehead",
