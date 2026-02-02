@@ -225,6 +225,62 @@ Capture for future reference:
 | Environment diff | Works locally, fails in prod | Compare configurations |
 | Data issue | Specific records fail | Examine failing data |
 
+## Mobile/Viewport-Specific Issues
+
+Mobile bugs often only reproduce on **real physical devices**, not emulators or browser dev tools.
+
+### Browser Testing Limitations
+
+Playwright and browser automation **cannot simulate**:
+- Real mobile keyboard viewport resizing
+- iOS Safari-specific behaviors
+- Touch keyboard interactions
+- Overscroll/bounce behavior
+
+**Recommendation**: Use ngrok or deploy to preview for real device testing.
+
+### Platform Behavior Differences
+
+| Behavior | Android Chrome | iOS Safari |
+|----------|---------------|------------|
+| `interactiveWidget: resizes-content` | ✅ Resizes viewport | ❌ Ignored |
+| `100dvh` on keyboard open | ✅ Shrinks correctly | ⚠️ Doesn't resize layout viewport |
+| `scrollIntoView()` with keyboard | ✅ Works | ❌ Needs manual 350ms delay |
+| Keyboard dismiss detection | Via resize event | Via focusout/blur |
+
+### Common Mobile Bug Patterns
+
+| Symptom | Likely Cause | Solution |
+|---------|--------------|----------|
+| Input covered by keyboard (iOS) | iOS doesn't resize layout viewport | Add `scrollIntoView` on focus with 350ms delay |
+| Gray space below content | Wrapper with `min-h-screen` | Remove wrapper, use `h-dvh` on page |
+| Page can scroll past content | Missing `overflow: hidden` on body | Add to html/body in CSS |
+| Textarea doesn't shrink | Empty value edge case | Explicitly check `!value` and reset height |
+| Overscroll bounce | iOS Safari default | Add `overscroll-behavior: none` to body |
+
+### Mobile Debugging Checklist
+
+When debugging mobile-specific issues:
+
+1. **Get real device screenshots** - Emulators don't reproduce these bugs
+2. **Check viewport meta tags first** - `interactiveWidget`, `maximum-scale`
+3. **Check root layout** - Look for `min-h-screen` wrappers causing extra space
+4. **Check CSS overflow** - `overflow: hidden` on html/body
+5. **Test on both platforms** - iOS Safari and Android Chrome behave differently
+6. **Use scrollIntoView workaround** - For iOS keyboard handling
+
+### iOS Safari Keyboard Workaround Pattern
+
+```typescript
+// iOS Safari doesn't resize viewport for keyboard
+// Manually scroll input into view after keyboard animation
+const handleFocus = () => {
+  setTimeout(() => {
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 350); // iOS keyboard animation is ~300ms
+};
+```
+
 ## Stop Conditions
 
 **Ask for help when**:

@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.0] - 2026-02-02
+
+### Added
+- **Mobile Debugging Skill** - New skill for debugging mobile-specific issues:
+  - Platform behavior differences table (iOS Safari vs Android Chrome)
+  - Common mobile bug patterns with solutions:
+    - Input covered by keyboard (iOS Safari scrollIntoView workaround)
+    - Gray space below content (min-h-screen wrapper issue)
+    - Flex layout not filling height (flex-1 vs h-full)
+    - Textarea not shrinking on delete
+    - Overscroll bounce prevention
+  - Mobile debugging checklist
+  - Testing requestAnimationFrame in Jest guidance
+  - Real device testing recommendations
+
+### Changed
+- **Debugging Agent** - Added comprehensive mobile/viewport section:
+  - Browser testing limitations documentation (Playwright can't simulate real mobile keyboard)
+  - Platform behavior differences table
+  - Common mobile bug patterns with solutions
+  - Mobile debugging checklist
+  - iOS Safari keyboard workaround pattern
+
+### Rationale
+Learned from a mobile keyboard fixes project that many mobile bugs only reproduce on real physical devices and require platform-specific solutions. iOS Safari and Android Chrome handle viewport/keyboard behavior completely differently, and CSS-only solutions don't work on iOS Safari.
+
 ## [0.13.0] - 2026-01-30
 
 ### Added
