@@ -23,6 +23,50 @@ Before proceeding, consider what tools are available:
 4. **Skills**: Domain expertise via Skill tool
 
 Select the most appropriate tools as you work through this process.
+## CLI Tool Discovery (Automation Assessment)
+
+Before creating tasks, assess what can be automated vs requires manual action:
+
+### Step 1: Identify External Services
+List all external services the project will interact with:
+- Infrastructure: Vercel, Railway, AWS, GCP, etc.
+- Databases: Supabase, PlanetScale, MongoDB, etc.
+- Auth providers: Auth0, Clerk, etc.
+- Other APIs and services
+
+### Step 2: Check CLI Availability
+For each service, check if a CLI is available and authenticated:
+
+```bash
+# Check for installed CLIs
+which vercel && vercel whoami
+which supabase && supabase projects list
+which railway && railway whoami
+which gh && gh auth status
+which aws && aws sts get-caller-identity
+```
+
+### Step 3: Document Automation Capabilities
+
+Create an automation assessment table:
+
+| Service | CLI Available | Authenticated | Can Automate |
+|---------|--------------|---------------|--------------|
+| Vercel | vercel | Yes/No | domains, env, deploy |
+| Supabase | supabase | Yes/No | migrations, config |
+| Railway | railway | Yes/No | env vars, deploy |
+| GitHub | gh | Yes/No | PRs, issues, releases |
+
+### Step 4: Prefer Automation in Task Planning
+
+When creating tasks:
+- **If CLI available and authenticated**: Mark task as "AI Agent" executable
+- **If CLI available but not authenticated**: Note auth requirement, still prefer CLI
+- **If no CLI exists**: Mark as "User (Dashboard)" with clear instructions
+
+**Principle**: Maximize agent autonomy by using CLIs over manual dashboard actions.
+
+
 
 ## Project Context Discovery
 
