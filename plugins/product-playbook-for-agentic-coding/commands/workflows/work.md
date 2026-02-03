@@ -138,6 +138,56 @@ Before starting, ensure:
    - Validate functionality manually if needed
 3. Fix any issues found
 
+
+### Step 5.5: Self-Validate Before Claiming Complete
+
+**CRITICAL**: Before marking a task complete, verify the work autonomously:
+
+#### For Code Changes
+```bash
+# Run relevant tests
+npm test  # or pytest, cargo test, etc.
+
+# Run linter/type checker
+npm run lint && npm run typecheck
+
+# Verify build succeeds
+npm run build
+```
+
+#### For API/Endpoint Changes
+```bash
+# Test the endpoint directly
+curl -X GET https://api.example.com/endpoint
+curl -X POST https://api.example.com/endpoint -d '{"test": true}'
+
+# Check CORS headers if applicable
+curl -I -X OPTIONS https://api.example.com/endpoint \
+  -H "Origin: https://app.example.com"
+```
+
+#### For Auth/Redirect Changes
+```bash
+# Trace the full redirect flow
+curl -L -v https://example.com/login 2>&1 | grep -i location
+
+# Verify OAuth callback URLs are configured
+```
+
+#### For Infrastructure Changes
+```bash
+# Health checks
+curl https://api.example.com/health
+
+# DNS verification
+dig +short app.example.com
+
+# SSL verification
+curl -I https://app.example.com
+```
+
+**Only proceed to "Complete" if automated verification passes.**
+
 ### Step 6: Complete Task and Update Documentation
 
 **From Engineering Manager + Product Manager perspectives:**
@@ -198,6 +248,37 @@ Should I:
 2. Mark task as blocked and move to next task?
 3. Escalate for your input?"
 ```
+
+### Autonomous Iteration Protocol
+
+When a verification check fails, iterate autonomously before asking the user:
+
+**Step 1: Gather Context**
+- Read error logs (server logs, browser console)
+- Check configuration files
+- Run diagnostic commands
+- Look for similar patterns in the codebase
+
+**Step 2: Form Hypothesis**
+- "The error suggests [X] is likely caused by [Y]"
+- Show evidence supporting the hypothesis
+
+**Step 3: Attempt Fix**
+- Make a targeted change based on hypothesis
+- Re-run verification
+
+**Step 4: Iterate (Up to 3 Attempts)**
+- If still failing, try alternative approach
+- Document what was tried and why it failed
+
+**Step 5: Escalate Only After Exhausting Options**
+- Provide all diagnostic information gathered
+- Explain what was tried and why it didn't work
+- Offer specific options for user input
+
+**Do NOT ask user "what's the error?" - investigate first.**
+
+
 
 ## Key Principles
 

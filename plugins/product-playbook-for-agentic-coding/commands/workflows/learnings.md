@@ -163,7 +163,46 @@ Based on trigger type, fill appropriate sections:
 - Root cause analysis
 - Prevention strategy
 
-### Step 7: Validate Completeness
+
+### Step 7: Propagate Learnings to CLAUDE.md
+
+After documenting learnings, identify patterns that should improve CLAUDE.md:
+
+#### Identify CLAUDE.md-Worthy Patterns
+Ask for each learning:
+- Is this a gotcha/pattern future work should know about?
+- Is this a required sequence (e.g., "CORS before DNS")?
+- Is this a tool preference (e.g., "use CLI over dashboard")?
+
+#### Propose CLAUDE.md Additions
+Format proposals as clear additions:
+
+```markdown
+### Proposed CLAUDE.md Addition
+
+**Section**: [Deployment / Authentication / Database / etc.]
+
+**Add**:
+```
+[New content in markdown format]
+```
+
+Approve this addition? [y/n]
+```
+
+#### Multi-File Distribution
+Consider which file each learning belongs to:
+
+| Learning Type | Target File |
+|---------------|-------------|
+| Gotchas/patterns | CLAUDE.md |
+| Architectural decisions | docs/architecture.md |
+| Procedures/workflows | docs/guides/[relevant].md |
+| Domain-specific | docs/agents/[relevant].md |
+
+**Principle**: Learnings should flow into guidance files, not just stay in learnings docs.
+
+### Step 8: Validate Completeness
 
 Review the document:
 - [ ] Trigger type captured
@@ -172,6 +211,8 @@ Review the document:
 - [ ] Key learning clearly documented
 - [ ] Actionable improvements identified
 - [ ] Saved to correct location
+- [ ] CLAUDE.md updates proposed (if applicable)
+- [ ] Other guidance files updated (if applicable)
 
 ## Key Principles
 
