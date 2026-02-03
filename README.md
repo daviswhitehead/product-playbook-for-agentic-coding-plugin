@@ -31,6 +31,25 @@ This plugin implements a systematic approach to building software with AI assist
 /plugin install product-playbook-for-agentic-coding@product-playbook-marketplace
 ```
 
+### Updating the Plugin
+
+This plugin uses a marketplace-embedded structure (plugin source is inside the marketplace repo). The "Update now" button in the plugin UI won't work directly—this is expected behavior for this type of plugin architecture.
+
+**To update to the latest version:**
+
+1. **Update the marketplace** (pulls latest from GitHub):
+   ```
+   /plugin → Marketplaces tab → select "product-playbook-marketplace" → Update now
+   ```
+
+2. **Reinstall the plugin**:
+   ```
+   /plugin → Installed tab → select the plugin → Uninstall
+   /plugin → Marketplaces tab → select marketplace → Install
+   ```
+
+**Note:** The "Local plugins cannot be updated remotely" message appears because the plugin uses a relative path source within the marketplace. This is the same pattern used by many plugins in Anthropic's official marketplace.
+
 ## Commands
 
 ### Core Workflow Commands
