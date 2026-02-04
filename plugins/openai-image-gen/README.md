@@ -120,6 +120,28 @@ assets/generated/
 - `openai` npm package
 - `tsx` (via npx)
 
+## Related Projects & Inspiration
+
+This plugin was inspired by and builds upon ideas from:
+
+- **[shipdeckai/claude-skills/image-gen](https://github.com/shipdeckai/claude-skills/tree/main/plugins/image-gen)** - A comprehensive multi-provider image generation plugin supporting 10+ AI providers (OpenAI, Stability, BFL FLUX, Ideogram, FAL, Gemini, Replicate, Clipdrop, Leonardo, Recraft) with intelligent provider selection, automatic fallback, and image editing capabilities. If you need multi-provider support or advanced features like image editing, check out their implementation.
+
+### Feature Comparison
+
+| Feature | This Plugin | shipdeckai/image-gen |
+|---------|-------------|---------------------|
+| OpenAI Support | ✅ | ✅ |
+| Multi-Provider | ❌ | ✅ (10 providers) |
+| Image Editing | ❌ | ✅ |
+| Auto Provider Selection | ❌ | ✅ |
+| Fallback Chain | ❌ | ✅ |
+| Simple Setup | ✅ | Moderate |
+| Zero Dependencies* | ✅ | ❌ |
+
+*Beyond the `openai` npm package
+
+This plugin prioritizes simplicity and quick setup for OpenAI-only workflows. For production use cases requiring multiple providers or image editing, consider the shipdeckai implementation.
+
 ## License
 
 MIT

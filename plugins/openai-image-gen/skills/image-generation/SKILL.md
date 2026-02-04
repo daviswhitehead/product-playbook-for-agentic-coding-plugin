@@ -247,6 +247,22 @@ Use metadata to:
 "UI icon set: cooking utensils, consistent line weight, minimal style, monochrome"
 ```
 
+## Alternative Providers
+
+This plugin focuses on OpenAI for simplicity. For specific use cases, other providers may be better:
+
+| Use Case | Consider |
+|----------|----------|
+| Text-heavy logos | Ideogram, Recraft |
+| Photorealism | BFL (FLUX), Stability AI |
+| Fast iterations | FAL |
+| Image editing | Clipdrop, Stability |
+| Artistic/fantasy | Leonardo |
+
+For multi-provider support with automatic fallback, see [shipdeckai/claude-skills/image-gen](https://github.com/shipdeckai/claude-skills/tree/main/plugins/image-gen).
+
+Detailed comparison: [references/alternative-providers.md](references/alternative-providers.md)
+
 ---
 
 *Remember: AI-generated images are starting points. Final brand assets should be refined and often recreated as vectors for production use.*
