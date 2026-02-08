@@ -12,6 +12,16 @@ You are helping organize project documentation files into logical subdirectories
 
 Help the user organize a directory of project files into logical subdirectories by reading and understanding file content, then grouping related files together.
 
+## Available Tools Discovery
+
+Before proceeding, inventory available tools:
+1. **Commands**: Other `/playbook:*` commands (if relevant)
+2. **Agents**: Specialized agents via Task tool (if available)
+3. **MCP Tools**: External service integrations via ToolSearch
+4. **Skills**: Domain expertise via Skill tool
+
+Select the most appropriate tools for the task at hand.
+
 ## Process
 
 ### Step 1: Understand the Directory Structure

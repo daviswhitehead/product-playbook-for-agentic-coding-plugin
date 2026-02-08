@@ -19,6 +19,16 @@ Before starting, ensure:
 - You have access to the session context (conversation history, files changed, tasks completed)
 - You understand what work was done and how it was accomplished
 
+## Available Tools Discovery
+
+Before proceeding, inventory available tools:
+1. **Commands**: Other `/playbook:*` commands (learnings, improve-playbook)
+2. **Agents**: Specialized agents via Task tool (playbook-improvement-agent)
+3. **MCP Tools**: External service integrations via ToolSearch
+4. **Skills**: Domain expertise via Skill tool
+
+Select the most appropriate tools for the task at hand.
+
 ## Process
 
 ### Step 0: Session Context Review

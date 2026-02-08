@@ -24,13 +24,13 @@ product-playbook-for-agentic-coding-plugin/
 ├── README.md                # User-facing documentation
 │
 ├── commands/
-│   ├── workflows/           # Core workflow commands (playbook:*)
-│   │   ├── product-requirements.md
-│   │   ├── tech-plan.md
-│   │   ├── tasks.md
-│   │   ├── work.md
-│   │   └── learnings.md
-│   └── debug.md             # Utility commands
+│   └── workflows/           # Core workflow commands (playbook:*)
+│       ├── product-requirements.md
+│       ├── tech-plan.md
+│       ├── tasks.md
+│       ├── work.md
+│       ├── learnings.md
+│       └── debug.md         # Debugging workflow
 │
 ├── agents/
 │   └── workflow/            # Phase-specific agents
@@ -44,7 +44,9 @@ product-playbook-for-agentic-coding-plugin/
 │   │   └── SKILL.md
 │   ├── learning-capture/
 │   │   └── SKILL.md
-│   └── autonomous-execution/
+│   ├── autonomous-execution/
+│   │   └── SKILL.md
+│   └── mobile-debugging/
 │       └── SKILL.md
 │
 └── resources/
