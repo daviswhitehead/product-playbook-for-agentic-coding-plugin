@@ -35,10 +35,18 @@ Display all available commands and help the user find the right one for their ta
 
 **Want to improve your process?**
 → `/playbook:learnings` - Capture what you learned
+→ `/playbook:critique` - Run multi-persona document critiques
 → `/playbook:identify-improvements` - Find top 10 improvements
 → `/playbook:prompt-coaching` - Get coaching on your prompts
 → `/playbook:review-autonomy` - Check project readiness for autonomous work
 → `/playbook:review-playbook` - Review and optimize the plugin itself
+→ `/playbook:improve-playbook` - Analyze sessions and implement improvements
+
+**Working with documents?**
+→ `/playbook:distill` - Create focused summaries from longer docs
+→ `/playbook:refine-doc` - Incorporate new info into existing docs
+→ `/playbook:rubric` - Validate code against quality rubrics
+→ `/playbook:rubric-doc` - Generate documents from spec files
 
 **Git operations?**
 → `/playbook:git-commit` - Create well-structured commits
@@ -80,10 +88,12 @@ Display all available commands and help the user find the right one for their ta
 ### Review & Improvement
 | Command | When to Use |
 |---------|-------------|
+| `/playbook:critique` | Run parallel multi-persona critiques on documents |
 | `/playbook:review-autonomy` | Check if project is ready for autonomous execution |
 | `/playbook:identify-improvements` | Find top 10 improvements from a coding session |
 | `/playbook:prompt-coaching` | Get feedback on how to write better prompts |
 | `/playbook:review-playbook` | Review and optimize this plugin |
+| `/playbook:improve-playbook` | Analyze sessions to find patterns and implement improvements |
 
 ### Git Operations
 | Command | When to Use |
@@ -99,6 +109,14 @@ Display all available commands and help the user find the right one for their ta
 | Command | When to Use |
 |---------|-------------|
 | `/playbook:organize-files` | Project files need reorganization |
+
+### Document Workflows
+| Command | When to Use |
+|---------|-------------|
+| `/playbook:distill` | Create focused summaries from longer documents |
+| `/playbook:refine-doc` | Incorporate new info into existing docs consistently |
+| `/playbook:rubric` | Validate code quality against predefined rubrics |
+| `/playbook:rubric-doc` | Generate documents based on spec files with citations |
 
 ---
 

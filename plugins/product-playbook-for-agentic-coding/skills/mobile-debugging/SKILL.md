@@ -222,6 +222,13 @@ Mobile debugging requires:
 3. **Root-level checks first** - Viewport meta, body overflow, wrapper elements
 4. **JavaScript workarounds for iOS** - `scrollIntoView` with delays
 
+## Integration with Playbook
+
+This skill works with:
+- `/playbook:debug` - Use this skill during mobile debugging sessions
+- `/playbook:learnings` - Capture mobile-specific fixes for future reference
+- `debugging-agent` - Provides mobile-specific debugging patterns
+
 ---
 
 *When in doubt: check on a real device, check the root layout, and remember iOS Safari needs special handling.*

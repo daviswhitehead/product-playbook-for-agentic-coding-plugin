@@ -131,6 +131,7 @@ This plugin uses a marketplace-embedded structure (plugin source is inside the m
 | `codebase-docs-search` | Patterns for finding and using project documentation |
 | `learning-capture` | Multi-trigger, dual-target learning capture |
 | `autonomous-execution` | Patterns for autonomous project execution |
+| `mobile-debugging` | Patterns for debugging mobile-specific issues on iOS Safari and Android Chrome |
 
 ## Key Features
 
@@ -206,14 +207,14 @@ product-playbook-for-agentic-coding-plugin/
 │       ├── .claude-plugin/
 │       │   └── plugin.json  # Plugin definition
 │       ├── commands/
-│       │   ├── workflows/   # Core workflow commands
-│       │   └── debug.md     # Debugging command
+│       │   └── workflows/   # Core workflow commands (including debug.md)
 │       ├── agents/
 │       │   └── workflow/    # Phase-specific agents
 │       ├── skills/
 │       │   ├── codebase-docs-search/
 │       │   ├── learning-capture/
-│       │   └── autonomous-execution/
+│       │   ├── autonomous-execution/
+│       │   └── mobile-debugging/
 │       └── resources/
 │           ├── templates/   # Document templates
 │           └── personas/    # Reusable critique personas

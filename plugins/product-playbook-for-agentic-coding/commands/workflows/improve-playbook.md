@@ -21,6 +21,16 @@ Guide the user through a systematic process to improve the playbook based on the
 
 Each phase has a checkpoint where you present findings and get user approval before proceeding.
 
+## Available Tools Discovery
+
+Before proceeding, inventory available tools:
+1. **Commands**: Other `/playbook:*` commands (learnings, review-playbook)
+2. **Agents**: Specialized agents via Task tool (playbook-improvement-agent)
+3. **MCP Tools**: External service integrations via ToolSearch (GitHub)
+4. **Skills**: Domain expertise via Skill tool
+
+Select the most appropriate tools for the task at hand.
+
 ## Arguments
 
 Parse optional arguments:

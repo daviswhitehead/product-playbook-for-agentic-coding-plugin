@@ -17,6 +17,16 @@ Help the user run structured critiques of their documents by:
 4. Tracking issues across versions
 5. Generating actionable tasks from findings
 
+## Available Tools Discovery
+
+Before proceeding, inventory available tools:
+1. **Commands**: Other `/playbook:*` commands (learnings, tasks)
+2. **Agents**: Specialized agents via Task tool (critique personas)
+3. **MCP Tools**: External service integrations via ToolSearch
+4. **Skills**: Domain expertise via Skill tool
+
+Select the most appropriate tools for the task at hand.
+
 ## Arguments
 
 Parse the user's input for:

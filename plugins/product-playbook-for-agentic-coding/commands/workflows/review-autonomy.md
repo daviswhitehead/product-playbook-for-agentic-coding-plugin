@@ -18,6 +18,16 @@ Help the user evaluate a project's readiness for autonomous agentic engineering 
 4. Generating prioritized improvement recommendations
 5. Creating a review report with actionable next steps
 
+## Available Tools Discovery
+
+Before proceeding, inventory available tools:
+1. **Commands**: Other `/playbook:*` commands (work, work-multiple)
+2. **Agents**: Specialized agents via Task tool (delivery-agent)
+3. **MCP Tools**: External service integrations via ToolSearch
+4. **Skills**: Domain expertise via Skill tool (autonomous-execution)
+
+Select the most appropriate tools for the task at hand.
+
 ## Prerequisites
 
 Before starting, ensure:

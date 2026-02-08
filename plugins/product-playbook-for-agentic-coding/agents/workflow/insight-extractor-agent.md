@@ -226,6 +226,22 @@ When user specifies a topic:
 | Including everything | Filter for value and relevance |
 | Guessing context | Note when context is unclear |
 
+## Integration Points
+
+This agent works with:
+- **Source materials** - Interview notes, research docs, meeting notes
+- `/playbook:product-requirements` - Extract insights for PRD creation
+- `/playbook:critique` - Surface insights from critique findings
+- `cross-reference-validator-agent` - Validate extracted insights match sources
+
+## Stop Conditions
+
+Stop and ask for guidance when:
+- Source materials are empty or unreadable
+- Conflicting information appears across sources
+- Insight categories don't match user's needs
+- Sources require authentication or special access
+
 ---
 
 *Extract insights that are traceable, organized, and actionable.*

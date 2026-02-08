@@ -23,6 +23,16 @@ Before starting, ensure:
 - Multiple tasks are ready to work on (dependencies satisfied, status is "Not Started")
 - Sufficient context for multiple task execution
 
+## Available Tools Discovery
+
+Before proceeding, inventory available tools:
+1. **Commands**: Other `/playbook:*` commands (debug, learnings)
+2. **Agents**: Specialized agents via Task tool (delivery-agent)
+3. **MCP Tools**: External service integrations via ToolSearch
+4. **Skills**: Domain expertise via Skill tool (autonomous-execution)
+
+Select the most appropriate tools for the task at hand.
+
 ## Task Prioritization (Lower Risk First)
 
 When selecting tasks to work on, prioritize in this order:

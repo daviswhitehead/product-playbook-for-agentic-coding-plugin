@@ -206,3 +206,12 @@ Planning is complete when:
 - Open questions are documented
 
 Ready for task breakdown → `/playbook:tasks`
+
+## Integration Points
+
+This agent works with:
+- **Product requirements** - Input for planning (from `/playbook:product-requirements`)
+- `/playbook:tech-plan` - Invoked by this command
+- `/playbook:tasks` - Next step after planning is complete
+- `delivery-agent` - Executes the tasks created from this plan
+- **Tech plan template** - Output follows this structure

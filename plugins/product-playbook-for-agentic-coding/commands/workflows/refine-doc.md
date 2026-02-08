@@ -16,6 +16,16 @@ When new information arrives (stakeholder feedback, new insights, changed requir
 3. Make consistent changes across the document set
 4. Verify cross-references remain valid
 
+## Available Tools Discovery
+
+Before proceeding, inventory available tools:
+1. **Commands**: Other `/playbook:*` commands (critique, distill)
+2. **Agents**: Specialized agents via Task tool (cross-reference-validator-agent)
+3. **MCP Tools**: External service integrations via ToolSearch
+4. **Skills**: Domain expertise via Skill tool
+
+Select the most appropriate tools for the task at hand.
+
 ## Arguments
 
 Parse the command arguments:
