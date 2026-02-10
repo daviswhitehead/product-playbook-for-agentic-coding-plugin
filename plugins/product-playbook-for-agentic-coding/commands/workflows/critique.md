@@ -72,7 +72,11 @@ Otherwise, recommend based on content type:
 - **Product/Marketing docs**: marketing-strategist, product-manager, investor
 - **Technical docs**: technical-reviewer, product-manager
 - **Domain-specific docs**: domain-expert (specify domain), product-manager
+- **UI/UX projects**: product-manager, technical-reviewer, **accessibility-expert** (WCAG compliance, contrast ratios, screen reader support), **design-system-architect** (token architecture, naming conventions, migration scope)
+- **Styling/theming projects**: technical-reviewer, **accessibility-expert**, **design-system-architect**
 - **Comprehensive**: all five personas
+
+> **Recommendation**: The critique phase is HIGH-ROI. Always run it after PRD and tech plan — it catches issues that are expensive to fix later (e.g., WCAG failures, re-render bugs, flaky tests). For UI projects, always include accessibility-expert and design-system-architect personas.
 
 Present selection to user:
 ```
@@ -284,6 +288,12 @@ Issues appearing in 3+ versions need dedicated resolution—they indicate a deep
 
 ### Exit Criteria Matter
 Use the Launch Readiness Checklist to define "done" before starting iterations.
+
+### Agent-Readiness Check (Product Manager Persona)
+The Product Manager persona should specifically flag subjective acceptance criteria that an agent cannot verify:
+- **Flag terms**: "appropriate", "premium", "feels like", "reasonable", "sufficient", "looks good", "nice"
+- **Suggest replacements**: measurable criteria (e.g., "contrast ratio >= 4.5:1", "matches token surface-base", "passes axe-core with 0 violations")
+- Subjective criteria lead to ambiguous sign-off and are a common source of scope creep.
 
 ---
 

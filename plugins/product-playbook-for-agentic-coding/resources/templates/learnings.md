@@ -40,6 +40,12 @@ module: "[affected_module_name]"
 - How it was solved
 - How to prevent next time
 
+### Platform Quirks Discovered
+*Capture framework/platform-specific behavior that differs from standard expectations*
+- Did you discover any platform quirk (e.g., React Native Web, Next.js, Expo)?
+- How does it differ from what you'd expect in standard HTML/CSS/JS?
+- Should this be documented in a project-level gotchas file (e.g., `docs/guides/[platform]-gotchas.md`)?
+
 ## Learning Target
 **Where should this improve things?**
 - [ ] Codebase documentation (project-specific)

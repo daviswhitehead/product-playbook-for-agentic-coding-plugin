@@ -128,6 +128,15 @@ Project size determines the complexity and depth of planning required:
 - [ ] [Risk 1: Description and mitigation strategy]
 - [ ] [Risk 2: Description and mitigation strategy]
 
+## External Dependencies
+
+> **Guidance**: Default to NON-BLOCKING for external reviews and approvals. Ship with automated verification, then incorporate expert feedback in a follow-up release. Only make blocking if: regulatory requirement OR safety-critical.
+
+| Dependency | Blocking? | Rationale |
+|------------|-----------|-----------|
+| [e.g., Design review] | Non-blocking | Automated tests provide adequate initial coverage |
+| [e.g., Security audit] | Blocking | Handles user credentials — requires sign-off |
+
 ---
 
 *This document focuses on What & Why - defining the problem, users, and success criteria.*
