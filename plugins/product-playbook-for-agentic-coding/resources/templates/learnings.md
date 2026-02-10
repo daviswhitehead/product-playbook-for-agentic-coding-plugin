@@ -2,7 +2,7 @@
 title: "[Brief descriptive title]"
 date: [YYYY-MM-DD]
 trigger: [chat-session | project-completion | blocker-overcome]
-category: [performance | database | integration | workflow | debugging | architecture | testing]
+category: [performance | database | integration | workflow | debugging | architecture | testing | design | generation | infrastructure]
 tags: [relevant, searchable, keywords]
 severity: [critical | high | medium | low]
 module: "[affected_module_name]"
@@ -119,6 +119,29 @@ module: "[affected_module_name]"
 - [ ] [Workflow enhancement]
 - [ ] [Template refinement]
 - [ ] [New skill or pattern to add]
+
+## Promote Learnings
+
+Move key learnings to where they'll be seen at the right moment:
+
+### Promotion Hierarchy
+1. **Code/automation** (happens automatically — scripts, hooks, linters)
+2. **CLAUDE.md / MEMORY.md** (agent sees every session)
+3. **Templates/checklists** (available when starting similar work)
+4. **Learnings docs** (comprehensive reference)
+
+### Promotion Checklist
+- [ ] Key pattern → CLAUDE.md rule?
+- [ ] Trigger condition → MEMORY.md entry?
+- [ ] Reusable process → `docs/templates/` checklist?
+- [ ] Repeated manual step → script/automation?
+- [ ] Stale doc → updated with new knowledge?
+
+### Promotions Made
+| Learning | Promoted To | Location |
+|----------|-------------|----------|
+| [Learning 1] | [CLAUDE.md / template / script] | [path] |
+| [Learning 2] | [CLAUDE.md / template / script] | [path] |
 
 ## Next Steps
 - [ ] [Action item 1]
