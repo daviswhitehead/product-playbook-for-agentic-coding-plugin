@@ -10,6 +10,12 @@
       "source": "./plugins/product-playbook-for-agentic-coding",
       "description": "A structured 4-phase workflow for agentic coding",
       "version": "0.14.0"
+    },
+    {
+      "name": "openai-image-gen",
+      "source": "./plugins/openai-image-gen",
+      "description": "Generate images using OpenAI's API (gpt-image-1, DALL-E) for logos, illustrations, and marketing assets",
+      "version": "1.0.0"
     }
   ]
 }
