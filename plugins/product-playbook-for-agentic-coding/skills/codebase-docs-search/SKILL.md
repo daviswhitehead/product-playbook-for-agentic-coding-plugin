@@ -84,7 +84,7 @@ For learnings and solutions with YAML frontmatter, use targeted searches:
 title: "Brief descriptive title"
 date: YYYY-MM-DD
 trigger: [chat-session|project-completion|blocker-overcome]
-category: [performance|database|integration|workflow|debugging]
+category: [performance|database|integration|workflow|debugging|design|generation|infrastructure]
 tags: [relevant, searchable, keywords]
 severity: [critical|high|medium|low]
 module: "affected_module_name"
@@ -95,6 +95,9 @@ module: "affected_module_name"
 ```bash
 Grep: "category: performance" in docs/learnings/
 Grep: "category: database" in docs/solutions/
+Grep: "category: design" in docs/learnings/
+Grep: "category: generation" in docs/learnings/
+Grep: "category: infrastructure" in docs/learnings/
 ```
 
 ### Search by Tags

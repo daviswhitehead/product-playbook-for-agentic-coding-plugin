@@ -32,6 +32,13 @@ Learnings should be captured at three key moments, each with different depth and
 - Process improvement: Always check existing tests before writing new ones
 ```
 
+**Session Handoff** (if work continues later):
+Also capture state for the next session:
+- What's done and what's next
+- Decisions made with reasoning
+- Docs that need updating (stale conclusions)
+- Where to start next session
+
 ### 2. After Project Completion (Comprehensive)
 
 **When**: At project milestones or completion
@@ -123,7 +130,7 @@ title: "Brief descriptive title"
 date: YYYY-MM-DD
 trigger: chat-session | project-completion | blocker-overcome
 target: codebase | plugin | both
-category: performance | database | integration | workflow | debugging | testing | security
+category: performance | database | integration | workflow | debugging | testing | security | design | generation | infrastructure
 tags: [relevant, searchable, keywords]
 severity: critical | high | medium | low
 module: "affected_module_name"
@@ -150,6 +157,9 @@ module: "affected_module_name"
 - `debugging`: Investigation patterns
 - `testing`: Test-related learnings
 - `security`: Security-related learnings
+- `design`: Visual design, UX, branding learnings
+- `generation`: AI content/image generation learnings
+- `infrastructure`: DevOps, CI/CD, deployment learnings
 
 **severity**: Impact level
 - `critical`: Must know, high impact
@@ -199,6 +209,12 @@ Add YAML frontmatter for searchability.
 ### Step 5: Save to Correct Location
 - Codebase: `docs/learnings/YYYY-MM-DD-topic.md`
 - Plugin: Create PR to plugin repo
+
+### Step 6: Promote Key Learnings
+Move the most important learnings to higher-actionability locations:
+- **Code/scripts** (automatic) > **CLAUDE.md** (always visible) > **Templates** (on-demand) > **Docs** (reference)
+- Ask: "Which 2-3 learnings should be promoted? Where should they live?"
+- Implement the promotions (edit CLAUDE.md, create template, update script)
 
 ## Integration Points
 

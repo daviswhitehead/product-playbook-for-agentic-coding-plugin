@@ -110,6 +110,13 @@ Quick questions:
 - What documentation gap did we discover?
 - Any tool or workflow improvement ideas?
 
+**Session Handoff** (for multi-session projects):
+If work will continue in a future session, also capture:
+- Current state: What's done, what's in progress?
+- Recent decisions: Any choices made this session with reasoning?
+- Stale docs: Did any earlier document's conclusions get invalidated?
+- Entry point: What should the next session read first?
+
 #### For Project Completion Learnings
 Comprehensive review:
 - **Project Summary**: What was built and outcomes
@@ -135,7 +142,7 @@ Ensure learnings include frontmatter:
 title: "Brief descriptive title"
 date: YYYY-MM-DD
 trigger: [chat-session|project-completion|blocker-overcome]
-category: [performance|database|integration|workflow|debugging]
+category: [performance|database|integration|workflow|debugging|design|generation|infrastructure]
 tags: [relevant, searchable, keywords]
 severity: [critical|high|medium|low]
 module: "affected_module_name"
@@ -164,9 +171,22 @@ Based on trigger type, fill appropriate sections:
 - Prevention strategy
 
 
-### Step 7: Propagate Learnings to CLAUDE.md
+### Step 7: Promote Learnings to Point-of-Use
 
-After documenting learnings, identify patterns that should improve CLAUDE.md:
+A learning left in a doc is a learning that will be re-learned the hard way. For each key learning, promote it as high as possible:
+
+**Promotion hierarchy** (highest = most actionable):
+1. **Code/automation** — Encode in scripts, hooks, linters (happens automatically)
+2. **CLAUDE.md / MEMORY.md** — Always visible to the agent every session
+3. **Templates/checklists** — Available when starting similar work
+4. **Learnings docs** — Comprehensive but requires active lookup
+
+**Promotion checklist:**
+- [ ] Should any learning become a CLAUDE.md rule? (pattern that applies broadly)
+- [ ] Should any learning update MEMORY.md? (trigger conditions for future work)
+- [ ] Should any learning become a reusable template? (`docs/templates/`)
+- [ ] Should any learning be encoded in code? (scripts, hooks, automation)
+- [ ] Should any earlier doc be updated to reflect new knowledge? (fix stale conclusions)
 
 #### Identify CLAUDE.md-Worthy Patterns
 Ask for each learning:
@@ -183,9 +203,7 @@ Format proposals as clear additions:
 **Section**: [Deployment / Authentication / Database / etc.]
 
 **Add**:
-```
-[New content in markdown format]
-```
+> [New content in markdown format]
 
 Approve this addition? [y/n]
 ```
@@ -196,11 +214,13 @@ Consider which file each learning belongs to:
 | Learning Type | Target File |
 |---------------|-------------|
 | Gotchas/patterns | CLAUDE.md |
+| Trigger conditions | MEMORY.md |
 | Architectural decisions | docs/architecture.md |
 | Procedures/workflows | docs/guides/[relevant].md |
+| Reusable processes | docs/templates/ |
 | Domain-specific | docs/agents/[relevant].md |
 
-**Principle**: Learnings should flow into guidance files, not just stay in learnings docs.
+Help the user identify 2-3 learnings worth promoting and implement the promotions.
 
 ### Step 8: Validate Completeness
 
@@ -211,7 +231,7 @@ Review the document:
 - [ ] Key learning clearly documented
 - [ ] Actionable improvements identified
 - [ ] Saved to correct location
-- [ ] CLAUDE.md updates proposed (if applicable)
+- [ ] Key learnings promoted to appropriate level (CLAUDE.md, templates, code)
 - [ ] Other guidance files updated (if applicable)
 
 ## Key Principles
