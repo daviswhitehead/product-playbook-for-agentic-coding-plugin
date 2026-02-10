@@ -31,6 +31,30 @@
 - Verify all dependencies are satisfied
 - Add completion notes documenting what was accomplished
 
+## Phase 0: Pre-Estimation Scope Audit
+
+> **When to use**: For migration-type work (design system changes, API upgrades, dependency updates, etc.), run automated checks BEFORE sizing tasks. Estimates based on "some" or "a few" are unreliable — quantify the actual scope first.
+
+### Task 0.1: Automated Scope Audit
+**Description**: Run automated checks (grep, ESLint, lint rules, etc.) to quantify the actual migration scope before estimating effort.
+
+**Acceptance Criteria**:
+- [ ] Automated scan completed (e.g., `grep -r`, ESLint rule, custom script)
+- [ ] Violation/change count documented below
+- [ ] Count used to size Phase 2+ cleanup tasks
+
+**Audit Results**:
+- Total violations found: [NUMBER]
+- Files affected: [NUMBER]
+- Estimated cleanup effort per violation: [TIME]
+- Tool/command used: [COMMAND]
+
+**Status**: [ ] Not Started | [ ] In Progress | [ ] Complete
+
+**Notes**: [Record the audit command and results here. This data directly informs task sizing below.]
+
+---
+
 ## Phase 1: [Phase Name]
 
 ### Task 1.1: [Task Name]
@@ -152,6 +176,36 @@
 ### Next Up
 - [ ] [Task name] - Ready to start
 - [ ] [Task name] - Waiting for dependency
+
+## Phase N: Polish & QA (for UI projects)
+
+> **When to use**: For any project with UI changes, include BOTH automated and visual QA. Automated tools (axe-core) catch numeric violations but miss visual issues (wrong colors, invisible text). Visual QA catches what automated tools miss.
+
+### Task N.1: Automated Accessibility Audit
+**Description**: Run automated accessibility checks on all affected pages/states.
+
+**Acceptance Criteria**:
+- [ ] axe-core (or equivalent) run on all affected pages
+- [ ] All modes/states tested (e.g., light mode, dark mode, empty state)
+- [ ] Contrast ratios verified programmatically (e.g., `polished.getContrast()`)
+- [ ] Zero critical/serious violations (or documented exceptions)
+
+**Status**: [ ] Not Started | [ ] In Progress | [ ] Complete
+
+---
+
+### Task N.2: Visual QA (Paired with Automated)
+**Description**: Take screenshots of all affected pages/states and verify visual correctness beyond what automated tools check.
+
+**Acceptance Criteria**:
+- [ ] Playwright screenshots taken for all affected pages
+- [ ] All modes/states captured (e.g., light + dark, empty + populated)
+- [ ] Visual review confirms correct colors, spacing, and readability
+- [ ] No invisible text, wrong backgrounds, or broken layouts
+
+**Status**: [ ] Not Started | [ ] In Progress | [ ] Complete
+
+---
 
 ## Final Verification Checklist
 
