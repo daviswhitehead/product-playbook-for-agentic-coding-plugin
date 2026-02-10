@@ -12,6 +12,16 @@ You are facilitating iterative CI failure debugging with a focus on **Latest Run
 
 Help the user systematically debug CI/CD test failures by focusing on the latest run, analyzing logs, and iterating with targeted fixes.
 
+## Available Tools Discovery
+
+Before proceeding, inventory available tools:
+1. **Commands**: Other `/playbook:*` commands (debug, learnings)
+2. **Agents**: Specialized agents via Task tool (debugging-agent)
+3. **MCP Tools**: External service integrations via ToolSearch (GitHub)
+4. **Skills**: Domain expertise via Skill tool
+
+Select the most appropriate tools for the task at hand.
+
 ## Prerequisites
 
 Before starting, ensure:

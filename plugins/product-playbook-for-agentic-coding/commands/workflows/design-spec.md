@@ -19,6 +19,16 @@ This workflow is **optional**. Not all projects require a design critique or a d
 
 Help the user produce a **high-fidelity, engineer-executable design spec** that enables junior engineers (including agentic engineers) to build a pixel-accurate implementation with minimal ambiguity.
 
+## Available Tools Discovery
+
+Before proceeding, inventory available tools:
+1. **Commands**: Other `/playbook:*` commands (tech-plan, tasks, work)
+2. **Agents**: Specialized agents via Task tool (if available)
+3. **MCP Tools**: External service integrations via ToolSearch (Figma, etc.)
+4. **Skills**: Domain expertise via Skill tool
+
+Select the most appropriate tools for the task at hand.
+
 ## Inputs (Optional)
 
 - Product Requirements Document (recommended, not required)

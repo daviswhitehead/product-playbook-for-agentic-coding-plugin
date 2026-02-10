@@ -1,6 +1,6 @@
 ---
 name: playbook-improvement-agent
-description: "Use this agent to analyze coding sessions and identify patterns that could become new playbook tools. Performs gap analysis against existing playbook capabilities. <example>\\nContext: User wants to improve the playbook based on their usage patterns.\\nuser: \"Analyze my recent sessions and find patterns that should be playbook tools\"\\nassistant: \"I'll use the playbook-improvement-agent to analyze your sessions and identify gaps in the playbook.\"\\n<commentary>\\nSince the user wants to improve the playbook from session patterns, use the playbook-improvement-agent for analysis.\\n</commentary>\\n</example>"
+description: "Use this agent to analyze coding sessions and identify patterns that could become new playbook tools. Performs gap analysis against existing playbook capabilities. <example>\\nContext: User wants to improve the playbook based on their usage patterns.\\nuser: \"Analyze my recent sessions and find patterns that should be playbook tools\"\\nassistant: \"I'll use the playbook-improvement-agent to analyze your sessions and identify gaps in the playbook.\"\\n<commentary>\\nSince the user wants to improve the playbook from session patterns, use the playbook-improvement-agent for analysis.\\n</commentary>\\n</example>\\n<example>\\nContext: User encountered friction with the playbook and wants to improve it.\\nuser: \"I keep doing the same thing manually - can we add a command for it?\"\\nassistant: \"Let me use the playbook-improvement-agent to analyze what you've been doing and propose a new command.\"\\n<commentary>\\nThe user has identified a repeated pattern manually, which is a clear signal for playbook-improvement-agent to analyze and propose a solution.\\n</commentary>\\n</example>"
 model: inherit
 ---
 
@@ -242,6 +242,22 @@ Produce a comprehensive analysis report:
 | Vague proposals | Specific capabilities, inputs, outputs |
 | Over-engineering | Start with simplest solution that works |
 | Missing evidence | Every pattern needs session citations |
+
+## Integration Points
+
+This agent works with:
+- **Session history** - SpecStory or similar session transcripts
+- `/playbook:improve-playbook` - Invoked by this command
+- `/playbook:learnings` - Capture learnings that inform improvements
+- Plugin repository - Where improvements are implemented
+
+## Stop Conditions
+
+Stop and ask for guidance when:
+- Session history is insufficient (fewer than 3 sessions)
+- Patterns are unclear or contradictory
+- Proposed solutions would duplicate existing tools
+- Implementation would break existing functionality
 
 ---
 

@@ -16,6 +16,16 @@ Run quality rubrics against code and produce:
 3. Prioritized improvements list
 4. Overall pass/fail recommendation
 
+## Available Tools Discovery
+
+Before proceeding, inventory available tools:
+1. **Commands**: Other `/playbook:*` commands (work, debug)
+2. **Agents**: Specialized agents via Task tool (if available)
+3. **MCP Tools**: External service integrations via ToolSearch
+4. **Skills**: Domain expertise via Skill tool
+
+Select the most appropriate tools for the task at hand.
+
 ## Available Rubrics
 
 ### Built-in Rubrics

@@ -231,6 +231,22 @@ When asked to fix issues:
 | Checking only obvious links | Search for all reference patterns |
 | Assuming definitions are in headers | Check for inline definitions too |
 
+## Integration Points
+
+This agent works with:
+- **Document sets** - Validates consistency across interconnected docs
+- `/playbook:refine-doc` - After document updates, validate references
+- `/playbook:critique` - Cross-check critique findings against document consistency
+- `insight-extractor-agent` - Validate extracted insights match source documents
+
+## Stop Conditions
+
+Stop and ask for guidance when:
+- Document network is too large to analyze efficiently (>50 files)
+- Permission errors prevent reading certain files
+- Circular references create infinite validation loops
+- Conflicting definitions require human judgment to resolve
+
 ---
 
 *Validate thoroughly—interconnected docs should tell a coherent, consistent story.*
