@@ -101,6 +101,23 @@ For each task, recommend:
 - **Tools**: Relevant MCP servers, plugins, or other tools
 - **Rationale**: Brief explanation of why
 
+#### 7. Design & Creative Project Considerations
+
+**From Designer + Product Manager perspectives:**
+
+If the project involves design, creative, or visual work (UI design, branding, illustration, style exploration), apply these additional patterns:
+
+- **User review checkpoints are tasks, not notes**: Create explicit tasks for stakeholder review at each phase gate (e.g., "User reviews palette options," "User approves character direction"). These are blocking dependencies.
+- **Explore → Critique → Refine → Approve cycles**: Structure phases as iteration loops, not linear sequences. Each design phase should include:
+  1. Exploration task (generate N options)
+  2. Critique task (evaluate against rubric or stakeholder feedback)
+  3. User review checkpoint (blocking)
+  4. Refinement task (iterate on selected option)
+- **Style exploration before implementation**: Add early tasks for style/direction exploration before any production implementation. This prevents expensive rework.
+- **Critique rounds between phases**: Reference `/playbook:critique` or specialist agent reviews between major phases, not just at the end.
+- **Visual acceptance criteria**: For design tasks, acceptance criteria should describe visual outcomes ("Logo readable at 32px," "Contrast ratio passes WCAG AA") not just code outcomes.
+- **Tool diversity**: Design tasks may require different AI tools per task type (image generation, SVG creation, font selection). Include tool recommendations per task.
+
 ### Task Quality Criteria
 
 Create tasks that are:

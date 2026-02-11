@@ -84,6 +84,21 @@ Use a concise diagram if helpful to visualize the system:
 - [Task A] and [Task B] can be done simultaneously
 - [Task C] and [Task D] can be done simultaneously
 
+## PR Strategy
+
+**Estimated Scope**: [X files estimated]
+
+**PR Boundaries** (required for Medium/Large projects):
+
+| PR | Phase/Milestone | Description | Est. Files |
+|----|----------------|-------------|------------|
+| 1  | [Phase name]   | [What ships] | ~N files  |
+| 2  | [Phase name]   | [What ships] | ~N files  |
+
+**Review Cadence**: [per-PR | per-phase | at merge]
+
+**Note**: Each PR should be independently reviewable and shippable. For projects >100 estimated files, splitting into milestone PRs is mandatory.
+
 ## Testing Strategy
 
 ### Test Types and Coverage

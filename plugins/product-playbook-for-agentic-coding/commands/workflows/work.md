@@ -92,6 +92,33 @@ Before starting, ensure:
    - Has all dependencies satisfied
    - Is not blocked
 
+### Step 1.5: Scope Verification (Every 3-5 Tasks)
+
+**From Engineering Manager perspective:**
+
+After completing every 3-5 tasks, pause and check project scope:
+
+1. **Measure current scope**: Run `git diff --stat main...HEAD` (or the base branch) to count files changed
+2. **Compare to plan**: Check the tech plan's estimated scope (file count, project size rating)
+3. **Check primary goal**: Re-read the PRD's primary deliverable — is it still on track, or has work drifted to secondary goals?
+
+**If scope exceeds 2x the tech plan estimate:**
+```
+"Scope check: X files changed vs ~Y estimated in the tech plan.
+The primary deliverable is: [primary goal from PRD].
+
+Options:
+1. Acknowledge expanded scope and continue
+2. Pause to re-plan and split into milestone PRs
+3. Defer non-essential work to keep scope manageable"
+```
+
+**If the primary deliverable is at risk** (work has drifted to secondary goals):
+- Flag immediately to the user
+- Recommend re-prioritizing remaining tasks toward the primary goal
+
+**Skip this step** for the first 3 tasks of a project (too early to measure meaningfully).
+
 ### Step 2: Review Task Details
 
 1. Read the full task description, acceptance criteria, and dependencies
@@ -289,6 +316,7 @@ When a verification check fails, iterate autonomously before asking the user:
 - **Test-Driven When Appropriate**: Write tests as you build
 - **Incremental Progress**: Complete one task fully before moving to next
 - **Incremental Commits**: Commit after each meaningful milestone
+- **Scope Awareness**: Periodically verify scope hasn't exceeded plan estimates (Step 1.5)
 
 ## Next Steps
 

@@ -74,6 +74,28 @@ Before proceeding, consider what tools are available:
 
 ## Process
 
+### Pre-Check: Validation Status (Project Completion Only)
+
+**Before capturing learnings for a completed project**, check if validation work was done:
+
+1. **Locate the tasks document** for the project (typically `docs/projects/[project-name]/tasks.md` or `projects/*/tasks.md`)
+2. **Search for validation/QA tasks** — look for tasks related to: accessibility audit, performance check (Lighthouse), test coverage, agent usability test, visual review
+3. **Check their status**:
+   - If validation tasks exist and are **incomplete**, warn the user:
+     ```
+     "I found incomplete validation tasks in the tasks document:
+     - [List incomplete validation tasks]
+
+     Validation is often skipped because it's less exciting than building.
+     Would you like to:
+     1. Complete validation tasks first, then capture learnings
+     2. Proceed with learnings and document deferred validation as an action item"
+     ```
+   - If validation tasks exist and are **complete**, proceed normally
+   - If **no validation tasks exist**, note this as a gap in the learnings
+
+This pre-check prevents a common pattern where projects skip validation and move directly to learnings/closure.
+
 ### Step 1: Identify Trigger Type
 
 Ask the user:

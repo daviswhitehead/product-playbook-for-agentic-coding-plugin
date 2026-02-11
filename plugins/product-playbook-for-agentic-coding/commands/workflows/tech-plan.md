@@ -160,6 +160,16 @@ Drawing from multiple role perspectives, guide the user through technical planni
 6. **Performance**: Detailed scalability planning
 7. **Decisions**: Document key decisions with rationale
 
+### Review Cadence
+
+Define when code review should happen based on project size:
+
+- **Small projects**: Review at PR time (single PR at the end)
+- **Medium projects**: One intermediate review at the midpoint, plus final PR review
+- **Large projects**: Review at each phase/milestone boundary — do not accumulate >100 files without review
+
+Include review points in the sequencing plan. For Medium and Large projects, specify PR boundaries (see PR Strategy section below).
+
 ### Role-Based Questions
 
 **From Software Architect perspective:**
@@ -197,6 +207,7 @@ Ensure all sections are filled with complexity matching project size:
 - Integration Approach
 - Design System Architecture (if applicable)
 - Performance Considerations
+- PR Strategy (scope estimate, PR boundaries, review cadence)
 
 **For Large Projects Only**:
 - Architectural Decisions with rationale
