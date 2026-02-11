@@ -1,15 +1,38 @@
 # Product Playbook for Agentic Coding
 
-A Claude Code plugin that provides a structured 4-phase workflow for agentic software development.
+A Claude Code plugin that provides a structured workflow for product-driven agentic software development.
 
 ## Overview
 
-This plugin implements a systematic approach to building software with AI assistance, following four key phases:
+This plugin implements a systematic approach to building software with AI assistance. The full evidence pipeline:
 
-1. **Product Discovery** - Define what to build and why
-2. **Solution Planning** - Design how to build it
-3. **Delivery** - Execute the work systematically
-4. **Retrospective** - Capture learnings and improve
+```
+Foundations → Research → Synthesis → Prioritization → PRD → Tech Plan → Tasks → Delivery → Learnings
+     ↑                                                                                        |
+     └────────────────────────── learnings feed back ─────────────────────────────────────────┘
+```
+
+### The Four Phases
+
+1. **Product Discovery** — Build strategy foundations, synthesize research, prioritize opportunities, and define what to build
+2. **Solution Planning** — Design how to build it with architecture, sequencing, and task breakdown
+3. **Delivery** — Execute work systematically with quality gates
+4. **Retrospective** — Capture learnings that improve both documentation and the workflow itself
+
+### The Evidence Pipeline
+
+Not every project needs every step. A small feature might start at PRD. A new product strategy starts at Foundations.
+
+| Step | Command | What It Produces | When to Use |
+|------|---------|------------------|-------------|
+| **Foundations** | `/playbook:foundations` | Mission, Vision, Personas, Engagement Framework | New product or strategy work |
+| **Research Synthesis** | `/playbook:research-synthesis` | Opportunities narrative from quant + qual + taste research | After conducting research |
+| **Prioritization** | Use `resources/templates/prioritization.md` | Ranked ideas with transparent scoring | When choosing between multiple opportunities |
+| **Product Requirements** | `/playbook:product-requirements` | Agent-ready PRD | Before building any feature |
+| **Tech Plan** | `/playbook:tech-plan` | Architecture, sequencing, technology decisions | Before implementation |
+| **Tasks** | `/playbook:tasks` | Specific, actionable tasks with acceptance criteria | Before starting work |
+| **Delivery** | `/playbook:work` | Implemented features | During implementation |
+| **Learnings** | `/playbook:learnings` | Documented insights that improve future work | After any work session |
 
 ## Installation
 
@@ -55,6 +78,8 @@ This plugin uses a marketplace-embedded structure (plugin source is inside the m
 ### Core Workflow Commands
 | Command | Description |
 |---------|-------------|
+| `/playbook:foundations` | Build strategy foundations (Mission, Vision, Personas, Engagement Framework) |
+| `/playbook:research-synthesis` | Synthesize research into strategic opportunities (quant + qual + taste) |
 | `/playbook:product-requirements` | Draft agent-ready PRDs with autonomous or interview modes |
 | `/playbook:tech-plan` | Create technical plan with architecture and sequencing |
 | `/playbook:tasks` | Break down work into specific, actionable tasks |
@@ -228,7 +253,21 @@ product-playbook-for-agentic-coding-plugin/
 ### Complete Workflow Example
 
 ```bash
-# 1. Start with product discovery
+# 0. (Optional) Build strategy foundations for a new product/strategy
+/playbook:foundations
+# Create Mission, Vision, Personas, Engagement Framework
+# Output: docs/foundations/strategy-foundations.md
+
+# 0b. (Optional) Synthesize research into opportunities
+/playbook:research-synthesis --context docs/research/
+# Combine quant + qual + taste research into strategic narrative
+# Output: docs/projects/my-feature/research-synthesis.md
+
+# 0c. (Optional) Prioritize opportunities
+# Use resources/templates/prioritization.md to score and rank ideas
+# Output: docs/projects/my-feature/prioritization.md
+
+# 1. Define product requirements
 /playbook:product-requirements
 # Answer questions, define the problem, users, and success criteria
 # Output: docs/projects/my-feature/product-requirements.md
@@ -259,6 +298,22 @@ product-playbook-for-agentic-coding-plugin/
 ```
 
 ### Command Details
+
+#### `/playbook:foundations`
+Builds **strategy foundations** — the decision filters that anchor all downstream product work:
+- Creates Mission, Vision, Core Promise, Personas, Engagement Framework
+- Each section builds on the previous in a deliberate sequence
+- Searches for existing context (company docs, research, interviews)
+- Validates internal consistency across the strategy stack
+- Foundations become decision filters for PRDs and prioritization
+
+#### `/playbook:research-synthesis`
+Synthesizes research from multiple sources into **strategic opportunities**:
+- Three-layer approach: Quantitative + Qualitative + Product Taste
+- Cross-layer synthesis finds converging and diverging signals
+- Produces ranked opportunities with evidence and confidence ratings
+- Bridges "what we know" and "what we should build"
+- Sources are tracked for traceability
 
 #### `/playbook:product-requirements`
 Creates **agent-ready PRDs** that enable autonomous technical planning and implementation:
