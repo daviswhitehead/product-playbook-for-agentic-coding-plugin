@@ -1,6 +1,27 @@
+<!--
+TEMPLATE GUIDANCE (for agents — do not include this block in output):
+
+This template is a reference structure, not a rigid form. Adapt it to fit the project:
+- Add sections that serve the project (e.g., Prioritization Analysis, Experiment Design)
+- Remove or merge sections that don't apply
+- Rename sections to fit the domain
+- Sections marked "Optional" can be omitted entirely
+- Sections marked "Adapt" should be customized to the project's context
+
+The philosophy note below should be rewritten for each PRD to reflect
+the document's specific approach and context. Don't use the placeholder—write
+something genuine that sets the reader's expectations.
+
+Quality bar: An AI agent should be able to create a tech plan and complete
+downstream tasks autonomously from this document. But clarity of thinking
+matters more than template completeness.
+-->
+
 # Product Requirements Document
 
-> **PRD Philosophy:** This document defines *what* we're building and *why*—not *how* to build it. The **Framing** section is the heart; **Solution** provides enough detail for technical planning without over-constraining. This PRD is optimized for agentic engineering: an AI agent should be able to create a tech plan and complete downstream tasks autonomously from this document alone.
+> [Write a brief, conversational note about this PRD's approach. What does this document aim to do? What's the relationship between Framing and Solution? What should the reader expect? Tailor this to the specific project—don't use boilerplate.]
+>
+> *Example: "The goal here is to articulate what we're doing and why—not to prescribe exactly what to build. The Framing section is the heart of the doc; Solution provides enough detail to guide the team without over-constraining. If I were joining the team, I'd want to collaborate early so the team's perspective shapes every section."*
 
 ---
 
@@ -33,7 +54,7 @@
 
 **[One-sentence problem statement]**
 
-[2-3 sentences expanding on the problem with supporting data]
+[2-3 sentences expanding on the problem with supporting data. Lead with the insight, not the solution.]
 
 | Evidence | Value | Source | Implication |
 |----------|-------|--------|-------------|
@@ -50,10 +71,13 @@
 
 ### What
 
-**Current state:** [How things work today]
-**Proposed state:** [How things will work after this ships]
+<!-- Adapt: Describe the change concretely. Use flow diagrams, before/after comparisons,
+     or whatever format makes the change clearest for this specific project. -->
 
-[2-3 sentences describing the change concretely]
+**Current flow:** [How things work today — be specific about the user's actual experience]
+**Proposed flow:** [How things will work after this ships]
+
+[2-3 sentences describing the change concretely. Focus on what changes from the user's perspective.]
 
 ### Why
 
@@ -67,7 +91,7 @@
 
 #### For Business
 
-**Strategic rationale:** [Why this matters for the business—connect to company goals]
+**Strategic rationale:** [Why this matters for the business—connect to company goals, strategy docs, or retention frameworks where available]
 
 **Impact forecast:**
 
@@ -76,30 +100,32 @@
 | [Primary metric] | [Current] | [+X%] | [+Y%] |
 | [Secondary metric] | [Current] | [+X%] | [+Y%] |
 
-**Revenue impact (if applicable):**
+**Revenue impact** *(Optional — include when the feature has direct or downstream revenue implications):*
 
-| Scenario | Annual Impact | Assumptions |
-|----------|---------------|-------------|
+| Scenario | Annual Impact | Key Assumptions |
+|----------|---------------|-----------------|
 | Conservative | $[X] | [Key assumptions] |
 | Optimistic | $[Y] | [Key assumptions] |
 
-**Forecast confidence:** [High / Medium / Low]. [Brief explanation of uncertainty and what would increase confidence]
+**Forecast confidence:** [High / Medium / Low]. [Explanation of what's uncertain and what would increase confidence. Be honest—hiding uncertainty erodes trust. Example: "High uncertainty. These projections require validation through experimentation. More product discovery—including data analysis, user research, and prototyping—can improve confidence before building."]
 
 ### Hypotheses
 
 **Primary hypothesis:**
 > If we [action], then [outcome], because [rationale].
 
-**Secondary hypothesis (if applicable):**
+**Secondary hypothesis** *(if applicable):*
 > If we [action], then [outcome], because [rationale].
 
 ### Success Metrics
 
-| Metric | Definition | Target | Measurement Method |
-|--------|------------|--------|-------------------|
+| Metric | Definition | Target | Measurement |
+|--------|------------|--------|-------------|
 | **Primary:** [Metric] | [Precise definition] | [Specific target] | [How to measure] |
 | **Secondary:** [Metric] | [Precise definition] | [Specific target] | [How to measure] |
 | **Guardrail:** [Metric] | [What we don't want to break] | [Threshold] | [How to monitor] |
+
+**Segmentation note:** [How should results be sliced? By cohort, signup source, user type, device? Call out segments that may respond differently and whether the winning approach may differ by segment.]
 
 ---
 
@@ -107,7 +133,7 @@
 
 ### Vision
 
-[2-3 sentences describing the end-state vision in 6-12 months if this succeeds. Paint a picture of the ideal experience.]
+[2-3 sentences describing the end-state vision in 6-18 months if this succeeds. Paint a picture of the ideal experience.]
 
 ### Evolution
 
@@ -117,36 +143,26 @@
 | **Phase 2** | [Iteration] | [Timeframe] | [Learning goals] |
 | **Future** | [Full vision] | [Timeframe] | [N/A] |
 
-### Functional Requirements
+### Details
 
-> **For Agentic Engineering:** Each requirement must have verifiable acceptance criteria. Use precise, testable language.
+<!-- Adapt: This section describes what we're building in enough detail for technical
+     planning. Use the format that communicates most clearly for this project:
 
-#### Requirement 1: [Name]
+     - Narrative descriptions (good for experiments, product changes, workflows)
+     - Requirement blocks with Given/When/Then acceptance criteria (good for engineering specs)
+     - A hybrid of both (narrative context + testable criteria)
 
-**Description:** [What this requirement accomplishes]
+     The goal is precision and clarity, not format compliance. -->
 
-**Acceptance Criteria:**
+[Describe the solution in enough detail that an engineer could estimate effort and an agent could generate a tech plan. Include key logic, rules, and behaviors. Break into subsections as needed.]
+
+**For engineering-heavy PRDs**, consider adding acceptance criteria per requirement:
 - [ ] **Given** [precondition], **when** [action], **then** [expected result]
-- [ ] **Given** [precondition], **when** [action], **then** [expected result]
-- [ ] [Additional criteria as needed]
-
-**Priority:** [Must Have / Should Have / Nice to Have]
-
-#### Requirement 2: [Name]
-
-**Description:** [What this requirement accomplishes]
-
-**Acceptance Criteria:**
-- [ ] **Given** [precondition], **when** [action], **then** [expected result]
-- [ ] **Given** [precondition], **when** [action], **then** [expected result]
-
-**Priority:** [Must Have / Should Have / Nice to Have]
-
-[Continue for all requirements]
 
 ### Scenarios
 
-> **For Agentic Engineering:** Scenarios provide concrete examples that reduce ambiguity. Each scenario should be implementable as a test case.
+<!-- Adapt: Scenarios reduce ambiguity by walking through concrete examples.
+     Each should be implementable as a test case. -->
 
 **Scenario 1: [Persona], the [context]**
 [Name] [context description]. [What they do step-by-step]. [Expected outcome].
@@ -162,14 +178,8 @@
 > **Format:** As a [user type], I want [goal] so that [benefit].
 
 1. **As a [user type]**, I want [goal] so that [benefit].
-   - **Acceptance Criteria:**
-     - [ ] [Testable criterion 1]
-     - [ ] [Testable criterion 2]
 
 2. **As a [user type]**, I want [goal] so that [benefit].
-   - **Acceptance Criteria:**
-     - [ ] [Testable criterion 1]
-     - [ ] [Testable criterion 2]
 
 ### Scope
 
@@ -189,7 +199,8 @@
 
 ### Technical Context
 
-> **For Agentic Engineering:** This section provides the technical context needed to create a tech plan without asking clarifying questions.
+<!-- For Agentic Engineering: This section provides the technical context needed to
+     create a tech plan without asking clarifying questions. -->
 
 **Integration Points:**
 - [System/API 1]: [How this feature interacts with it]
@@ -209,6 +220,9 @@
 
 ### Design Considerations
 
+<!-- Adapt: Think about how the experience should feel, not just what it does.
+     What's the emotional tone? What should feel effortless vs. deliberate? -->
+
 **Key UX Principles:**
 - [Principle 1]: [How it applies to this feature]
 - [Principle 2]: [How it applies to this feature]
@@ -220,6 +234,16 @@
 **Accessibility Requirements:**
 - [Requirement 1]
 - [Requirement 2]
+
+### Comps / Inspiration
+
+<!-- Optional but recommended: What products solve a similar problem well?
+     What patterns can we learn from? Grounds design thinking in proven approaches. -->
+
+| Product | Pattern | Relevance |
+|---------|---------|-----------|
+| [Product 1] | [What they do] | [How it informs our approach] |
+| [Product 2] | [What they do] | [How it informs our approach] |
 
 ### Dependencies
 
@@ -272,11 +296,19 @@
 - [How users will discover/adopt this]
 - [Any user education required]
 
+### Revenue *(Optional)*
+
+- [Direct revenue impact, if any]
+- [Downstream revenue implications (e.g., retention → LTV)]
+- [Pricing or packaging considerations]
+
 ---
 
 ## Decision Log
 
-> **For Agentic Engineering:** This section captures key decisions so agents don't re-litigate settled questions.
+<!-- Recommended: Capture key decisions as they're made during drafting and review.
+     This documents the thinking process, not just the outputs. Agents should populate
+     this as they make choices, and it prevents re-litigating settled questions. -->
 
 | Decision | Options Considered | Choice | Rationale | Date |
 |----------|-------------------|--------|-----------|------|
@@ -287,16 +319,27 @@
 
 ## Open Questions
 
-> **For Agentic Engineering:** Questions that must be answered before implementation can proceed. Agents should flag these as blockers.
+<!-- Adapt format: Use a table for structured tracking, or a simple bulleted list
+     for more conversational questions. Both work—choose what fits the project.
+     For agentic engineering, questions that block implementation should be clearly
+     flagged so agents treat them as blockers. -->
 
-| Question | Owner | Status | Answer |
-|----------|-------|--------|--------|
-| [Question 1] | [Who can answer] | [Open/Resolved] | [Answer if resolved] |
-| [Question 2] | [Who can answer] | [Open/Resolved] | [Answer if resolved] |
+**[Question 1]**
+
+**[Question 2]**
+
+**[Question 3]**
 
 ---
 
 ## Research
+
+### Strategy Context *(Optional)*
+
+<!-- How does this PRD connect to broader strategy? Reference mission, vision,
+     retention frameworks, or strategic priorities where available. -->
+
+[How this initiative fits within the broader strategy. Reference specific strategy documents, frameworks, or priorities.]
 
 ### Quantitative Data
 
@@ -313,12 +356,12 @@
 > "[Quote from user research]"
 > *Source: [Source]*
 
-### Competitive/Comparable Analysis
+### Product Critique *(Optional)*
 
-| Product | Pattern | Relevance |
-|---------|---------|-----------|
-| [Product 1] | [What they do] | [How it informs our approach] |
-| [Product 2] | [What they do] | [How it informs our approach] |
+<!-- Insights from product critique, taste analysis, or UX review that informed this PRD. -->
+
+- [Insight 1]: [Source]
+- [Insight 2]: [Source]
 
 ### Related Work
 
@@ -338,13 +381,20 @@
 
 ## Appendix
 
+<!-- Include supporting details that are useful for reference but would clutter
+     the main document. Examples: draft content, algorithm logic, data tables,
+     starter lists, format definitions, experiment assignment logic. -->
+
 [Supporting details, technical specifications, data tables, etc.]
 
 ---
 
-## Agent-Ready Checklist
+## Quality Guidelines
 
-> **For Agentic Engineering:** Before considering this PRD complete, verify the following. An agent should be able to answer "yes" to all items.
+<!-- These are quality targets for agentic engineering, not rigid gates. Not every PRD
+     needs every item checked—use judgment based on the project's stage and complexity.
+     The goal: an AI agent should be able to create a tech plan and execute tasks
+     autonomously from this document. -->
 
 ### Clarity & Completeness
 - [ ] **Problem is specific:** The opportunity section quantifies the problem with data
@@ -358,8 +408,8 @@
 - [ ] **Codebase context provided:** Relevant areas of the codebase identified
 
 ### Acceptance Criteria Quality
-- [ ] **All requirements have acceptance criteria:** Every functional requirement has testable criteria
-- [ ] **Given/When/Then format used:** Criteria follow structured format where appropriate
+- [ ] **Requirements are testable:** Every major requirement has verifiable criteria
+- [ ] **Structured format used where appropriate:** Given/When/Then or equivalent for behavioral criteria
 - [ ] **Edge cases covered:** Scenarios include error states and edge cases
 
 ### Decision Completeness

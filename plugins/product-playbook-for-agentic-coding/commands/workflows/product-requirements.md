@@ -31,6 +31,30 @@ Parse the arguments to determine mode:
 
 ---
 
+## Principles for Quality PRDs
+
+These principles apply to both modes. They represent hard-won learnings about what makes PRDs effective:
+
+### Simplify Ruthlessly
+Iterate toward simplicity, not complexity. If a section feels overcomplicated, cut rather than explain. Fewer words with more precision beats comprehensive but dense.
+
+### Surface Uncertainty
+Don't hide what you don't know. Use forecast confidence levels (High / Medium / Low) and explain what's uncertain. Flag assumptions explicitly. Suggest what would increase confidence. Example: "High uncertainty. These projections require validation through experimentation."
+
+### Ground in Evidence
+Every claim should trace to a source — data, user research, product critique, or strategic reasoning. Preference for data, but judgment and taste count too. Be data-informed, not data-driven.
+
+### Anchor in Strategy
+When strategy docs exist (mission, vision, retention frameworks, personas), connect the PRD to them. PRDs aren't isolated specs — they're part of a strategic narrative.
+
+### Document Thinking
+Capture key decisions with rationale in the Decision Log. The thinking process is as valuable as the output. When you simplify a section or reject an approach, note why.
+
+### Adapt the Template
+The template at `resources/templates/product-requirements-v2.md` is a strong starting point, not a rigid form. Add sections that serve the project (e.g., Prioritization Analysis, Experiment Design). Remove sections that don't apply. Rename sections to fit the domain. Write a genuine philosophy note for each PRD.
+
+---
+
 ## Autonomous Mode Process
 
 ### Step 1: Gather Context
@@ -42,11 +66,14 @@ Context sources (search in order):
 1. --context path (if provided)
 2. docs/, docs/projects/, projects/
 3. CLAUDE.md, AGENTS.md, README.md
-4. Any files mentioned in user's description
-5. Related research, data analysis, meeting notes
+4. Strategy and foundation docs (mission, vision, retention framework, personas)
+5. Any files mentioned in user's description
+6. Related research, data analysis, meeting notes
 ```
 
 Use Glob → Grep → Read strategy to find and read all relevant context.
+
+**Track your sources.** Record which files you read and what you extracted from each. You will include a Context Summary in your output showing which sources informed which sections.
 
 **Minimum context required for autonomous mode:**
 - Clear problem statement or opportunity
@@ -61,27 +88,34 @@ If minimum context is not found, inform the user and switch to Interview Mode.
 From gathered context, extract:
 - **Problem/Opportunity:** What problem are we solving? What's the evidence?
 - **Users:** Who has this problem? What are their contexts?
-- **Current State:** How do users solve this today?
+- **Current State:** How do users solve this today? What's the current flow?
 - **Proposed Solution:** What's the high-level approach?
-- **Success Criteria:** How will we measure success?
+- **Success Criteria:** How will we measure success? How should results be segmented?
+- **Strategy Context:** How does this connect to broader strategy or frameworks?
+- **Comps/Inspiration:** What products solve similar problems well?
 - **Constraints:** Technical, timeline, resource limitations
 - **Risks:** What could go wrong?
+- **Confidence:** Where is confidence high vs. where does it need validation?
 
 ### Step 3: Draft the PRD
 
-Use the template at `resources/templates/product-requirements-v2.md` to create a complete PRD.
+Use the template at `resources/templates/product-requirements-v2.md` as a starting point, then adapt it to fit the project.
 
-**Agent-Ready Requirements:**
-- Every functional requirement MUST have testable acceptance criteria
-- Use Given/When/Then format for acceptance criteria
+**Key requirements:**
+- Write a genuine, tailored philosophy note (not boilerplate)
+- Fill every section with specific, measurable content (not placeholders)
+- Use the format that communicates most clearly — narrative, tables, Given/When/Then, or a hybrid
 - Include edge cases in scenarios
 - Document all integration points and data requirements
 - Capture decisions with rationale in Decision Log
+- Include forecast confidence assessments where projections appear
 - Mark any unresolved questions as Open Questions
 
 ### Step 4: Validate Completeness
 
-Run through the Agent-Ready Checklist at the end of the template. For any items that cannot be checked:
+Run through the Quality Guidelines at the end of the template. These are quality targets, not rigid gates — use judgment based on the project's stage and complexity.
+
+For any items that cannot be checked:
 - Mark them explicitly as incomplete
 - Add corresponding Open Questions
 - Recommend follow-up actions
@@ -89,10 +123,11 @@ Run through the Agent-Ready Checklist at the end of the template. For any items 
 ### Step 5: Present for Review
 
 Present the draft to the user with:
-- Summary of context sources used
-- Key decisions made (with rationale)
-- Items marked incomplete or needing validation
-- Recommended next steps
+- **Context summary**: Which source files informed which sections
+- **Key decisions made** (with rationale, from the Decision Log)
+- **Confidence assessment**: What's solid vs. needs validation
+- **Items marked incomplete** or needing validation
+- **Recommended next steps**
 
 ---
 
@@ -109,24 +144,27 @@ Ask the user about their project:
 ### Step 2: Search for Existing Context
 
 Before deep discovery, search for existing documentation:
-1. **Search for docs**: Look in `docs/`, `docs/projects/`, `projects/` for relevant context
-2. **Check for instructions**: Look for `CLAUDE.md`, `AGENTS.md`, `README.md`
-3. **Find existing work**: Search for any prior product requirements, research, or planning docs
+1. **Strategy docs**: Look for mission, vision, retention frameworks, strategic priorities
+2. **Research and data**: Look for analyses, user research, product critiques, meeting notes
+3. **Project docs**: Look in `docs/`, `docs/projects/`, `projects/` for relevant context
+4. **Instructions**: Look for `CLAUDE.md`, `AGENTS.md`, `README.md`
+5. **Prior work**: Search for existing PRDs, feature specs, or planning docs
 
-Use Glob → Grep → Read strategy. Summarize what you found.
+Use Glob → Grep → Read strategy. Summarize what you found — this grounds the conversation in existing context rather than starting from zero.
 
 ### Step 3: Pre-Draft Clarification Gate
 
 **Before creating any document**, ask and capture answers to these clarifying questions:
 
-| Question | Why It Matters for Agents |
-|----------|---------------------------|
+| Question | Why It Matters |
+|----------|----------------|
 | What is the single most important outcome? | Defines primary success metric |
 | Who is the primary user and their context? | Enables accurate scenarios |
 | What constraints are already known? | Prevents invalid technical plans |
 | What is explicitly out of scope? | Prevents scope creep |
 | What does success look like (quantitative)? | Enables testable acceptance criteria |
 | What existing systems does this touch? | Enables accurate dependency mapping |
+| How confident are we in these projections? | Surfaces uncertainty early |
 
 **Proceed only after these are answered clearly.** Summarize understanding and confirm alignment.
 
@@ -154,6 +192,12 @@ For each section, ask probing questions from multiple perspectives:
 - "What's the simplest version that would validate our hypothesis?"
 - "What makes this solution unique/defensible?"
 
+#### Comps & Inspiration
+**From Designer + Domain Expert:**
+- "What products solve a similar problem well? What patterns can we learn from?"
+- "How should the experience feel? What's the emotional tone?"
+- "What design patterns should we reference or avoid?"
+
 #### Technical Context (Critical for Agents)
 **From Technical Advisor + Agentic Engineer:**
 - "What existing systems does this need to integrate with?"
@@ -166,6 +210,8 @@ For each section, ask probing questions from multiple perspectives:
 - "What's the primary metric, and what specific target makes this a success?"
 - "How will we measure this metric?"
 - "What guardrail metrics should we monitor?"
+- "How should results be segmented? Will different cohorts respond differently?"
+- "How confident are we in these projections? What would increase confidence?"
 
 #### Acceptance Criteria (Critical for Agents)
 **From Agentic Engineer:**
@@ -175,17 +221,20 @@ For each section, ask probing questions from multiple perspectives:
 
 ### Step 5: Draft the Document
 
-Create the PRD using `resources/templates/product-requirements-v2.md`.
+Create the PRD using `resources/templates/product-requirements-v2.md` as a starting point, adapting it to fit the project.
 
 Ensure every section is filled with:
 - **Specific, measurable** content (not placeholders)
-- **Testable acceptance criteria** for all requirements
+- **Verifiable criteria** for all major requirements
 - **Explicit scope boundaries**
 - **Technical context** sufficient for tech planning
+- **A genuine philosophy note** tailored to this PRD
+- **Forecast confidence** assessments where projections appear
+- **Decisions captured** in the Decision Log
 
-### Step 6: Validate Agent-Readiness
+### Step 6: Validate Quality
 
-Review against the Agent-Ready Checklist:
+Review against the Quality Guidelines:
 
 **Clarity & Completeness**
 - [ ] Problem is quantified with data
@@ -199,8 +248,8 @@ Review against the Agent-Ready Checklist:
 - [ ] Codebase context provided
 
 **Acceptance Criteria Quality**
-- [ ] All requirements have acceptance criteria
-- [ ] Given/When/Then format used
+- [ ] Major requirements have verifiable criteria
+- [ ] Structured format used where appropriate
 - [ ] Edge cases covered in scenarios
 
 **Decision Completeness**
@@ -208,7 +257,7 @@ Review against the Agent-Ready Checklist:
 - [ ] Key decisions logged with rationale
 - [ ] Assumptions have validation methods
 
-For any unchecked items, either:
+These are quality targets, not rigid gates. For any unchecked items, either:
 1. Ask follow-up questions to fill the gap
 2. Mark as Open Questions in the document
 
@@ -220,8 +269,9 @@ For any unchecked items, either:
 
 - **Agent-Ready is the bar**: The PRD must enable autonomous tech planning and task completion
 - **Explicit over implicit**: Nothing should be left to interpretation
-- **Testable criteria**: Every requirement must have verifiable acceptance criteria
+- **Testable criteria**: Major requirements must have verifiable acceptance criteria
 - **Technical context matters**: Integration points, data, constraints must be documented
+- **Adapt the template**: The template is a starting point — customize it for the project
 
 ### For Interview Mode
 
@@ -233,6 +283,7 @@ For any unchecked items, either:
 ### For Autonomous Mode
 
 - **Use all available context**: Search thoroughly before drafting
+- **Track your sources**: Document which files informed which sections
 - **Make decisions explicit**: Document any decisions you made with rationale
 - **Flag uncertainty**: Mark assumptions and open questions clearly
 - **Present for validation**: Always have user review autonomous output
@@ -250,7 +301,7 @@ Create the PRD at an appropriate location:
 ## Next Steps
 
 Once the PRD is complete, guide the user to:
-1. **Review the Agent-Ready Checklist** — ensure all items are checked
+1. **Review the Quality Guidelines** — verify key items are addressed
 2. **Resolve Open Questions** — these are blockers for autonomous work
 3. **Proceed to Tech Planning** — use `/playbook:tech-plan` for the next phase
 
