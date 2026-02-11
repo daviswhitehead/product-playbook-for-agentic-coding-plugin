@@ -307,6 +307,36 @@ When a verification check fails, iterate autonomously before asking the user:
 
 
 
+## Branch Hygiene Checks
+
+### Merge Cadence Reminder
+
+**From DevOps Engineer perspective:**
+
+When working on a feature branch across multiple sessions, check the branch age:
+
+```bash
+# How long has this branch diverged from production?
+git log --oneline HEAD --not origin/production | wc -l
+```
+
+**If the branch is >3 days old or >15 commits ahead**, remind the user:
+
+> "This branch has diverged from production for [N days / N commits]. Merging production into the feature branch now prevents painful merge conflicts later. Design system changes, migration drift, and ESLint rule additions all compound with divergence time. Merge every 3 days maximum."
+
+### Content Change → Test Coupling
+
+**From QA Specialist perspective:**
+
+When modifying user-facing copy, headlines, or section names, proactively check for E2E tests that assert on the changed content:
+
+```bash
+# After modifying copy in a component, check for E2E tests referencing it
+grep -r "OLD_HEADLINE_TEXT" frontend/tests/e2e/ --include="*.spec.ts"
+```
+
+If matches are found, update the E2E tests in the same commit. Prefer migrating text assertions to `data-testid` selectors where possible to prevent future breakage.
+
 ## Key Principles
 
 - **Multi-Role Perspective**: Draw from all engineering perspectives
