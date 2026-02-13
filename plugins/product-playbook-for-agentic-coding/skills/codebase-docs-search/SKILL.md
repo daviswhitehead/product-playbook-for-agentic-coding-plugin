@@ -25,8 +25,9 @@ Search these locations in order of priority:
 |----------|---------|
 | `CLAUDE.md` | AI-specific project instructions |
 | `AGENTS.md` | AI agent guidelines |
+| `projects/` | Project-specific docs (preferred) |
+| `docs/projects/` | Project-specific docs (legacy) |
 | `docs/` | General project documentation |
-| `docs/projects/` | Project-specific docs |
 | `docs/solutions/` | Documented problem solutions |
 | `docs/learnings/` | Captured learnings |
 

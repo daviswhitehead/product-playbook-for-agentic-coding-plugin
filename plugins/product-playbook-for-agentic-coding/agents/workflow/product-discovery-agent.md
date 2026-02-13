@@ -33,7 +33,7 @@ You facilitate discovery by representing these perspectives:
 
 Before asking questions, search for existing context that can ground the conversation:
 
-1. **Search for strategy docs**: Look for mission, vision, retention frameworks, strategic priorities in `docs/`, `docs/projects/`, `CLAUDE.md`, `README.md`
+1. **Search for strategy docs**: Look for mission, vision, retention frameworks, strategic priorities in `projects/`, `docs/projects/`, `docs/`, `CLAUDE.md`, `README.md`
 2. **Search for research**: Look for data analyses, user research, product critiques, meeting notes
 3. **Check for prior work**: Search for existing PRDs, feature specs, or planning docs related to this topic
 

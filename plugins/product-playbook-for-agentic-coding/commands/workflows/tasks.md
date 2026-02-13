@@ -29,7 +29,7 @@ Select the most appropriate tools as you work through this process.
 Before starting, search for existing project documentation:
 1. **Find Tech Plan**: This is required input—locate it first
 2. **Find Product Requirements**: For context on goals and success criteria
-3. **Search for docs**: Look in `docs/`, `docs/projects/`, `projects/`
+3. **Search for docs**: Look in `projects/`, `docs/projects/`, `docs/`
 4. **Find existing learnings**: Search for prior learnings that might be relevant
 
 Use Glob -> Grep -> Read strategy to find and incorporate relevant context.
@@ -63,7 +63,7 @@ Before starting, ensure:
 
 1. Check if a Tasks document already exists for this project
 2. If not, use the template pattern from `resources/templates/tasks.md`
-3. Create it in an appropriate location (e.g., `docs/projects/[project-name]/tasks.md`)
+3. Create it in an appropriate location (e.g., `projects/[project-name]/tasks.md`)
 
 ### Step 3: Break Down Work into Tasks
 
@@ -160,9 +160,11 @@ Review the document:
 
 Once the Tasks Document is complete, guide the user to:
 1. Review and validate the task breakdown
-2. Begin implementation using `/playbook:work` command to execute tasks
-3. Use `/playbook:work` repeatedly to work through the task list
-4. Capture learnings using `/playbook:learnings` when complete
+2. **Run a stakeholder critique** — use `/playbook:critique` on the tasks document. This catches missing dependencies, underestimated effort, and unclear acceptance criteria before work begins.
+3. Begin implementation using `/playbook:work` command to execute tasks
+4. Use `/playbook:work` repeatedly to work through the task list
+5. **During implementation**: Use specialist code review agents (security-sentinel, performance-oracle, etc.) at milestone boundaries — don't accumulate >100 files without review
+6. Capture learnings using `/playbook:learnings` when complete
 
 ---
 

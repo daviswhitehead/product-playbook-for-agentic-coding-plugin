@@ -8,6 +8,91 @@ argument-hint: "[--autonomous] [--context <path>] [brief project description]"
 
 You are facilitating the Product Discovery phase. Your goal is to create a comprehensive, **agent-ready** Product Requirements Document (PRD) that enables autonomous technical planning and implementation.
 
+## Step 0: Workflow Mode Detection
+
+**Before starting discovery**, determine what type of work this is. Different work types need different workflow depth.
+
+Ask the user:
+```
+What type of work is this?
+
+1. **New feature / major addition** — Needs full discovery, planning, and task breakdown
+   Examples: new page, new integration, new data model, new user flow
+   → Full pipeline: PRD → Tech Plan → Tasks → Work → Learnings
+
+2. **UI polish / iteration** — Known scope, feedback-driven, just needs execution
+   Examples: spacing fixes, animation tweaks, responsive adjustments, copy changes
+   → Lightweight: Scope note → Work directly → Learnings
+
+3. **Bug fix / targeted repair** — Something is broken, needs systematic debugging
+   Examples: broken layout, failed test, incorrect behavior, regression
+   → Debug path: /playbook:debug → Learnings
+
+4. **Refactor / technical improvement** — Code works but needs structural improvement
+   Examples: extract component, improve types, reduce duplication, optimize performance
+   → Lightweight with tech context: Quick scope → Work → Learnings
+
+5. **Not sure yet** — Need to explore before deciding
+   → Start with discovery questions, then route
+```
+
+### Routing Logic
+
+**Route to Full Pipeline** (continue with this command) if ANY of:
+- Work requires new data models or API endpoints
+- Work touches 3+ systems or services
+- Work needs architectural decisions not yet made
+- Estimated scope is >20 files
+- User selects option 1 or 5
+
+**Route to Lightweight Path** if ALL of:
+- Solution approach is already known
+- Work is within a single system or component area
+- No new architectural decisions needed
+- Estimated scope is <20 files
+- User selects option 2 or 4
+
+**Route to Debug Path** if:
+- User selects option 3
+- Suggest: "Use `/playbook:debug` for systematic debugging, then `/playbook:learnings` to capture the solution."
+
+### Lightweight Path (for options 2 and 4)
+
+If routing to lightweight, skip the full PRD. Instead create a **scope note**:
+
+```markdown
+## Lightweight Scope Note
+
+**Work type**: [UI polish | Refactor | Iteration]
+**Goal**: [One sentence: what should be different when done]
+**Files likely affected**: [List key files or components]
+**Acceptance criteria**:
+- [ ] [Specific, testable criterion]
+- [ ] [Specific, testable criterion]
+**Estimated scope**: [~N files]
+**Approach**: [Brief description of how to accomplish it]
+```
+
+Save to `projects/[project-name]/scope-note.md` (or inline if trivial).
+
+Then guide the user:
+```
+This looks like lightweight work. I've created a scope note instead of a full PRD.
+
+Next steps:
+1. Review the scope note above
+2. Jump directly to implementation with `/playbook:work` (using scope note as context)
+3. Capture learnings when done with `/playbook:learnings`
+
+No tech plan or task document needed for this scope.
+```
+
+For option 4 (refactor), also ask: "What's the current pattern, the target pattern, and are there tests covering this code?"
+
+---
+
+## Full Pipeline (continues below for option 1 or 5)
+
 ## Modes
 
 This command supports two modes:
@@ -64,7 +149,7 @@ Search extensively for existing documentation:
 ```
 Context sources (search in order):
 1. --context path (if provided)
-2. docs/, docs/projects/, projects/
+2. projects/, docs/projects/, docs/
 3. CLAUDE.md, AGENTS.md, README.md
 4. Strategy and foundation docs (mission, vision, retention framework, personas)
 5. Any files mentioned in user's description
@@ -146,7 +231,7 @@ Ask the user about their project:
 Before deep discovery, search for existing documentation:
 1. **Strategy docs**: Look for mission, vision, retention frameworks, strategic priorities
 2. **Research and data**: Look for analyses, user research, product critiques, meeting notes
-3. **Project docs**: Look in `docs/`, `docs/projects/`, `projects/` for relevant context
+3. **Project docs**: Look in `projects/`, `docs/projects/`, `docs/` for relevant context
 4. **Instructions**: Look for `CLAUDE.md`, `AGENTS.md`, `README.md`
 5. **Prior work**: Search for existing PRDs, feature specs, or planning docs
 
@@ -293,7 +378,7 @@ These are quality targets, not rigid gates. For any unchecked items, either:
 ## Output
 
 Create the PRD at an appropriate location:
-- Default: `docs/projects/[project-name]/product-requirements.md`
+- Default: `projects/[project-name]/product-requirements.md`
 - Or: Path specified by user
 
 ---
@@ -303,7 +388,8 @@ Create the PRD at an appropriate location:
 Once the PRD is complete, guide the user to:
 1. **Review the Quality Guidelines** — verify key items are addressed
 2. **Resolve Open Questions** — these are blockers for autonomous work
-3. **Proceed to Tech Planning** — use `/playbook:tech-plan` for the next phase
+3. **Run a stakeholder critique** — use `/playbook:critique` to get multi-persona feedback on the PRD before proceeding. Critiques at document stages are the highest-ROI workflow step — catching issues here is 10x cheaper than during implementation.
+4. **Proceed to Tech Planning** — use `/playbook:tech-plan` for the next phase
 
 ---
 

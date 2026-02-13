@@ -116,7 +116,7 @@ A startup creating its first strategy needs the full stack. A team adding a feat
 
 Create the foundations document at an appropriate location:
 - Default: `docs/foundations/strategy-foundations.md`
-- Or: `docs/projects/[project-name]/foundations.md`
+- Or: `projects/[project-name]/foundations.md`
 - Or: Path specified by user
 
 Use the template at `resources/templates/strategy-foundations.md` as a starting point, adapted to the project's scope.

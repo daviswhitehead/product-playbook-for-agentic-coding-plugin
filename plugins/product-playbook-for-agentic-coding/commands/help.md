@@ -139,6 +139,21 @@ Display all available commands and help the user find the right one for their ta
 2. /playbook:learnings             → Capture the solution (blocker-overcome)
 ```
 
+### UI Polish / Iteration Work
+```
+1. /playbook:product-requirements  → Detects lightweight work, creates scope note
+2. /playbook:work                  → Execute directly (no tasks doc needed)
+3. /playbook:git-commit            → Commit when done
+4. /playbook:learnings             → Capture what you learned
+```
+
+### Bug Fix
+```
+1. /playbook:debug                 → Systematic debugging
+2. /playbook:learnings             → Capture the solution
+3. /playbook:git-commit            → Commit the fix
+```
+
 ### Quick Task Execution
 ```
 1. /playbook:work                  → Execute next task
