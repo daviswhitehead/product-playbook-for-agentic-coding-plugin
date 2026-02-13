@@ -52,7 +52,7 @@ If the user says a design spec is not needed, stop here and proceed to the next 
 ### Step 1: Gather and organize references
 
 1. Ask for the minimum set of visuals needed (screenshots, mockups, competitor flows).
-2. Recommend saving images in `docs/projects/[project-name]/`.
+2. Recommend saving images in `projects/[project-name]/`.
 3. Use clear filenames (e.g., `agent-reply-states.png`, `composer-states.png`).
 4. Capture short notes for each image: what it shows and why it matters.
 
@@ -62,7 +62,7 @@ If the user says a design spec is not needed, stop here and proceed to the next 
 
 1. Check if a design spec already exists for this project
 2. If not, use the design-spec template from this plugin's `resources/templates/`
-3. Create it at: `docs/projects/[project-name]/design-spec.md`
+3. Create it at: `projects/[project-name]/design-spec.md`
 
 ### Step 3: Draft the spec (Product Designer lead)
 

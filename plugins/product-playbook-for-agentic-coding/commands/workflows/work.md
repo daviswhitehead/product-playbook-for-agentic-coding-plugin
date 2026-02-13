@@ -81,11 +81,18 @@ Before starting, ensure:
 - Tasks Document exists and has tasks defined
 - At least one task is ready to work on (dependencies satisfied)
 
+### Environment & Secrets Check
+
+**Check CLAUDE.md** for how the project manages secrets and environment variables. Common patterns:
+- **Doppler**: All env vars injected at runtime. Use `doppler run -- <command>`. The project's `npm run` scripts often wrap Doppler internally.
+- **Local services** (e.g., Supabase): Use the CLI status command (e.g., `supabase status`) to get local URLs/keys.
+- **NEVER** say "environment variables are missing" or ask the user for API keys. They are always available via the project's secrets management. If a command fails with missing env vars, check CLAUDE.md for the correct prefix/wrapper.
+
 ## Process
 
 ### Step 1: Locate and Review Tasks Document
 
-1. Locate the Tasks Document (typically `docs/projects/[project-name]/tasks.md`)
+1. Locate the Tasks Document (typically `projects/[project-name]/tasks.md` or `docs/projects/[project-name]/tasks.md`)
 2. Read the "Current Focus" section to identify the active task
 3. If no active task is specified, identify the next task that:
    - Has status "Not Started" or "In Progress"
@@ -166,11 +173,11 @@ Options:
 3. Fix any issues found
 
 
-### Step 5.5: Self-Validate Before Claiming Complete
+### Step 5.5: Autonomous Pre-Review (Agent Dry-Run)
 
-**CRITICAL**: Before marking a task complete, verify the work autonomously:
+**CRITICAL**: Before presenting work to the user, maximize autonomous progress. The goal is to catch every obvious issue so the user's review focuses on taste, direction, and edge cases — not bugs you could have found yourself.
 
-#### For Code Changes
+#### 1. Run Automated Checks
 ```bash
 # Run relevant tests
 npm test  # or pytest, cargo test, etc.
@@ -182,9 +189,19 @@ npm run lint && npm run typecheck
 npm run build
 ```
 
-#### For API/Endpoint Changes
+#### 2. Walk Through the Feature Yourself
+
+**For UI changes**: Launch the dev server and use browser tools to verify:
+- Navigate to the affected pages/routes
+- Take screenshots of before/after states
+- Check responsive behavior (mobile, tablet, desktop viewports)
+- Test light mode AND dark mode
+- Verify interactive elements work (clicks, hovers, inputs)
+- Check for visual regressions in surrounding UI
+
+**For API/Endpoint changes**:
 ```bash
-# Test the endpoint directly
+# Test endpoints directly
 curl -X GET https://api.example.com/endpoint
 curl -X POST https://api.example.com/endpoint -d '{"test": true}'
 
@@ -193,27 +210,57 @@ curl -I -X OPTIONS https://api.example.com/endpoint \
   -H "Origin: https://app.example.com"
 ```
 
-#### For Auth/Redirect Changes
+**For Auth/Redirect changes**:
 ```bash
 # Trace the full redirect flow
 curl -L -v https://example.com/login 2>&1 | grep -i location
-
-# Verify OAuth callback URLs are configured
 ```
 
-#### For Infrastructure Changes
+**For Infrastructure changes**:
 ```bash
-# Health checks
 curl https://api.example.com/health
-
-# DNS verification
 dig +short app.example.com
-
-# SSL verification
 curl -I https://app.example.com
 ```
 
-**Only proceed to "Complete" if automated verification passes.**
+#### 3. Run Applicable Rubrics
+
+Auto-detect which rubrics to apply based on files changed:
+
+| Files Changed | Rubric(s) to Run |
+|---------------|-----------------|
+| `*.tsx`, `*.css`, UI components | Design system compliance, accessibility (WCAG) |
+| `route.ts`, `server.ts`, API files | Security, API contract, error handling |
+| `*.test.*`, `*.spec.*` | Test quality, coverage, flakiness check |
+| `migration*`, `database*` | Data integrity, rollback safety |
+| `*.md`, documentation | Completeness, accuracy, freshness |
+
+Use `/playbook:rubric` if available, or manually check against project standards in CLAUDE.md.
+
+#### 4. Fix What You Find
+
+If automated checks or manual walkthrough reveal issues:
+- Fix them immediately (don't report to user)
+- Re-run verification after each fix
+- Iterate up to 3 times before escalating
+
+**Only proceed to "Present to User" after all automated verification passes and manual walkthrough looks correct.**
+
+### Step 5.6: Present to User for Review
+
+After autonomous pre-review passes, present the work concisely:
+
+```
+"Task [X.Y] implementation complete. Here's what I built and verified:
+
+**What was done**: [1-2 sentence summary]
+**Files changed**: [list key files]
+**Verified**: [checks that passed — tests, lint, typecheck, build, visual]
+
+Ready for your review. Anything you'd like adjusted?"
+```
+
+**Key principle**: The user reviews for taste, direction, and subtle issues. The agent handles all obvious quality checks autonomously.
 
 ### Step 6: Complete Task and Update Documentation
 
@@ -354,7 +401,24 @@ After completing a task:
 1. Update Tasks Document with completion status
 2. Identify next task (checking dependencies)
 3. Ask user if they want to continue or take a break
-4. When all tasks complete, use `/playbook:learnings`
+
+When all tasks are complete, follow this end-to-end flow:
+
+```
+Implement (all tasks done)
+  ↓
+Automated Testing — Run full test suite, lint, typecheck, build
+  ↓
+Local Review — Walk through the feature yourself (browser, endpoints, etc.)
+  ↓
+CI Maximizing — Push and ensure all CI checks pass. Use `/playbook:debug-ci` if failures occur.
+  ↓
+Create PR — Use `/playbook:git:create-pr` or `gh pr create`
+  ↓
+Learnings — Use `/playbook:learnings` to capture what you learned
+```
+
+**Don't skip steps.** CI failures are learning opportunities — if `/playbook:debug-ci` is used, follow up with `/playbook:learnings` to capture the root cause.
 
 ---
 

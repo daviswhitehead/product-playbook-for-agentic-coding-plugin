@@ -45,7 +45,7 @@ Help the user organize their visual materials:
 
 ### Step 3: Create the Critique Document
 
-Create a design critique document in the project folder (e.g., `docs/projects/[project-name]/design-critique.md`) with:
+Create a design critique document in the project folder (e.g., `projects/[project-name]/design-critique.md`) with:
 
 ```markdown
 # Design Critique: [Feature/Area Name]

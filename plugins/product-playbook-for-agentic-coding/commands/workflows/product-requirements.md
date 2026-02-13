@@ -73,7 +73,7 @@ If routing to lightweight, skip the full PRD. Instead create a **scope note**:
 **Approach**: [Brief description of how to accomplish it]
 ```
 
-Save to `docs/projects/[project-name]/scope-note.md` (or inline if trivial).
+Save to `projects/[project-name]/scope-note.md` (or inline if trivial).
 
 Then guide the user:
 ```
@@ -149,7 +149,7 @@ Search extensively for existing documentation:
 ```
 Context sources (search in order):
 1. --context path (if provided)
-2. docs/, docs/projects/, projects/
+2. projects/, docs/projects/, docs/
 3. CLAUDE.md, AGENTS.md, README.md
 4. Strategy and foundation docs (mission, vision, retention framework, personas)
 5. Any files mentioned in user's description
@@ -231,7 +231,7 @@ Ask the user about their project:
 Before deep discovery, search for existing documentation:
 1. **Strategy docs**: Look for mission, vision, retention frameworks, strategic priorities
 2. **Research and data**: Look for analyses, user research, product critiques, meeting notes
-3. **Project docs**: Look in `docs/`, `docs/projects/`, `projects/` for relevant context
+3. **Project docs**: Look in `projects/`, `docs/projects/`, `docs/` for relevant context
 4. **Instructions**: Look for `CLAUDE.md`, `AGENTS.md`, `README.md`
 5. **Prior work**: Search for existing PRDs, feature specs, or planning docs
 
@@ -378,7 +378,7 @@ These are quality targets, not rigid gates. For any unchecked items, either:
 ## Output
 
 Create the PRD at an appropriate location:
-- Default: `docs/projects/[project-name]/product-requirements.md`
+- Default: `projects/[project-name]/product-requirements.md`
 - Or: Path specified by user
 
 ---
@@ -388,7 +388,8 @@ Create the PRD at an appropriate location:
 Once the PRD is complete, guide the user to:
 1. **Review the Quality Guidelines** — verify key items are addressed
 2. **Resolve Open Questions** — these are blockers for autonomous work
-3. **Proceed to Tech Planning** — use `/playbook:tech-plan` for the next phase
+3. **Run a stakeholder critique** — use `/playbook:critique` to get multi-persona feedback on the PRD before proceeding. Critiques at document stages are the highest-ROI workflow step — catching issues here is 10x cheaper than during implementation.
+4. **Proceed to Tech Planning** — use `/playbook:tech-plan` for the next phase
 
 ---
 

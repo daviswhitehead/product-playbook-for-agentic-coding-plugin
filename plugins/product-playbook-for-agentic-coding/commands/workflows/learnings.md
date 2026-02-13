@@ -78,7 +78,7 @@ Before proceeding, consider what tools are available:
 
 **Before capturing learnings for a completed project**, check if validation work was done:
 
-1. **Locate the tasks document** for the project (typically `docs/projects/[project-name]/tasks.md` or `projects/*/tasks.md`)
+1. **Locate the tasks document** for the project (typically `projects/[project-name]/tasks.md` or `docs/projects/*/tasks.md`)
 2. **Search for validation/QA tasks** — look for tasks related to: accessibility audit, performance check (Lighthouse), test coverage, agent usability test, visual review
 3. **Check their status**:
    - If validation tasks exist and are **incomplete**, warn the user:

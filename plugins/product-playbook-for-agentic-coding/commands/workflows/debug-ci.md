@@ -237,7 +237,13 @@ supabase migration list
 ## Next Steps
 
 After fixing CI:
-1. Document the root cause
-2. Consider if this is a pattern that needs prevention (pre-commit hook, CI lint)
-3. Use `/playbook:learnings` to capture what you learned
-4. If a policy gap enabled the failure, propose enforcement automation
+1. Document the root cause in the commit message
+2. **Mandatory**: Use `/playbook:learnings` with trigger type "blocker-overcome" to capture:
+   - What failed and why
+   - What the actual root cause was (vs initial hypothesis)
+   - How to prevent it next time
+   - Whether a CLAUDE.md rule, pre-commit hook, or CI lint should enforce prevention
+3. If a policy gap enabled the failure, propose enforcement automation
+4. If this is a recurring pattern, add it to the "Common Failure Patterns" section above
+
+**CI failures are the highest-signal learning moments.** The fix is worth 1x; the prevention is worth 10x. Never skip the learnings capture after a CI fix.

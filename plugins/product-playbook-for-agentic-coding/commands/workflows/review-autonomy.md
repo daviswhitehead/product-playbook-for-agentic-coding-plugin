@@ -40,8 +40,8 @@ Before starting, ensure:
 ### Step 1: Locate and Review Project Documents
 
 1. **Locate project documents**:
-   - Tech Plan Document (typically `docs/projects/[project-name]/tech-plan.md`)
-   - Tasks Document (typically `docs/projects/[project-name]/tasks.md`)
+   - Tech Plan Document (typically `projects/[project-name]/tech-plan.md`)
+   - Tasks Document (typically `projects/[project-name]/tasks.md`)
    - Product Requirements (if applicable)
    - Related documentation
 

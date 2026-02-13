@@ -43,7 +43,7 @@ Search extensively for relevant documentation:
 ```
 Priority order:
 1. Specified context path(s)
-2. docs/, docs/projects/, projects/
+2. projects/, docs/projects/, docs/
 3. CLAUDE.md, AGENTS.md, README.md
 4. Strategy and foundation docs (mission, vision, retention framework, personas)
 5. Research files, meeting notes, data analysis
