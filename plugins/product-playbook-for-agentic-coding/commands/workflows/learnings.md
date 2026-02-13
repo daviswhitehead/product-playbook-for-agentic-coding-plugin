@@ -106,6 +106,21 @@ What type of learning moment is this?
 3. Overcame a blocker (targeted documentation)
 ```
 
+**If the user selects option 2 (project completion)**, additionally ask:
+
+```
+Would you like a deep retrospective that analyzes session history?
+
+A. **Standard retrospective** — Capture learnings from what we discussed
+   Time: ~15 minutes
+
+B. **Deep retrospective** — Analyze SpecStory session files for patterns
+   the agent missed: repetition, wasted effort, user frustration signals
+   Time: ~30-45 minutes (requires .specstory/history/ files)
+```
+
+If the user selects B, set `deep_retrospective = true` and proceed to Step 4.5 after Step 4.
+
 ### Step 2: Identify Output Target
 
 Ask the user:
@@ -156,6 +171,79 @@ Targeted capture:
 - **Solution**: How was it fixed?
 - **Prevention**: How to avoid this in the future?
 
+### Step 4.5: Deep Session History Analysis (If Selected)
+
+**Only run this step if the user opted for deep retrospective in Step 1.**
+
+#### 4.5.1: Locate Session Files
+
+Search for SpecStory session history files:
+```
+.specstory/history/*.md
+```
+
+Filter to files within the project's date range. If no session files are found, fall back to standard retrospective.
+
+#### 4.5.2: Analyze Sessions
+
+Use the Task tool to spawn a research agent that reads through the session files (they can be very large — read in chunks). The agent should analyze for:
+
+**Repetition Patterns** (signals of misalignment or missing docs):
+- Same instruction given by user multiple times in different forms
+- Same file read 3+ times in a session
+- Same error encountered and "fixed" more than twice
+- Agent proposing a solution, reverting it, proposing it again
+- Agent making the same type of mistake across sessions
+
+**Wasted Effort** (work that didn't contribute to outcome):
+- Code written and then deleted in the same session
+- Multiple failed approaches before finding the right one
+- Long debugging cycles for simple root causes
+- Planning documents generated but never referenced during implementation
+
+**User Frustration Signals**:
+- Short corrective responses after long agent outputs ("no", "just do X")
+- User repeating instructions with increasing specificity
+- User overriding agent decisions ("don't do that, do this instead")
+- User taking over tasks the agent was supposed to handle (e.g., manually testing CSS values)
+
+**Knowledge Gaps**:
+- Information the agent searched for that was already in CLAUDE.md or MEMORY.md
+- Platform quirks the agent hit that were documented but not consulted
+- Commands or workflows the agent got wrong despite documentation
+
+#### 4.5.3: Present Findings
+
+Produce a structured summary:
+
+```
+## Deep Retrospective Findings
+
+**Sessions analyzed**: N (from [date] to [date])
+
+### Repetition Patterns (N found)
+- [Pattern]: Seen X times. Example: "[quote]". Prevention: [action]
+
+### Wasted Effort (N instances)
+- [Instance]: [description]. Root cause: [why]. Prevention: [action]
+
+### Frustration Signals (N instances)
+- [Signal]: [context]. Root cause: [why]. Prevention: [action]
+
+### Knowledge Gaps (N found)
+- [Gap]: Info was in [location] but agent didn't find it. Fix: [action]
+```
+
+#### 4.5.4: Compare with Standard Retrospective
+
+After completing the standard retrospective (Step 4), compare findings:
+- What did the deep analysis find that the standard retrospective missed?
+- This comparison itself is a learning: the delta shows the agent's blind spots.
+
+Include a comparison table in the final learnings document.
+
+---
+
 ### Step 5: Use YAML Frontmatter for Searchability
 
 Ensure learnings include frontmatter:
@@ -164,10 +252,12 @@ Ensure learnings include frontmatter:
 title: "Brief descriptive title"
 date: YYYY-MM-DD
 trigger: [chat-session|project-completion|blocker-overcome]
+analysis-depth: [standard|deep]
 category: [performance|database|integration|workflow|debugging|design|generation|infrastructure]
 tags: [relevant, searchable, keywords]
 severity: [critical|high|medium|low]
 module: "affected_module_name"
+sessions-analyzed: [N]  # only for deep retrospectives
 ---
 ```
 

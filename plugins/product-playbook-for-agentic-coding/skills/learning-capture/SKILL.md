@@ -120,6 +120,37 @@ Learnings can improve two distinct areas:
 | Template fix | Update resources/templates/ |
 | New workflow | Create new command or skill |
 
+## Deep Session Analysis Patterns
+
+When performing a deep retrospective (analyzing SpecStory session files in `.specstory/history/`), use these patterns to extract insights the agent missed during the session.
+
+### Pattern: Repetition Detection
+**Signal**: Same action performed multiple times without progress.
+**How to detect**: Scan for repeated file reads (same path 3+ times), repeated errors, repeated user corrections, and solution/revert cycles.
+**What it means**: The agent lacked context, had a faulty mental model, or didn't learn from previous attempts.
+**Improvement**: Add the missing context to CLAUDE.md or MEMORY.md so future sessions start with it.
+
+### Pattern: Frustration Signal Detection
+**Signal**: User communication shifts from collaborative to directive.
+**Severity scale**:
+1. Mild — User provides more specific instructions than before
+2. Moderate — Short corrective phrases ("no", "not that", "just X")
+3. Strong — User takes over the task themselves
+4. Severe — User explicitly states frustration
+**Improvement**: Identify the specific mismatch and encode it as a behavioral rule.
+
+### Pattern: Wasted Effort Detection
+**Signal**: Work that didn't contribute to the final outcome.
+**How to detect**: Compare final git diff to all changes during session, look for "let me try a different approach" patterns, count debugging cycles per issue (>2 = wasted).
+**Improvement**: Document the correct approach so future sessions don't repeat wrong paths.
+
+### Pattern: Scope Drift Detection
+**Signal**: Work expanded significantly beyond original request.
+**How to detect**: Compare first user message to final summary. Count files touched vs expected.
+**Improvement**: If unintentional, add scope-check trigger to MEMORY.md.
+
+---
+
 ## YAML Frontmatter Schema
 
 All learnings should include searchable frontmatter:
@@ -209,6 +240,13 @@ Add YAML frontmatter for searchability.
 ### Step 5: Save to Correct Location
 - Codebase: `docs/learnings/YYYY-MM-DD-topic.md`
 - Plugin: Create PR to plugin repo
+
+### Step 5.5: Deep Analysis (Optional, Project Completion Only)
+If session history files are available (`.specstory/history/*.md`):
+- Spawn a research agent to scan for repetition patterns, frustration signals, wasted effort, scope drift
+- Quantify findings with examples and estimated time impact
+- Compare deep findings against the standard retrospective to identify blind spots
+- Feed improvement actions into Step 6 alongside standard learnings
 
 ### Step 6: Promote Key Learnings
 Move the most important learnings to higher-actionability locations:

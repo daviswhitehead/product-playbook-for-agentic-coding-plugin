@@ -108,6 +108,40 @@ module: "[affected_module_name]"
 
 ---
 
+## Deep Retrospective Findings (Optional)
+*Populated when using deep retrospective mode with SpecStory session analysis.*
+
+### Sessions Analyzed
+- **Count**: [N sessions]
+- **Date range**: [From] to [To]
+
+### Repetition Patterns
+| Pattern | Occurrences | Est. Time Wasted | Prevention |
+|---------|-------------|------------------|------------|
+| [Pattern 1] | X times | ~Y min | [Action] |
+
+### Wasted Effort
+| Instance | What Happened | Root Cause | Prevention |
+|----------|---------------|------------|------------|
+| [Instance 1] | [Description] | [Why] | [Action] |
+
+### Frustration Signals
+| Signal | Context | Root Cause | Prevention |
+|--------|---------|------------|------------|
+| [Signal 1] | [What was happening] | [Why] | [Action] |
+
+### Knowledge Gaps Found
+| Gap | Info Location | Should Be In | Action |
+|-----|---------------|--------------|--------|
+| [Gap 1] | [Where it exists] | [Where it should be] | [Move/copy] |
+
+### Comparison: Standard vs Deep Findings
+| Finding | In Standard Retro? | Source |
+|---------|:---:|--------|
+| [Finding 1] | Yes/No | [Standard/Deep analysis] |
+
+---
+
 ## Actionable Improvements
 
 ### Codebase Documentation Updates
