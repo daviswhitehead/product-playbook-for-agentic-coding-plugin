@@ -86,6 +86,33 @@
 
 ---
 
+### Task 1.H: [Human Task Name] `[HUMAN]`
+> Use this format for tasks requiring manual action in external dashboards, third-party services, or physical access that the agent cannot perform.
+
+**Description**: [What needs to be done and why]
+
+**Executor**: `[HUMAN]` (with agent guidance)
+
+**Step-by-Step Instructions**:
+1. [Go to specific URL / Open specific dashboard]
+2. [Navigate to exact menu: Settings > Sub-menu > Option]
+3. [Specific action to take, with exact values to enter]
+4. [What to verify after the action]
+
+**Decision Points** (choices the human will face):
+- [Decision 1]: Choose [Option A] because [reason]. [Option B] is for [different use case].
+- [Decision 2]: Select [specific value]. [Why this value over alternatives].
+
+**Output Needed for Next Task**: [Exact values, keys, or confirmations the agent needs to proceed]
+
+**Acceptance Criteria**:
+- [ ] [Criteria 1 - specific and verifiable]
+- [ ] [Criteria 2 - specific and verifiable]
+
+**Status**: [ ] Not Started | [ ] In Progress | [ ] Complete
+
+---
+
 ### Task 1.2: [Task Name]
 **Description**: [Detailed task description - specific and actionable]
 

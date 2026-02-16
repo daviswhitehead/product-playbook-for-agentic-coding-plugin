@@ -101,6 +101,17 @@ For each task, recommend:
 - **Tools**: Relevant MCP servers, plugins, or other tools
 - **Rationale**: Brief explanation of why
 
+#### 6.5. Human Task Instructions
+**From DevOps Engineer + Engineering Manager perspectives:**
+
+Some tasks require human action in external dashboards or services (e.g., creating accounts, configuring third-party tools, setting secrets). Mark these with `[HUMAN]` executor and provide:
+
+- **Step-by-step instructions**: Exact menu paths, URLs, and actions — not just "create a project in [Service]"
+- **Decision points**: Where the human will face choices, explain which option to pick and why
+- **Output needed**: What values/keys/confirmations the agent needs from the human to proceed with dependent tasks
+
+**Why this matters**: Vague `[HUMAN]` tasks create back-and-forth friction. The human shouldn't need to ask "which option do I pick?" at every step. Write instructions as if the human has never used the service before.
+
 #### 7. Design & Creative Project Considerations
 
 **From Designer + Product Manager perspectives:**
