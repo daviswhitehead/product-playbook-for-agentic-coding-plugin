@@ -149,6 +149,12 @@ When performing a deep retrospective (analyzing SpecStory session files in `.spe
 **How to detect**: Compare first user message to final summary. Count files touched vs expected.
 **Improvement**: If unintentional, add scope-check trigger to MEMORY.md.
 
+### Pattern: CLAUDE.md Growth
+**Signal**: CLAUDE.md size exceeds 32,000 chars or triggers the performance warning (>40k).
+**How to detect**: Run `wc -c CLAUDE.md`. Check for RESOLVED issues still inline, niche guides that belong in `docs/guides/`, duplicate content (e.g., test commands listed in both Quick Reference and a Common Workflows section).
+**Root cause**: The learnings promotion workflow is additive-only — it promotes content UP to CLAUDE.md but never demotes stale content DOWN to docs/guides/ or docs/learnings/.
+**Improvement**: Before promoting new learnings to CLAUDE.md, check size and archive stale content. Resolved issues should be moved to `docs/learnings/resolved-issues.md`. Niche guides should be moved to `docs/guides/` with a 1-line reference in CLAUDE.md.
+
 ---
 
 ## YAML Frontmatter Schema
@@ -248,11 +254,27 @@ If session history files are available (`.specstory/history/*.md`):
 - Compare deep findings against the standard retrospective to identify blind spots
 - Feed improvement actions into Step 6 alongside standard learnings
 
-### Step 6: Promote Key Learnings
-Move the most important learnings to higher-actionability locations:
+### Step 6: CLAUDE.md Health Check & Promote Key Learnings
+
+**Before promoting**, check CLAUDE.md health:
+1. Run `wc -c CLAUDE.md` to check current size
+2. If over 32,000 chars (80% of 40k limit), trigger a **trimming pass** before adding content:
+   - Archive RESOLVED known issues to `docs/learnings/resolved-issues.md`
+   - Move niche/domain-specific guides to `docs/guides/`
+   - Remove content that duplicates the Quick Reference section
+   - Condense verbose sections that can be replaced with a 1-line reference + link
+3. If over 40,000 chars, trimming is **mandatory** before any promotion
+
+**Promotion hierarchy** (highest = most actionable):
 - **Code/scripts** (automatic) > **CLAUDE.md** (always visible) > **Templates** (on-demand) > **Docs** (reference)
 - Ask: "Which 2-3 learnings should be promoted? Where should they live?"
 - Implement the promotions (edit CLAUDE.md, create template, update script)
+
+**Demotion** — content should also move DOWN the hierarchy over time:
+- RESOLVED known issues → `docs/learnings/resolved-issues.md`
+- Niche workflow guides (used by <1 session/month) → `docs/guides/`
+- Content duplicated elsewhere in CLAUDE.md → delete
+- Stale milestone-specific content → delete or archive
 
 ## Integration Points
 

@@ -287,6 +287,17 @@ Based on trigger type, fill appropriate sections:
 
 A learning left in a doc is a learning that will be re-learned the hard way. For each key learning, promote it as high as possible:
 
+#### Pre-Promotion: CLAUDE.md Health Check
+
+**Before adding content to CLAUDE.md**, check its current size:
+1. Run `wc -c CLAUDE.md`
+2. If over **32,000 chars** (80% of 40k limit), trim before adding:
+   - Archive RESOLVED known issues → `docs/learnings/resolved-issues.md`
+   - Move niche/domain-specific guides → `docs/guides/[topic].md` (keep 1-line reference in CLAUDE.md)
+   - Remove content that duplicates the Quick Reference section
+   - Condense verbose sections to a reference + link
+3. If over **40,000 chars**, trimming is **mandatory** — the file will degrade agent performance
+
 **Promotion hierarchy** (highest = most actionable):
 1. **Code/automation** — Encode in scripts, hooks, linters (happens automatically)
 2. **CLAUDE.md / MEMORY.md** — Always visible to the agent every session
@@ -299,6 +310,12 @@ A learning left in a doc is a learning that will be re-learned the hard way. For
 - [ ] Should any learning become a reusable template? (`docs/templates/`)
 - [ ] Should any learning be encoded in code? (scripts, hooks, automation)
 - [ ] Should any earlier doc be updated to reflect new knowledge? (fix stale conclusions)
+
+**Demotion checklist** (run alongside promotion):
+- [ ] Are there RESOLVED known issues still in CLAUDE.md? → Archive to `docs/learnings/resolved-issues.md`
+- [ ] Are there niche guides in CLAUDE.md used <1x/month? → Move to `docs/guides/`
+- [ ] Is any CLAUDE.md content duplicated across sections? → Consolidate or delete
+- [ ] Are there stale milestone-specific references? → Delete or archive
 
 #### Identify CLAUDE.md-Worthy Patterns
 Ask for each learning:
