@@ -118,14 +118,32 @@ Before starting, ensure:
 
 ### Pre-Draft Clarification (Gate)
 
-**Before drafting**, ask the most important clarifying questions:
+**Before drafting or proposing any architecture**, ask the most important clarifying questions:
+
+**Constraint questions (ask these FIRST — before proposing any approaches):**
+- What is the budget / billing constraint? (e.g., free tier only, existing subscriptions, spending limit)
+- What infrastructure is already available? (e.g., existing servers, CI/CD, cloud accounts)
+- What are the firm constraints? (timeline, tech stack, team size, compliance)
+- What is the expected scale? (users, data volume, frequency)
+
+**Scope questions:**
 - What is the MVP scope we are targeting first?
-- What constraints (timeline/budget/tech) are firm?
 - Which integrations are must-have vs nice-to-have?
-- What are the primary performance/scalability expectations?
 - Any known high-risk areas requiring research/POCs?
 
+**CRITICAL**: Do NOT propose multiple architecture options before understanding constraints. Asking "here are 7 possible approaches" wastes time when 5 of them violate unstated constraints. Gather constraints first, then propose 1-2 viable options.
+
 **Confirm alignment with a brief summary, then proceed to draft.**
+
+### Architecture Confirmation Gate
+
+**CRITICAL**: Do NOT begin writing implementation code until the user confirms the chosen architecture. The sequence is:
+1. Gather constraints (Pre-Draft Clarification above)
+2. Propose 1-2 viable approaches with trade-offs
+3. **Wait for user confirmation** before writing any code or detailed implementation plans
+4. Only then proceed to detailed planning and task creation
+
+Building before architecture is confirmed leads to wasted effort on unused code.
 
 ### Step 2: Locate or Create the Template
 
@@ -186,6 +204,17 @@ Include review points in the sequencing plan. For Medium and Large projects, spe
 - "What infrastructure is needed?"
 - "How will we deploy and monitor this?"
 - "What environments are in scope?"
+
+**From DevOps perspective (Automation/Cron Pre-flight):**
+
+When the plan includes cron jobs, scheduled tasks, or CI automation, add a pre-flight checklist:
+- [ ] Identify all tools that use the system keyring (e.g., Doppler, gh, aws) — cron/CI can't access the keyring
+- [ ] Create file-based tokens with restricted permissions (`chmod 600`) for each keyring-dependent tool
+- [ ] Ensure `PATH` includes all required binaries (e.g., `/opt/homebrew/bin` on macOS)
+- [ ] Verify Full Disk Access permissions (macOS) or equivalent
+- [ ] Test with `env -i HOME=$HOME /bin/bash script.sh` to simulate the restricted environment
+- [ ] Set up log output redirection (`>> ~/.local/logs/crons/<job>.log 2>&1`)
+- [ ] Document token rotation schedule
 
 **From QA Specialist perspective:**
 - "How will we test this?"

@@ -352,6 +352,31 @@ When a verification check fails, iterate autonomously before asking the user:
 
 **Do NOT ask user "what's the error?" - investigate first.**
 
+### Express Uncertainty
+
+When making claims about tool capabilities, platform limitations, or external service behavior:
+
+- **Say "I'm not sure, let me verify" instead of stating limitations as fact.** Confidently wrong answers waste more time than expressing uncertainty, because the user trusts the answer and builds on it.
+- **Verify before stating**: Check documentation, run a test command, or search the web before asserting something can't be done.
+- **Examples of what to avoid**:
+  - "X can't do Y" (without checking) → say "I'm not sure if X can do Y — let me check"
+  - "That's not possible" (without evidence) → say "I don't think that's possible, but let me verify"
+  - "The only option is..." (without exploring) → say "One option is... let me check if there are others"
+
+### Recognize Tool Limitations Early
+
+When using external tools (APIs, MCP servers, search tools):
+
+- **After 2 consecutive failures with the same tool**, stop and switch strategy. Do not brute-force the same failing approach.
+- **Common signs a tool is hitting its limits**: same error repeated, empty results with different queries, pagination returning the same data.
+- **Switch strategy options**:
+  1. Try a different tool or API for the same information
+  2. Ask the user if they know where the information lives
+  3. Use web search or documentation as a fallback
+  4. Accept partial results and move on
+
+**Do NOT make 15 API calls to a tool that clearly has a 10-result cap.**
+
 
 
 ## Branch Hygiene Checks

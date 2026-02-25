@@ -137,6 +137,14 @@ Track hypotheses systematically:
 - Hypothesis 1: [Description] - Status: [Untested/Testing/Confirmed/Disproven]
 - Hypothesis 2: [Description] - Status: [Untested/Testing/Confirmed/Disproven]
 
+### Tool Limitation Recognition
+
+When using diagnostic tools (search APIs, log queries, MCP servers):
+- **After 2 consecutive failures with the same tool**, stop and switch strategy
+- Do not brute-force a tool that's clearly returning empty/error results
+- Switch to: a different tool, web search, documentation, or asking the user
+- **Express uncertainty**: Say "I'm not sure, let me verify" instead of stating capabilities/limitations as fact
+
 ### Step 6: Root Cause Analysis
 
 Ask these questions:
