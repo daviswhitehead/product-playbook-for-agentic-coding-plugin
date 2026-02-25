@@ -110,6 +110,8 @@ After completing each phase:
 | External dependency blocked | Stop, report blocker |
 | Quality gate failure (can't fix) | Stop, seek help |
 | Ambiguous requirements | Stop, ask for clarification |
+| Same tool fails 2+ times | Switch strategy, don't brute-force |
+| Unsure about platform capability | Say "I'm not sure, let me verify" — don't state as fact |
 
 ### Pause and Evaluate
 | Condition | Action |
