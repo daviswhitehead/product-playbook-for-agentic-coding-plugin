@@ -35,6 +35,7 @@ Parse the user's input for:
 - **--version** (optional): Version number for this critique (default: auto-detect next version)
 - **--rerun** (optional): Re-run previous critique with incremented version
 - **--output** (optional): Output directory (default: same directory as input)
+- **--keep-perspectives** (optional): Keep individual persona critique files in the output directory. By default, individual perspectives are archived to `[output]/archive/` after synthesis — only the synthesis and issue tracker remain in the output directory.
 
 ## Available Personas
 
@@ -207,6 +208,22 @@ If it doesn't exist and this is v1:
 
 ---
 
+### Step 3.6: Archive Individual Perspectives (Default Behavior)
+
+Unless `--keep-perspectives` is specified, archive individual persona critique files after synthesis:
+
+```bash
+mkdir -p [output]/archive
+mv [output]/critique-v[N]-*.md [output]/archive/ 2>/dev/null
+mv [output]/archive/critique-v[N]-synthesis.md [output]/ 2>/dev/null
+```
+
+This keeps the output directory clean — only the synthesis and issue tracker remain as the primary deliverables. Individual perspectives are preserved in `archive/` for reference.
+
+**Why this is the default**: Retrospective analysis of real projects found that individual perspective documents (often 50%+ of project doc volume) were never referenced during implementation. The synthesis captures all actionable findings. Archiving rather than deleting preserves the supporting evidence without cluttering the working directory.
+
+---
+
 ### Step 4: Present Results
 
 ```
@@ -228,9 +245,9 @@ If it doesn't exist and this is v1:
 
 ## Files Created
 - [output]/critique-v[N]-synthesis.md
-- [output]/critique-v[N]-[persona1].md
-- [output]/critique-v[N]-[persona2].md
 - [output]/critique-issue-tracker.md (created/updated)
+- [output]/archive/critique-v[N]-[persona1].md (archived)
+- [output]/archive/critique-v[N]-[persona2].md (archived)
 
 ## Next Steps
 1. Review synthesis document
@@ -280,6 +297,12 @@ Increments to next version, compares to previous.
 /playbook:critique docs/foundations/ --version 3
 ```
 
+### Keep Individual Perspectives
+```
+/playbook:critique docs/foundations/ --keep-perspectives
+```
+Skips archiving — all individual persona files remain in the output directory alongside the synthesis.
+
 ---
 
 ## Key Principles
@@ -291,7 +314,7 @@ Always launch persona agents in parallel for speed. Use a single message with mu
 Every critique run should have a version. This enables tracking progress over iterations.
 
 ### Synthesis Over Individual Critiques
-The synthesis is the primary output. Individual critiques are supporting evidence.
+The synthesis is the primary output. Individual critiques are supporting evidence and are archived by default. Use `--keep-perspectives` if you need them in the output directory.
 
 ### Track Persistent Issues
 Issues appearing in 3+ versions need dedicated resolution—they indicate a deeper problem.
