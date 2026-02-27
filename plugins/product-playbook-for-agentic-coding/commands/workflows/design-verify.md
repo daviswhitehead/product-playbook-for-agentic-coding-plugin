@@ -278,5 +278,5 @@ Confirm the report path with the user before writing.
 
 Report complete. Proceed based on findings:
 - **P0/P1 issues found**: Fix the discrepancies using `/playbook:work`, then re-run `/playbook:design-verify` to confirm fixes
-- **Only P2/P3 remaining**: Design pipeline is effectively complete. Proceed to final testing and PR
-- **When clean**: The design-to-implementation pipeline is verified end-to-end. The feature is design-complete.
+- **Only P2/P3 remaining**: Design pipeline is effectively complete. Capture what worked and what didn't with `/playbook:learnings`
+- **When clean**: The design-to-implementation pipeline is verified end-to-end. Capture learnings with `/playbook:learnings`, then proceed to final testing and PR

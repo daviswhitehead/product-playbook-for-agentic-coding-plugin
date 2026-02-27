@@ -185,6 +185,6 @@ For P0/P1 items from mockups, include regeneration recommendation:
 
 Once the Design Critique is complete:
 1. **If P0/P1 issues remain in mockups**: Iterate — modify prompts per recommendations, re-run `/playbook:mockups` for affected screens, then re-critique
-2. **If converged**: Proceed to `/playbook:tech-plan` for implementation planning
+2. **If converged**: Proceed to `/playbook:design-to-code` to scaffold components from the approved mockups
 3. Use findings to refine DESIGN.md if systemic design system issues were found (via `/playbook:design-system`)
 4. Or proceed to `/playbook:design-spec` if the critique reveals the need for more detailed specifications
