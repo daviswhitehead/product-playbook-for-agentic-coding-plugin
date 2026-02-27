@@ -454,6 +454,39 @@ Would you like to run /compound to document it as a reusable solution
 in docs/solutions/? This makes it searchable for future projects."
 ```
 
+### Step 10: Improve This Workflow (Meta-Retrospective)
+
+> **Why this step exists**: The learnings workflow itself is a product. Every time you run it, you discover gaps between what the skill prescribes and what actually works. This step closes the loop — the retrospective retrospectes on itself.
+
+Ask the user:
+
+```
+"Before we wrap up — did anything about the learnings process itself
+feel like it could be improved? For example:
+
+- Steps that were missing or out of order
+- Questions that weren't asked but should have been
+- Parts that felt redundant or too slow
+- Things we did that the skill didn't guide us to do
+
+If yes, I'll add those improvements to the plugin PR."
+```
+
+**If the user identifies improvements:**
+
+1. Compare what the skill prescribed vs what actually happened in this session
+2. Identify concrete gaps (missing steps, missing data sources, missing integrations)
+3. Propose specific edits to `learnings.md`
+4. Add the changes to the plugin PR created in Step 9.3 (or create one if none exists)
+
+**If the user says no**, skip — don't force meta-reflection when there's nothing to improve.
+
+**Examples of improvements discovered this way:**
+- Git history analysis was missing as a data source (found during subscriptions-v1 retro)
+- Step 9 (Execute Improvements) didn't exist — the skill stopped at documentation
+- /compound integration wasn't suggested for significant solved problems
+- No guidance for large session sets (>20 sessions)
+
 ---
 
 ## Key Principles
