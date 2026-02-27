@@ -37,6 +37,21 @@ Ask the user about the design critique context:
 
 ### Step 2: Gather Visual References
 
+**Auto-fetch from Stitch (if available):**
+
+Before asking the user for manual screenshots, check for a mockups manifest:
+
+1. Look for `docs/projects/[project]/mockups-manifest.md` in the codebase
+2. If found:
+   - Parse the manifest for screen IDs and names
+   - Use the `stitch-integration` skill and Stitch `get_screen` tool to fetch each screen's current state
+   - Save screenshots to the project folder (e.g., `docs/projects/[project]/critique-screenshots/`)
+   - Log which screens were fetched and their versions
+3. Also check for a `DESIGN.md` (project-level or repo root) — use it as ground truth for brand and design system consistency checks in Step 4
+4. If no manifest is found, fall back to the manual process below
+
+**Manual process (fallback):**
+
 Help the user organize their visual materials:
 1. Ask them to share screenshots or images
 2. Suggest a naming convention (e.g., `homepage-product-vs-competitor.png`)
@@ -111,6 +126,35 @@ Ask about:
 - Competitive differentiation
 - Business goal alignment
 
+#### 6. Mobile UX Specialist Perspective
+Ask about:
+- Responsive behavior across breakpoints
+- Thumb zone accessibility (bottom nav, FABs in reach zone)
+- Scroll depth and content prioritization on small screens
+- Keyboard avoidance for input-heavy screens
+- Touch target sizing (44x44px minimum)
+- Viewport-specific layout differences
+
+#### 7. Brand Consistency Reviewer Perspective
+Ask about:
+- Font consistency across all reviewed screens
+- Color palette adherence to DESIGN.md (if available)
+- Spacing rhythm consistency (same gaps, padding, margins)
+- Component reuse (are buttons, cards, inputs visually identical across screens?)
+- Icon style consistency
+- Overall "does this feel like one product?" assessment
+
+### Step 4b: Cross-Screen Analysis (when multiple screens are reviewed)
+
+If multiple screens were reviewed, perform a holistic comparison:
+- **Navigation consistency**: Does nav look/behave the same across screens?
+- **Shared components**: Are buttons, cards, inputs identical across screens?
+- **Typography scale**: Is the type hierarchy consistent (H1 always same size)?
+- **Color drift**: Any screens using slightly different shades for the same token?
+- **Spacing rhythm**: Same vertical/horizontal rhythm across screens?
+
+Flag systemic issues that wouldn't surface reviewing screens individually.
+
 ### Step 5: Synthesize Findings
 
 Help organize insights into:
@@ -119,6 +163,15 @@ Help organize insights into:
 2. **What Doesn't Work** - Problems to solve
 3. **Design Principles** - Guidelines for the new design
 4. **Recommendations** - Specific actionable suggestions
+
+**Priority each finding:**
+- **P0 Blocking**: Must fix before proceeding (accessibility failures, broken layout, brand violations)
+- **P1 Important**: Should fix, significantly impacts UX
+- **P2 Minor**: Polish items
+- **P3 Nice-to-have**: Suggestions for consideration
+
+For P0/P1 items from mockups, include regeneration recommendation:
+"Modify prompt to [specific change] and regenerate via `/playbook:mockups`."
 
 ## Key Principles
 
@@ -131,7 +184,7 @@ Help organize insights into:
 ## Next Steps
 
 Once the Design Critique is complete:
-1. Review insights with stakeholders
-2. Use findings to inform Product Requirements (if not yet created)
-3. Proceed to `/playbook:design-spec` for detailed design specifications
-4. Or proceed to `/playbook:tech-plan` if design direction is clear
+1. **If P0/P1 issues remain in mockups**: Iterate — modify prompts per recommendations, re-run `/playbook:mockups` for affected screens, then re-critique
+2. **If converged**: Proceed to `/playbook:tech-plan` for implementation planning
+3. Use findings to refine DESIGN.md if systemic design system issues were found (via `/playbook:design-system`)
+4. Or proceed to `/playbook:design-spec` if the critique reveals the need for more detailed specifications
