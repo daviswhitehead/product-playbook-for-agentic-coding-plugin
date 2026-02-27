@@ -19,6 +19,7 @@ What type of work is this?
 1. **New feature / major addition** — Needs full discovery, planning, and task breakdown
    Examples: new page, new integration, new data model, new user flow
    → Full pipeline: PRD → Tech Plan → Tasks → Work → Learnings
+   → **If UI-heavy**: PRD → Design System → Design Spec → Mockups → Design Critique → Tech Plan → Tasks → Work → Design Verify → Learnings
 
 2. **UI polish / iteration** — Known scope, feedback-driven, just needs execution
    Examples: spacing fixes, animation tweaks, responsive adjustments, copy changes
@@ -390,6 +391,12 @@ Once the PRD is complete, guide the user to:
 2. **Resolve Open Questions** — these are blockers for autonomous work
 3. **Run a stakeholder critique** — use `/playbook:critique` to get multi-persona feedback on the PRD before proceeding. Critiques at document stages are the highest-ROI workflow step — catching issues here is 10x cheaper than during implementation.
 4. **Proceed to Tech Planning** — use `/playbook:tech-plan` for the next phase
+5. **If project involves significant UI** (new pages, visual redesign, new component patterns):
+   - Run `/playbook:design-system` to extract or create DESIGN.md
+   - Then `/playbook:design-spec` to generate engineering spec + Stitch prompts
+   - Then `/playbook:mockups` to batch-generate screens
+   - Then `/playbook:design-critique` for multi-persona visual feedback
+   - Iterate until converged, then proceed to `/playbook:tech-plan`
 
 ---
 

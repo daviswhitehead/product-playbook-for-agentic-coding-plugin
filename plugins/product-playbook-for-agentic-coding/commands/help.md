@@ -29,9 +29,13 @@ Display all available commands and help the user find the right one for their ta
 → `/playbook:debug` - Systematic debugging workflow
 → `/playbook:debug-ci` - CI/CD specific failures
 
-**Want feedback on designs?**
-→ `/playbook:design-critique` - Analyze visual designs
-→ `/playbook:design-spec` - Create detailed UI specifications
+**Designing UI for a feature?**
+→ `/playbook:design-system` - Extract your design system into DESIGN.md
+→ `/playbook:design-spec` - Create spec + generate Stitch mockup prompts
+→ `/playbook:mockups` - Batch-generate Stitch screens
+→ `/playbook:design-critique` - Multi-persona visual feedback on mockups
+→ `/playbook:design-to-code` - Transform mockups into component scaffolds
+→ `/playbook:design-verify` - Compare implementation against mockups
 
 **Want to improve your process?**
 → `/playbook:learnings` - Capture what you learned
@@ -79,11 +83,15 @@ Display all available commands and help the user find the right one for their ta
 | `/playbook:debug` | Something isn't working - systematic debugging |
 | `/playbook:debug-ci` | CI/CD pipeline failures - GitHub Actions, tests |
 
-### Design
+### Design Pipeline
 | Command | When to Use |
 |---------|-------------|
-| `/playbook:design-critique` | Review visual designs with structured feedback |
-| `/playbook:design-spec` | Create detailed UI specification for complex features |
+| `/playbook:design-system` | Extract or create DESIGN.md (foundation for consistency) |
+| `/playbook:design-spec` | Create detailed UI spec + generate Stitch mockup prompts |
+| `/playbook:mockups` | Batch-generate Stitch screens with consistency enforcement |
+| `/playbook:design-critique` | Multi-persona visual critique on mockups |
+| `/playbook:design-to-code` | Transform Stitch HTML into project component scaffolds |
+| `/playbook:design-verify` | Compare implementation against Stitch mockups |
 
 ### Review & Improvement
 | Command | When to Use |
@@ -131,6 +139,23 @@ Display all available commands and help the user find the right one for their ta
 5. /playbook:git-commit            → Commit changes
 6. /playbook:git-pr                → Create PR
 7. /playbook:learnings             → Capture what you learned
+```
+
+### UI Feature Development (with Design Pipeline)
+```
+1. /playbook:product-requirements  → Define the feature
+2. /playbook:design-system         → Extract/create DESIGN.md
+3. /playbook:design-spec           → Engineer spec + Stitch prompts
+4. /playbook:mockups               → Batch-generate Stitch screens
+5. /playbook:design-critique       → Visual critique (iterate until converged)
+6. /playbook:tech-plan             → Plan implementation
+7. /playbook:tasks                 → Break into tasks
+8. /playbook:design-to-code        → Scaffold components from mockups
+9. /playbook:work                  → Implement (repeat)
+10. /playbook:design-verify        → Compare against mockups
+11. /playbook:git-commit           → Commit changes
+12. /playbook:git-pr               → Create PR
+13. /playbook:learnings            → Capture what you learned
 ```
 
 ### Debugging Session
