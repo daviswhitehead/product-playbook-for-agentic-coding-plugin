@@ -204,11 +204,25 @@
 - [ ] [Task name] - Ready to start
 - [ ] [Task name] - Waiting for dependency
 
-## Phase N: Polish & QA (for UI projects)
+## Phase N: Validation & QA (MANDATORY)
 
-> **When to use**: For any project with UI changes, include BOTH automated and visual QA. Automated tools (axe-core) catch numeric violations but miss visual issues (wrong colors, invisible text). Visual QA catches what automated tools miss.
+> **This phase is mandatory for ALL projects**, not just UI projects. Backend-only projects still need E2E critical path testing, webhook verification, and boundary condition validation. Skipping this phase leads to bugs discovered only during manual testing — which is expensive and often happens right before launch.
 
-### Task N.1: Automated Accessibility Audit
+### Task N.1: E2E Critical Path Testing
+**Description**: Write or verify E2E tests cover every critical user path introduced or modified by this project.
+
+**Acceptance Criteria**:
+- [ ] Critical paths identified (e.g., checkout flow, signup flow, data mutation paths)
+- [ ] E2E test exists for each critical path
+- [ ] Boundary conditions tested (e.g., message limits at exact threshold, trial expiry at exact day)
+- [ ] Error states tested (e.g., payment failure, network error, rate limit)
+- [ ] All E2E tests pass in CI
+
+**Status**: [ ] Not Started | [ ] In Progress | [ ] Complete
+
+---
+
+### Task N.2: Automated Accessibility Audit (if UI changes)
 **Description**: Run automated accessibility checks on all affected pages/states.
 
 **Acceptance Criteria**:
@@ -217,11 +231,11 @@
 - [ ] Contrast ratios verified programmatically (e.g., `polished.getContrast()`)
 - [ ] Zero critical/serious violations (or documented exceptions)
 
-**Status**: [ ] Not Started | [ ] In Progress | [ ] Complete
+**Status**: [ ] Not Started | [ ] In Progress | [ ] Complete | [ ] N/A (no UI changes)
 
 ---
 
-### Task N.2: Visual QA (Paired with Automated)
+### Task N.3: Visual QA (if UI changes)
 **Description**: Take screenshots of all affected pages/states and verify visual correctness beyond what automated tools check.
 
 **Acceptance Criteria**:
@@ -230,7 +244,7 @@
 - [ ] Visual review confirms correct colors, spacing, and readability
 - [ ] No invisible text, wrong backgrounds, or broken layouts
 
-**Status**: [ ] Not Started | [ ] In Progress | [ ] Complete
+**Status**: [ ] Not Started | [ ] In Progress | [ ] Complete | [ ] N/A (no UI changes)
 
 ---
 

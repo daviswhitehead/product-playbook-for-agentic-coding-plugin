@@ -161,6 +161,19 @@ Options:
    - Document any architectural decisions
    - Update relevant project documentation
 
+**Task Identity in Agent Prompts**: When spawning implementation agents via the Task tool, always include the specific task identifier and name in the prompt — not a generic description. This enables better session tracking and context recovery when sessions restart.
+
+```
+# ✅ GOOD: Specific task identity
+"Implement task 2.4: Create UpgradePaywall and PromptBanner components.
+Acceptance criteria: [list from tasks doc]"
+
+# ❌ BAD: Generic prompt that all sessions share
+"Implement the following plan: [paste entire tech plan]"
+```
+
+**Why this matters**: Sessions that hit context limits and restart have no way to determine what was completed previously if the opening prompt is generic. Including the task ID, name, and acceptance criteria gives each session a clear scope and starting point.
+
 ### Step 5: Validate Against Acceptance Criteria
 
 **From QA Specialist + Product Manager perspectives:**

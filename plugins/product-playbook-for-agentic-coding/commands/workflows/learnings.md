@@ -175,18 +175,42 @@ Targeted capture:
 
 **Only run this step if the user opted for deep retrospective in Step 1.**
 
-#### 4.5.1: Locate Session Files
+**Parallelism**: Launch the deep analysis agent **in the background** while conducting the standard retrospective (Step 4) with the user. This runs both in parallel and cuts total time significantly.
 
-Search for SpecStory session history files:
+#### 4.5.1: Locate Data Sources
+
+**Session files** — Search for SpecStory session history files:
 ```
 .specstory/history/*.md
 ```
 
 Filter to files within the project's date range. If no session files are found, fall back to standard retrospective.
 
+**Git history** — Analyze commit patterns alongside session files:
+```bash
+# Commit volume and categories
+git log --oneline [base-branch]...HEAD
+
+# File churn (which files changed most)
+git diff --stat [base-branch]...HEAD
+
+# Commit message patterns (look for fix/test churn)
+git log --oneline [base-branch]...HEAD | grep -iE "^[a-f0-9]+ (fix|test|revert)" | wc -l
+```
+
+Git history often reveals patterns invisible in session files — e.g., "46% of commits were test fixes" or "same file modified in 10+ separate commits."
+
+#### 4.5.1b: Scale Strategy for Large Session Sets
+
+When session data is large (>20 sessions or >10MB total):
+- **Prioritize by file size**: Larger sessions = more interaction = more signal
+- **Chunk by date range**: Split into weekly ranges and assign parallel agents
+- **Sample if necessary**: For 50+ sessions, analyze the 20 largest plus a random sample of 10 smaller ones
+- **Always include**: First session (setup patterns), last 5 sessions (final-mile patterns), and any sessions >1MB
+
 #### 4.5.2: Analyze Sessions
 
-Use the Task tool to spawn a research agent that reads through the session files (they can be very large — read in chunks). The agent should analyze for:
+Use the Task tool to spawn a research agent (run in background) that reads through the session files and git history. The agent should analyze for:
 
 **Repetition Patterns** (signals of misalignment or missing docs):
 - Same instruction given by user multiple times in different forms
@@ -363,6 +387,108 @@ Review the document:
 - [ ] Key learnings promoted to appropriate level (CLAUDE.md, templates, code)
 - [ ] Other guidance files updated (if applicable)
 
+### Step 9: Execute Improvements (Don't Just Document — Do)
+
+> **Why this step exists**: The biggest gap in retrospectives is stopping at documentation. Learnings that aren't acted on will be re-learned. This step ensures each actionable improvement is either executed or explicitly deferred.
+
+#### 9.1: Triage Actionable Improvements
+
+Review all improvements from the learnings document. For each one, classify:
+
+| Action | Type | Execute Now? |
+|--------|------|-------------|
+| CLAUDE.md/MEMORY.md updates | Promotion | Yes — already done in Step 7 |
+| File cleanup (archive, move, delete) | Codebase hygiene | Yes — quick wins |
+| Fix inaccurate docs/code | Codebase fix | Yes — prevents future confusion |
+| Plugin/workflow changes | Plugin PR | Yes — create PR |
+| New automation (hooks, scripts, CI) | Infrastructure | Defer if complex, do if simple |
+
+Present the triage to the user:
+```
+"Here are the actionable improvements from this retrospective:
+
+Execute now:
+1. [Action] — [brief description]
+2. [Action] — [brief description]
+
+Defer:
+3. [Action] — [reason for deferral]
+
+Which should we proceed with?"
+```
+
+#### 9.2: Execute Codebase Improvements
+
+For each approved codebase action:
+1. Make the change (archive files, fix docs, update configs)
+2. Verify the change (run relevant checks)
+3. Report what was done
+
+#### 9.3: Create Plugin PR (If Applicable)
+
+If the user selected "Both" or "Plugin/workflow" as the output target and improvements to the playbook/plugin were identified:
+
+1. **Locate the plugin repo**: Check `.claude/plugins/` for the plugin directory
+2. **Create a feature branch**: `git checkout -b improve/[project-name]-retrospective-learnings`
+3. **Make changes**: Modify the relevant plugin files (commands, templates, skills)
+4. **Create the PR**: Use `gh pr create` with a clear description of what was learned and why each change improves the workflow
+5. **Report the PR URL** to the user
+
+**Common plugin files to improve:**
+- `commands/workflows/*.md` — Workflow steps and guidance
+- `resources/templates/*.md` — Task and document templates
+- `skills/*.md` — Skill definitions and patterns
+
+#### 9.4: Document Solutions with /compound (If Applicable)
+
+For any high-severity finding that has a clear problem → investigation → solution pattern, suggest running `/compound` (or the compound engineering compound skill) to create a reusable solution document in `docs/solutions/`.
+
+**When to suggest /compound:**
+- A significant bug or drift was discovered AND fixed during the retrospective
+- The root cause is non-obvious and likely to recur in other projects
+- The investigation steps would save future developers time
+
+```
+"The [problem] we identified and fixed has a clear solution pattern.
+Would you like to run /compound to document it as a reusable solution
+in docs/solutions/? This makes it searchable for future projects."
+```
+
+### Step 10: Improve This Workflow (Meta-Retrospective)
+
+> **Why this step exists**: The learnings workflow itself is a product. Every time you run it, you discover gaps between what the skill prescribes and what actually works. This step closes the loop — the retrospective retrospectes on itself.
+
+Ask the user:
+
+```
+"Before we wrap up — did anything about the learnings process itself
+feel like it could be improved? For example:
+
+- Steps that were missing or out of order
+- Questions that weren't asked but should have been
+- Parts that felt redundant or too slow
+- Things we did that the skill didn't guide us to do
+
+If yes, I'll add those improvements to the plugin PR."
+```
+
+**If the user identifies improvements:**
+
+1. Compare what the skill prescribed vs what actually happened in this session
+2. Identify concrete gaps (missing steps, missing data sources, missing integrations)
+3. Propose specific edits to `learnings.md`
+4. Add the changes to the plugin PR created in Step 9.3 (or create one if none exists)
+
+**If the user says no**, skip — don't force meta-reflection when there's nothing to improve.
+
+**Examples of improvements discovered this way:**
+- Git history analysis was missing as a data source (found during subscriptions-v1 retro)
+- Step 9 (Execute Improvements) didn't exist — the skill stopped at documentation
+- /compound integration wasn't suggested for significant solved problems
+- No guidance for large session sets (>20 sessions)
+
+---
+
 ## Key Principles
 
 - **Be Honest**: Encourage honest reflection on what worked and didn't
@@ -370,15 +496,17 @@ Review the document:
 - **Enable Discovery**: Use YAML frontmatter for future searchability
 - **Dual-Target**: Consider both codebase docs AND workflow improvements
 - **Right-Sized**: Match depth to trigger type (lightweight vs comprehensive)
+- **Execute, Don't Just Document**: Learnings without follow-through will be re-learned
 
 ## Next Steps
 
-Once the Learnings Document is complete:
+Once the Learnings Document is complete and improvements are executed:
 1. Review and validate the learnings
-2. Implement identified improvements
-3. If plugin improvements identified, create PR to plugin repo
-4. Apply learnings to future work
+2. Verify all executed improvements (Step 9)
+3. If plugin PR was created, share the PR URL with the user
+4. If `/compound` was run, verify the solution doc was created
+5. Apply learnings to future work
 
 ---
 
-*Learnings compound over time. Capture them to improve both this project's documentation and the overall workflow.*
+*Learnings compound over time. Capture them AND act on them to improve both this project's documentation and the overall workflow.*
