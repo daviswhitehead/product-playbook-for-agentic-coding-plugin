@@ -76,10 +76,22 @@ Before proceeding, consider what tools are available:
 
 ### Pre-Check: Validation Status (Project Completion Only)
 
-**Before capturing learnings for a completed project**, check if validation work was done:
+**Before capturing learnings for a completed project**, run two pre-checks:
+
+#### Pre-Check A: Gap Analysis
+
+**Run a planned-vs-implemented gap analysis before the retrospective.** This gives the retrospective concrete data instead of relying on memory.
+
+1. **Locate planning docs**: Find the PRD, tech plan, tasks doc, and any v2/revised plans
+2. **Compare planned vs actual**: For each planned component, check if it was implemented, modified, deferred, or dropped
+3. **Write the analysis to a file**: Save as `projects/[project-name]/planned-vs-implemented.md` — this becomes input to the retrospective questions
+
+**Why this matters**: Without a gap analysis, retrospective questions like "what didn't work?" get vague answers. With a gap analysis, you can ask specific questions like "the tech plan called for GitHub Actions but you used local cron — what drove that decision?"
+
+#### Pre-Check B: Validation Tasks
 
 1. **Locate the tasks document** for the project (typically `projects/[project-name]/tasks.md` or `docs/projects/*/tasks.md`)
-2. **Search for validation/QA tasks** — look for tasks related to: accessibility audit, performance check (Lighthouse), test coverage, agent usability test, visual review
+2. **Search for validation/QA tasks** — look for tasks related to the project's actual validation needs. Common examples include: test coverage, integration testing, CI pipeline verification, performance profiling, security review, manual smoke testing. Don't assume UI-specific checks (Lighthouse, accessibility audit, visual review) apply to every project — match validation to what the project actually built.
 3. **Check their status**:
    - If validation tasks exist and are **incomplete**, warn the user:
      ```
@@ -94,7 +106,7 @@ Before proceeding, consider what tools are available:
    - If validation tasks exist and are **complete**, proceed normally
    - If **no validation tasks exist**, note this as a gap in the learnings
 
-This pre-check prevents a common pattern where projects skip validation and move directly to learnings/closure.
+These pre-checks prevent two common patterns: (1) projects skip validation and move directly to learnings/closure, and (2) retrospectives produce vague insights because no one checked what actually shipped vs what was planned.
 
 ### Step 1: Identify Trigger Type
 
@@ -155,7 +167,30 @@ If work will continue in a future session, also capture:
 - Entry point: What should the next session read first?
 
 #### For Project Completion Learnings
-Comprehensive review:
+
+**If a gap analysis was produced in Pre-Check A**, use it to generate specific, targeted questions instead of generic ones. The gap analysis transforms vague retrospective prompts into concrete questions grounded in what actually happened.
+
+**Gap-analysis-informed questions** (preferred):
+```
+Based on the planned-vs-implemented analysis:
+
+1. **Architecture drift**: [Specific drift from gap analysis] — what drove this change?
+   Was it a good decision in hindsight, or should the plan have been updated earlier?
+
+2. **Deferred items**: [Specific deferred items] — should these be implemented,
+   formally dropped, or carried to the next project?
+
+3. **Unplanned additions**: [Items built but not in plan] — were these necessary?
+   Should future plans account for this type of emergent work?
+
+4. **Process friction**: Which phase caused the most rework?
+   (Discovery → Planning → Implementation → Testing → Deployment)
+
+5. **Multi-session coordination**: What information was hardest to maintain
+   across sessions? What would have helped?
+```
+
+**Generic fallback** (use only if no gap analysis exists):
 - **Project Summary**: What was built and outcomes
 - **What Went Well**: Successes and effective practices
 - **What Could Be Improved**: Challenges and pain points
@@ -210,7 +245,9 @@ When session data is large (>20 sessions or >10MB total):
 
 #### 4.5.2: Analyze Sessions
 
-Use the Task tool to spawn a research agent (run in background) that reads through the session files and git history. The agent should analyze for:
+Use the Task tool to spawn a research agent (run in background) that reads through the session files and git history. **Use the prompt template at `resources/templates/deep-retrospective-agent-prompt.md`** — fill in the placeholders rather than improvising the prompt each time. If a gap analysis exists from Pre-Check A, include it as additional context for the agent.
+
+The agent should analyze for:
 
 **Repetition Patterns** (signals of misalignment or missing docs):
 - Same instruction given by user multiple times in different forms
@@ -258,13 +295,26 @@ Produce a structured summary:
 - [Gap]: Info was in [location] but agent didn't find it. Fix: [action]
 ```
 
-#### 4.5.4: Compare with Standard Retrospective
+#### 4.5.4: Merge Standard + Deep Findings
 
-After completing the standard retrospective (Step 4), compare findings:
-- What did the deep analysis find that the standard retrospective missed?
-- This comparison itself is a learning: the delta shows the agent's blind spots.
+After both the standard retrospective (Step 4) and deep analysis complete, **merge the findings into a single unified document** rather than presenting them as two separate sections.
 
-Include a comparison table in the final learnings document.
+1. **Create a comparison table** showing what each method found:
+
+```markdown
+| Finding | Standard Retro | Deep Analysis | Notes |
+|---------|:---:|:---:|-------|
+| [Finding A] | ✓ | ✓ | Both methods caught this |
+| [Finding B] | ✓ | - | Only surfaced in discussion |
+| [Finding C] | - | ✓ | Hidden pattern in session data |
+| [Finding D] | - | ✓ | Agent blind spot |
+```
+
+2. **Highlight the delta**: Findings that ONLY appeared in the deep analysis represent the agent's blind spots — patterns invisible during normal conversation. These are the highest-value learnings because they reveal what the retrospective would have missed without session analysis.
+
+3. **Deduplicate**: Where both methods found the same pattern, combine into the stronger version (usually the deep analysis has more evidence).
+
+4. **The comparison table itself is a learning**: It shows whether deep retrospectives are worth the extra time for this type of project. Include it in the final document.
 
 ---
 
@@ -396,35 +446,35 @@ Review the document:
 - [ ] Planning docs checked for accuracy (Step 7.5)
 - [ ] Other guidance files updated (if applicable)
 
-### Step 9: Execute Improvements (Don't Just Document — Do)
+### Step 9: Execute Improvements (The Climax — Don't Just Document, Do)
 
-> **Why this step exists**: The biggest gap in retrospectives is stopping at documentation. Learnings that aren't acted on will be re-learned. This step ensures each actionable improvement is either executed or explicitly deferred.
+> **Why this step exists**: The biggest gap in retrospectives is stopping at documentation. Learnings that aren't acted on will be re-learned. **This step is the most important part of the entire workflow** — everything before it is analysis; this is where value is created.
 
-#### 9.1: Triage Actionable Improvements
+#### 9.1: Present the Full Action Plan
 
-Review all improvements from the learnings document. For each one, classify:
+Gather ALL actionable improvements from Steps 4 through 8 (standard findings, deep findings, gap analysis, promotions, planning doc fixes) and present them as a **single prioritized action plan**, split by target:
 
-| Action | Type | Execute Now? |
-|--------|------|-------------|
-| CLAUDE.md/MEMORY.md updates | Promotion | Yes — already done in Step 7 |
-| File cleanup (archive, move, delete) | Codebase hygiene | Yes — quick wins |
-| Fix inaccurate docs/code | Codebase fix | Yes — prevents future confusion |
-| Plugin/workflow changes | Plugin PR | Yes — create PR |
-| New automation (hooks, scripts, CI) | Infrastructure | Defer if complex, do if simple |
-
-Present the triage to the user:
 ```
-"Here are the actionable improvements from this retrospective:
+"Here's everything we identified, organized by where it goes:
 
-Execute now:
+## Codebase Improvements (N items)
+1. [Priority: High] [Action] — [brief description]
+2. [Priority: Medium] [Action] — [brief description]
+...
+
+## Plugin/Workflow Improvements (N items)
 1. [Action] — [brief description]
 2. [Action] — [brief description]
+...
 
-Defer:
-3. [Action] — [reason for deferral]
+## Deferred (N items)
+1. [Action] — [reason for deferral]
+...
 
-Which should we proceed with?"
+Which should we proceed with? (I recommend executing all High priority items.)"
 ```
+
+**Key**: Present codebase and plugin items separately — the user may want to execute codebase items immediately but batch plugin items into a single PR. Ask the user for their preferred execution strategy before starting.
 
 #### 9.2: Execute Codebase Improvements
 
@@ -462,6 +512,22 @@ For any high-severity finding that has a clear problem → investigation → sol
 Would you like to run /compound to document it as a reusable solution
 in docs/solutions/? This makes it searchable for future projects."
 ```
+
+#### 9.5: Feed-Forward to Next Project Templates
+
+**Learnings are most valuable when they prevent the same patterns in the next project, not just document them after the current one.**
+
+For each systemic finding (especially from deep analysis), check if it should inform the starting templates for future projects:
+
+| Finding Type | Template to Update |
+|-------------|-------------------|
+| Missing planning for emergent work | `resources/templates/tech-plan.md` — add "Emergent Work Budget" section |
+| Architecture drift not caught early | `resources/templates/tasks.md` — add mid-project architecture check task |
+| Multi-session context loss | `resources/templates/tasks.md` — add session handoff checkpoint tasks |
+| Validation skipped at end | `resources/templates/tasks.md` — add validation tasks as default |
+| Planning docs went stale | `resources/templates/tech-plan.md` — add "Accuracy Review" milestone |
+
+**How to apply**: Don't just note "we should do X next time" — actually edit the template so the next project starts with the improved structure. Add template changes to the plugin PR (Step 9.3).
 
 ### Step 10: Improve This Workflow (Meta-Retrospective)
 
