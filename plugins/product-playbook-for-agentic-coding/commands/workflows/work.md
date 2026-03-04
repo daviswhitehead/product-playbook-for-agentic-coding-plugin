@@ -275,6 +275,16 @@ Ready for your review. Anything you'd like adjusted?"
 
 **Key principle**: The user reviews for taste, direction, and subtle issues. The agent handles all obvious quality checks autonomously.
 
+### Step 5.5: Check for Combinable Structural Refactors
+
+**From Senior Engineer perspective:**
+
+Before starting a structural refactor (renames, directory reorganization, file moves), check:
+- Will the **next task** also touch the same files? (e.g., rename files, then reorganize output directories)
+- If yes, **combine both tasks into one** to avoid touching the same files twice.
+
+Sequential structural refactors that touch overlapping files are a common source of wasted effort. A single plan with 12-15 tasks is more efficient than two sequential plans of 8 and 5 tasks touching the same files.
+
 ### Step 6: Complete Task and Update Documentation
 
 **From Engineering Manager + Product Manager perspectives:**
@@ -284,6 +294,7 @@ Ready for your review. Anything you'd like adjusted?"
 3. **Update Task Status**: Mark task as "Complete" in Tasks Document
 4. **Update Current Focus**: Identify and set the next task
 5. **Update Progress Tracking**: Move task to "Completed Tasks" section
+6. **Update Architecture README**: If this task changed the system architecture, directory structure, or introduced new patterns, update the relevant README (or create one if it doesn't exist). This is the single highest-ROI documentation action — it prevents expensive re-discovery in future sessions.
 
 ### Step 7: Verify Completion
 

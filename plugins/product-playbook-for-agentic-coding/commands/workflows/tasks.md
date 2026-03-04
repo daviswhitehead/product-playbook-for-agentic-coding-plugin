@@ -129,6 +129,20 @@ If the project involves design, creative, or visual work (UI design, branding, i
 - **Visual acceptance criteria**: For design tasks, acceptance criteria should describe visual outcomes ("Logo readable at 32px," "Contrast ratio passes WCAG AA") not just code outcomes.
 - **Tool diversity**: Design tasks may require different AI tools per task type (image generation, SVG creation, font selection). Include tool recommendations per task.
 
+#### 8. Synthesize Critique Findings
+
+**From Engineering Manager + QA Specialist perspectives:**
+
+If `/playbook:critique` was run on the tech plan or PRD, **do not leave critique docs as standalone files that implementers must find and read**. They won't — deep analysis of real projects shows critique documents are almost never referenced during implementation.
+
+Instead:
+- Extract the top 3-5 warnings or gotchas from each critique
+- Insert them as inline `> **Critique warning:**` callouts in the relevant task descriptions
+- Add any critique-surfaced risks as explicit tasks (e.g., "Add input validation per security critique")
+- After synthesis, note in the task doc which critique files were consumed
+
+This ensures critique insights survive into the implementation phase rather than sitting unread in the project directory.
+
 ### Task Quality Criteria
 
 Create tasks that are:
