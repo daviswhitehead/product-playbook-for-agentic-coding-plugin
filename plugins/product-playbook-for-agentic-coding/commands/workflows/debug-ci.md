@@ -111,6 +111,17 @@ gh run view <RUN_ID> --log-failed
    - Environment/dependency issues
    - Timeout or resource issues
 
+### Step 4.5: Present Findings Before Fixing
+
+**CRITICAL: Analyze first, propose changes second.**
+
+Before writing any code, present your findings to the user:
+1. Which jobs failed and why (root cause hypothesis)
+2. Whether it's a test bug, product bug, environment issue, or policy violation
+3. Your proposed fix and why you believe it's correct
+
+**Do NOT jump to implementing fixes** until the user has seen your analysis. Users often have context about whether a failure is pre-existing, whether a migration was intentional, or whether the fix should go in a different direction. Presenting findings first prevents wasted effort from incorrect assumptions.
+
 ### Step 5: Classify Failure Type
 
 Categorize the failure:

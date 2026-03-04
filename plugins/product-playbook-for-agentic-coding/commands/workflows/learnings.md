@@ -375,6 +375,14 @@ Consider which file each learning belongs to:
 
 Help the user identify 2-3 learnings worth promoting and implement the promotions.
 
+### Step 7.5: Check Planning Doc Accuracy
+
+**Planning documents that drift from reality waste tokens in every future session.** Before finalizing, check:
+
+- [ ] **Are planning docs still accurate?** If the project evolved beyond the original tech plan or tasks doc, mark stale docs as superseded with a deprecation notice pointing to the current source of truth.
+- [ ] **Are there standalone critique/review docs that were never referenced?** Synthesize key warnings into the tasks doc as inline notes, then consider archiving the standalone files to reduce directory noise.
+- [ ] **Does an architecture README exist?** If agents spent significant time re-discovering the codebase structure, create or update a README in the relevant directory. This is the single highest-ROI action for multi-session projects.
+
 ### Step 8: Validate Completeness
 
 Review the document:
@@ -385,6 +393,7 @@ Review the document:
 - [ ] Actionable improvements identified
 - [ ] Saved to correct location
 - [ ] Key learnings promoted to appropriate level (CLAUDE.md, templates, code)
+- [ ] Planning docs checked for accuracy (Step 7.5)
 - [ ] Other guidance files updated (if applicable)
 
 ### Step 9: Execute Improvements (Don't Just Document — Do)

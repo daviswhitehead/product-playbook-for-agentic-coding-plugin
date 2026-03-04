@@ -250,7 +250,22 @@ Review the document:
 - [ ] Technology stack is appropriate and justified
 - [ ] Integration points are identified
 - [ ] Technical risks are assessed with mitigation
+- [ ] Supersession protocol followed (see below)
+- [ ] Shared patterns identified for multi-consumer systems (see below)
 - [ ] Ready for Delivery phase
+
+#### Supersession Protocol
+
+If this tech plan replaces or significantly changes a prior plan:
+1. Add a deprecation notice to the top of the old plan: `> **SUPERSEDED (date)**: This plan is replaced by [new plan path]. See [gap analysis] for differences.`
+2. Do this **now**, not "later" — stale docs that look current waste tokens in every future session.
+
+#### Shared Pattern Alignment
+
+If the plan introduces shared infrastructure (libraries, runners, delivery mechanisms) that will have multiple consumers:
+1. **Standardize the shared pattern before building the second consumer.** Don't build consumer B with a different pattern than consumer A, then migrate B to match A later.
+2. Explicitly list which patterns are shared vs. consumer-specific in the architecture section.
+3. If a second consumer is foreseeable, design the shared abstraction in the first consumer's plan rather than extracting it retroactively.
 
 ## Key Principles
 
@@ -259,6 +274,7 @@ Review the document:
 - **Minimize Blockers**: Sequencing should enable parallel work
 - **Justify Choices**: Provide rationale for technology decisions
 - **Identify Risks**: Surface technical challenges early
+- **Supersede Explicitly**: When plans evolve, mark old versions immediately
 
 ## Next Steps
 
