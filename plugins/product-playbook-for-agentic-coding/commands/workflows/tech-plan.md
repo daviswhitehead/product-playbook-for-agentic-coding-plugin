@@ -68,6 +68,14 @@ When creating tasks:
 
 
 
+## Verification of External API Claims
+
+When planning integrations with external services or APIs:
+- **Verify capabilities** via official documentation or API exploration before including them in the plan
+- **Do not assume** an API supports a specific feature — confirm it first
+- **Flag assumptions**: If you can't verify, mark as "Assumption — needs verification" in the plan rather than stating as fact
+- This prevents wasted implementation effort on capabilities that don't exist (e.g., planning around a "Date created" field that doesn't exist in GitHub Projects V2)
+
 ## Project Context Discovery
 
 Before starting, search for existing project documentation:

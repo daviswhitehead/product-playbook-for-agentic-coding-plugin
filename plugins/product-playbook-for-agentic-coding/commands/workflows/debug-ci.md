@@ -31,6 +31,28 @@ Before starting, ensure:
 
 ## Process
 
+### Step 0: Triage — Is This Failure Related to My Changes?
+
+**Before investigating, determine if the failure is related to the current PR's changes.**
+
+1. Identify the failing test/file:
+```bash
+gh run view <RUN_ID> --log-failed 2>&1 | head -50
+```
+
+2. Check if the failing test was modified in this PR:
+```bash
+git diff --name-only origin/production...HEAD | grep -i "test\|spec"
+```
+
+3. **If the failing test was NOT modified in this PR**:
+   - Check if it's a known flaky test (search project docs, recent CI history)
+   - Run the test locally to confirm it fails independent of your changes
+   - If confirmed unrelated: report it to the user and skip to fixing the flaky test (or skip it entirely)
+   - Do NOT spend time investigating infrastructure or timing issues for tests unrelated to the PR
+
+4. **If the failing test WAS modified or is related to changed code**: proceed to Step 1.
+
 ### Step 1: Get Latest Run Information
 
 **ALWAYS start with the most recent CI run - don't assume previous fixes worked**

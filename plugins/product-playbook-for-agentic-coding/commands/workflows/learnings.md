@@ -14,55 +14,34 @@ You are facilitating the Retrospective phase by representing multiple stakeholde
 
 Help the user capture learnings that improve both codebase documentation AND the plugin/workflow itself.
 
-## Three Trigger Types
+## Trigger Types & Output
 
-Ask the user which type of learning moment this is:
+Ask the user a single combined question:
 
-### 1. After Chat Session (Lightweight)
-Quick capture at end of an agentic coding session:
-- What did we learn?
-- What should be documented?
-- Any quick process improvements?
+```
+What type of learning moment is this?
+1. End of chat session (lightweight capture)
+2. Project completion (comprehensive retrospective)
+3. Overcame a blocker (targeted documentation)
 
-**Depth**: Brief, focused on immediate insights
+Output defaults to **both** codebase docs and plugin improvements.
+Say so if you only want one target.
+```
 
-### 2. After Project Completion (Comprehensive)
-Full retrospective at project end:
-- What worked well?
-- What didn't work?
-- What to do differently next time?
+### Trigger Type Reference
 
-**Depth**: Thorough review of entire project
+| Type | Depth | Key Questions |
+|------|-------|---------------|
+| Chat session | Brief | What did we learn? What should be documented? Process improvements? |
+| Project completion | Thorough | What worked? What didn't? What to do differently? |
+| Blocker overcome | Targeted | What was painful? Root cause? Prevention? |
 
-### 3. After Overcoming Blockers (Targeted)
-Capture immediately after solving a hard problem:
-- What was painful?
-- How was it solved?
-- How to prevent next time?
+### Output Targets
 
-**Depth**: Focused on the specific blocker and solution
+Both targets are active by default:
 
-## Two Output Targets
-
-Ask the user where improvements should go:
-
-### 1. Codebase Documentation
-Project-specific improvements:
-- Patterns and gotchas for this codebase
-- Architecture decisions and rationale
-- Debugging solutions
-- Troubleshooting guides
-
-**Location**: `[current-codebase]/docs/` (appropriate subfolder)
-
-### 2. Plugin Improvements
-Workflow and tool improvements:
-- Workflow optimizations
-- New patterns to add to skills
-- Command/agent refinements
-- Template improvements
-
-**Location**: Plugin repository (commands, skills, or docs)
+1. **Codebase Documentation** — Patterns, gotchas, architecture decisions, debugging solutions. Location: `[current-codebase]/docs/`
+2. **Plugin Improvements** — Skill/workflow optimizations, missing steps, wrong defaults, new commands. Location: Plugin repository (`commands/`, `skills/`)
 
 ## Available Tools Discovery
 
@@ -108,7 +87,7 @@ Before proceeding, consider what tools are available:
 
 These pre-checks prevent two common patterns: (1) projects skip validation and move directly to learnings/closure, and (2) retrospectives produce vague insights because no one checked what actually shipped vs what was planned.
 
-### Step 1: Identify Trigger Type
+### Step 1: Identify Trigger Type and Output
 
 Ask the user:
 ```
@@ -116,42 +95,39 @@ What type of learning moment is this?
 1. End of chat session (lightweight capture)
 2. Project completion (comprehensive retrospective)
 3. Overcame a blocker (targeted documentation)
+
+Output defaults to **both** codebase docs and plugin improvements.
+Say so if you only want one target.
 ```
 
-**If the user selects option 2 (project completion)**, additionally ask:
+**If the user selects option 2 (project completion)**, check for session history files:
+
+1. Search for SpecStory session files: `.specstory/history/*.md`
+2. If session files exist within the project's date range, **default to deep retrospective**:
 
 ```
-Would you like a deep retrospective that analyzes session history?
+Session history files found (N files from [date range]).
 
-A. **Standard retrospective** — Capture learnings from what we discussed
-   Time: ~15 minutes
+For project completions, I recommend a **deep retrospective** — it analyzes
+session files for patterns the standard retro misses: repetition, wasted
+effort, and user frustration signals. (In past projects, deep analysis found
+8+ patterns that standard retrospectives missed.)
 
-B. **Deep retrospective** — Analyze SpecStory session files for patterns
-   the agent missed: repetition, wasted effort, user frustration signals
-   Time: ~30-45 minutes (requires .specstory/history/ files)
+A. **Deep retrospective** (recommended) — ~30-45 minutes
+B. **Standard retrospective** — ~15 minutes
 ```
 
-If the user selects B, set `deep_retrospective = true` and proceed to Step 4.5 after Step 4.
+3. If no session files are found, fall back to standard retrospective automatically.
 
-### Step 2: Identify Output Target
+Set `deep_retrospective = true` if the user selects A (or accepts the default) and proceed to Step 3.5 after Step 3.
 
-Ask the user:
-```
-What should improve?
-1. Codebase documentation (project-specific)
-2. Plugin/workflow itself
-3. Both
-```
-
-### Step 3: Locate or Create the Template
+### Step 2: Locate or Create the Template
 
 1. Check if a Learnings document already exists
 2. If not, use template from `resources/templates/learnings.md`
-3. Create in appropriate location based on output target:
-   - Codebase: `docs/learnings/[learning-name].md`
-   - Plugin: Plugin repository docs
+3. Create in `docs/learnings/[learning-name].md`
 
-### Step 4: Facilitate Based on Trigger Type
+### Step 3: Facilitate Based on Trigger Type
 
 #### For Chat Session Learnings
 Quick questions:
@@ -206,13 +182,13 @@ Targeted capture:
 - **Solution**: How was it fixed?
 - **Prevention**: How to avoid this in the future?
 
-### Step 4.5: Deep Session History Analysis (If Selected)
+### Step 3.5: Deep Session History Analysis (If Selected)
 
 **Only run this step if the user opted for deep retrospective in Step 1.**
 
-**Parallelism**: Launch the deep analysis agent **in the background** while conducting the standard retrospective (Step 4) with the user. This runs both in parallel and cuts total time significantly.
+**Parallelism**: Launch the deep analysis agent **in the background** while conducting the standard retrospective (Step 3) with the user. This runs both in parallel and cuts total time significantly.
 
-#### 4.5.1: Locate Data Sources
+#### 3.5.1: Locate Data Sources
 
 **Session files** — Search for SpecStory session history files:
 ```
@@ -235,7 +211,7 @@ git log --oneline [base-branch]...HEAD | grep -iE "^[a-f0-9]+ (fix|test|revert)"
 
 Git history often reveals patterns invisible in session files — e.g., "46% of commits were test fixes" or "same file modified in 10+ separate commits."
 
-#### 4.5.1b: Scale Strategy for Large Session Sets
+#### 3.5.1b: Scale Strategy for Large Session Sets
 
 When session data is large (>20 sessions or >10MB total):
 - **Prioritize by file size**: Larger sessions = more interaction = more signal
@@ -243,11 +219,27 @@ When session data is large (>20 sessions or >10MB total):
 - **Sample if necessary**: For 50+ sessions, analyze the 20 largest plus a random sample of 10 smaller ones
 - **Always include**: First session (setup patterns), last 5 sessions (final-mile patterns), and any sessions >1MB
 
-#### 4.5.2: Analyze Sessions
+#### 3.5.2: Analyze Sessions
 
 Use the Task tool to spawn a research agent (run in background) that reads through the session files and git history. **Use the prompt template at `resources/templates/deep-retrospective-agent-prompt.md`** — fill in the placeholders rather than improvising the prompt each time. If a gap analysis exists from Pre-Check A, include it as additional context for the agent.
 
-The agent should analyze for:
+Agents should return **structured, tagged findings**.
+
+**For each finding, assign a target tag:**
+
+| Tag | Meaning | Routes To |
+|-----|---------|-----------|
+| `codebase` | Fix via project documentation or code | CLAUDE.md, README, docs/, code |
+| `plugin` | Fix via skill/workflow/command change | Plugin repo files |
+| `both` | Needs changes in both places | Both promotion tracks |
+
+**Tagging guidance:**
+- "Agent didn't invoke a skill" → `plugin`
+- "Agent jumped to implementation during planning" → `plugin`
+- "Agent used wrong branch name despite docs" → `codebase`
+- "Agent didn't commit before git operations" → `both`
+
+**Agents analyze for these 5 categories:**
 
 **Repetition Patterns** (signals of misalignment or missing docs):
 - Same instruction given by user multiple times in different forms
@@ -273,31 +265,48 @@ The agent should analyze for:
 - Platform quirks the agent hit that were documented but not consulted
 - Commands or workflows the agent got wrong despite documentation
 
-#### 4.5.3: Present Findings
+**Skill/Workflow Gaps** (patterns that map to plugin improvements):
+- Agent didn't invoke a skill that was available and relevant
+- Agent used a skill but the skill's instructions were insufficient (missing step, wrong default)
+- User had to redirect the agent's approach — the skill should have guided it correctly
+- Agent repeated a cross-session pattern that a skill should encode
+- User overrode an agent default — the skill's default should change
+- Agent confabulated facts that a "verify before asserting" instruction would have prevented
 
-Produce a structured summary:
+#### 3.5.3: Present Findings
+
+Agents return findings in this structured format:
+
+```
+## Finding: [title]
+- **Category**: repetition | wasted_effort | frustration | knowledge_gap | skill_gap
+- **Target**: codebase | plugin | both
+- **Evidence**: [specific quote or example from session]
+- **Impact**: [estimated waste — tokens, time, user redirections]
+- **Proposed fix**: [concrete action]
+- **Target file** (if plugin): [skill/command path, e.g., commands/workflows/debug-ci.md]
+```
+
+Produce a summary grouped by target:
 
 ```
 ## Deep Retrospective Findings
 
 **Sessions analyzed**: N (from [date] to [date])
 
-### Repetition Patterns (N found)
-- [Pattern]: Seen X times. Example: "[quote]". Prevention: [action]
+### Codebase Findings (N)
+[Findings tagged `codebase` or `both`, grouped by category]
 
-### Wasted Effort (N instances)
-- [Instance]: [description]. Root cause: [why]. Prevention: [action]
+### Plugin Findings (N)
+[Findings tagged `plugin` or `both`, grouped by category]
 
-### Frustration Signals (N instances)
-- [Signal]: [context]. Root cause: [why]. Prevention: [action]
-
-### Knowledge Gaps (N found)
-- [Gap]: Info was in [location] but agent didn't find it. Fix: [action]
+### Cross-Cutting Findings (N)
+[Findings tagged `both`, showing proposed changes for each target]
 ```
 
-#### 4.5.4: Merge Standard + Deep Findings
+#### 3.5.4: Merge Standard + Deep Findings
 
-After both the standard retrospective (Step 4) and deep analysis complete, **merge the findings into a single unified document** rather than presenting them as two separate sections.
+After both the standard retrospective (Step 3) and deep analysis complete, **merge the findings into a single unified document** rather than presenting them as two separate sections.
 
 1. **Create a comparison table** showing what each method found:
 
@@ -318,7 +327,7 @@ After both the standard retrospective (Step 4) and deep analysis complete, **mer
 
 ---
 
-### Step 5: Use YAML Frontmatter for Searchability
+### Step 4: Use YAML Frontmatter for Searchability
 
 Ensure learnings include frontmatter:
 ```yaml
@@ -337,7 +346,7 @@ sessions-analyzed: [N]  # only for deep retrospectives
 
 This enables fast filtering when searching for relevant learnings later.
 
-### Step 6: Complete the Document
+### Step 5: Complete the Document
 
 Based on trigger type, fill appropriate sections:
 
@@ -357,9 +366,9 @@ Based on trigger type, fill appropriate sections:
 - Prevention strategy
 
 
-### Step 7: Promote Learnings to Point-of-Use
+### Step 6: Promote Learnings to Point-of-Use
 
-A learning left in a doc is a learning that will be re-learned the hard way. For each key learning, promote it as high as possible:
+A learning left in a doc is a learning that will be re-learned the hard way. Promote findings via two parallel tracks.
 
 #### Pre-Promotion: CLAUDE.md Health Check
 
@@ -367,65 +376,88 @@ A learning left in a doc is a learning that will be re-learned the hard way. For
 1. Run `wc -c CLAUDE.md`
 2. If over **32,000 chars** (80% of 40k limit), trim before adding:
    - Archive RESOLVED known issues → `docs/learnings/resolved-issues.md`
-   - Move niche/domain-specific guides → `docs/guides/[topic].md` (keep 1-line reference in CLAUDE.md)
+   - Move niche/domain-specific guides → `docs/guides/[topic].md` (keep 1-line reference)
    - Remove content that duplicates the Quick Reference section
    - Condense verbose sections to a reference + link
 3. If over **40,000 chars**, trimming is **mandatory** — the file will degrade agent performance
 
-**Promotion hierarchy** (highest = most actionable):
-1. **Code/automation** — Encode in scripts, hooks, linters (happens automatically)
-2. **CLAUDE.md / MEMORY.md** — Always visible to the agent every session
-3. **Templates/checklists** — Available when starting similar work
-4. **Learnings docs** — Comprehensive but requires active lookup
-
-**Promotion checklist:**
-- [ ] Should any learning become a CLAUDE.md rule? (pattern that applies broadly)
-- [ ] Should any learning update MEMORY.md? (trigger conditions for future work)
-- [ ] Should any learning become a reusable template? (`docs/templates/`)
-- [ ] Should any learning be encoded in code? (scripts, hooks, automation)
-- [ ] Should any earlier doc be updated to reflect new knowledge? (fix stale conclusions)
-
-**Demotion checklist** (run alongside promotion):
-- [ ] Are there RESOLVED known issues still in CLAUDE.md? → Archive to `docs/learnings/resolved-issues.md`
+**Demotion checklist** (run before promotion):
+- [ ] Are there RESOLVED known issues still in CLAUDE.md? → Archive
 - [ ] Are there niche guides in CLAUDE.md used <1x/month? → Move to `docs/guides/`
-- [ ] Is any CLAUDE.md content duplicated across sections? → Consolidate or delete
-- [ ] Are there stale milestone-specific references? → Delete or archive
+- [ ] Is any CLAUDE.md content duplicated across sections? → Consolidate
+- [ ] Are there stale milestone-specific references? → Delete
 
-#### Identify CLAUDE.md-Worthy Patterns
-Ask for each learning:
-- Is this a gotcha/pattern future work should know about?
-- Is this a required sequence (e.g., "CORS before DNS")?
-- Is this a tool preference (e.g., "use CLI over dashboard")?
+---
 
-#### Propose CLAUDE.md Additions
-Format proposals as clear additions:
+#### Track 1: Codebase Promotion
 
-```markdown
-### Proposed CLAUDE.md Addition
+For each finding tagged `codebase` or `both`, route using this decision tree:
 
-**Section**: [Deployment / Authentication / Database / etc.]
+1. **Broadly applicable gotcha or rule?** → CLAUDE.md (Known Issues or Architecture section)
+2. **Specific to one subsystem** (workflows, agent, frontend)? → Subsystem README or `docs/guides/`
+3. **Should be enforced in code?** → Lint rule, pre-commit hook, or script check
+4. **One-time fix?** → Just do it (no documentation needed)
 
-**Add**:
-> [New content in markdown format]
+**Present a single batch summary:**
 
-Approve this addition? [y/n]
+```
+Codebase promotion plan:
+- CLAUDE.md: [N findings] — [brief list]
+- workflows/README.md: [N findings] — [brief list]
+- Code fixes: [N findings] — [brief list]
+- No action needed: [N findings]
+
+Approve all? [y/n, or specify changes]
 ```
 
-#### Multi-File Distribution
-Consider which file each learning belongs to:
+Implement all approved edits after a single approval. Do not ask per-item.
 
-| Learning Type | Target File |
-|---------------|-------------|
-| Gotchas/patterns | CLAUDE.md |
-| Trigger conditions | MEMORY.md |
-| Architectural decisions | docs/architecture.md |
-| Procedures/workflows | docs/guides/[relevant].md |
-| Reusable processes | docs/templates/ |
-| Domain-specific | docs/agents/[relevant].md |
+---
 
-Help the user identify 2-3 learnings worth promoting and implement the promotions.
+#### Track 2: Plugin Promotion
 
-### Step 7.5: Check Planning Doc Accuracy
+For each finding tagged `plugin` or `both`:
+
+**Step A — Discover the plugin repo:**
+1. Check CLAUDE.md or MEMORY.md for the plugin repo path
+2. If not found, search: `find ~ -maxdepth 4 -name "product-playbook-for-agentic-coding" -type d 2>/dev/null`
+3. Cache the discovered path in MEMORY.md for future sessions
+
+**Step B — Map findings to skills/commands:**
+
+Read the plugin directory structure (`commands/workflows/`, `skills/`). For each finding, identify which file should change:
+
+| Finding Pattern | Target File |
+|----------------|-------------|
+| Agent didn't triage before investigating | `commands/workflows/debug-ci.md` or `debug.md` |
+| Agent jumped to implementation during research | `commands/workflows/research-synthesis.md` |
+| Agent didn't commit before git operations | `commands/workflows/work.md` |
+| Skill default didn't match user preference | The specific skill file |
+| Missing workflow entirely | Propose new command file |
+
+**Step C — Classify change type:**
+
+| Type | Description | Example |
+|------|-------------|---------|
+| New step | Add a step to an existing workflow | "Step 0: Triage" in debug-ci |
+| Default change | Change a workflow's default behavior | Deep retro as default |
+| New principle | Add a rule/principle to a workflow | "Commit checkpoint" in work.md |
+| New workflow | Entirely new command needed | New `/playbook:run-review` |
+
+**Step D — Present a single batch summary:**
+
+```
+Plugin promotion plan:
+- [file]: [change type] — [brief description]
+- [file]: [change type] — [brief description]
+- New command: [name] — [brief description]
+
+Approve all? [y/n, or specify changes]
+```
+
+Implement all approved edits after a single approval. Do not ask per-item.
+
+### Step 7: Check Planning Doc Accuracy
 
 **Planning documents that drift from reality waste tokens in every future session.** Before finalizing, check:
 
@@ -437,13 +469,14 @@ Help the user identify 2-3 learnings worth promoting and implement the promotion
 
 Review the document:
 - [ ] Trigger type captured
-- [ ] Output target identified
 - [ ] YAML frontmatter complete for searchability
 - [ ] Key learning clearly documented
 - [ ] Actionable improvements identified
 - [ ] Saved to correct location
-- [ ] Key learnings promoted to appropriate level (CLAUDE.md, templates, code)
-- [ ] Planning docs checked for accuracy (Step 7.5)
+- [ ] **Codebase track**: Key learnings promoted (CLAUDE.md, README, docs/, code)
+- [ ] **Plugin track**: Skill/workflow improvements identified, mapped, and implemented
+- [ ] Plugin repo path cached in MEMORY.md (if discovered this session)
+- [ ] Planning docs checked for accuracy (Step 7)
 - [ ] Other guidance files updated (if applicable)
 
 ### Step 9: Execute Improvements (The Climax — Don't Just Document, Do)
@@ -452,7 +485,7 @@ Review the document:
 
 #### 9.1: Present the Full Action Plan
 
-Gather ALL actionable improvements from Steps 4 through 8 (standard findings, deep findings, gap analysis, promotions, planning doc fixes) and present them as a **single prioritized action plan**, split by target:
+Gather ALL actionable improvements from Steps 3 through 8 (standard findings, deep findings, gap analysis, promotions, planning doc fixes) and present them as a **single prioritized action plan**, split by target:
 
 ```
 "Here's everything we identified, organized by where it goes:
@@ -569,7 +602,7 @@ If yes, I'll add those improvements to the plugin PR."
 - **Be Honest**: Encourage honest reflection on what worked and didn't
 - **Focus on Actionability**: Improvements should be specific and actionable
 - **Enable Discovery**: Use YAML frontmatter for future searchability
-- **Dual-Target**: Consider both codebase docs AND workflow improvements
+- **Plugin Improvements Are First-Class**: Plugin/workflow improvements are proactively surfaced, not an afterthought. The deep analysis explicitly looks for skill gaps, and promotion runs a dedicated plugin track.
 - **Right-Sized**: Match depth to trigger type (lightweight vs comprehensive)
 - **Execute, Don't Just Document**: Learnings without follow-through will be re-learned
 

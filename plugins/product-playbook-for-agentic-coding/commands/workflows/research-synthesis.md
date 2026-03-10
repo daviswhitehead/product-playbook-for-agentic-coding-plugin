@@ -24,6 +24,25 @@ Strong product thinking combines three types of evidence:
 
 Each layer corrects the others' blind spots. Using all three prevents biased decisions.
 
+## Output Mode
+
+**Before starting**, clarify the expected output with the user:
+
+```
+What would you like me to do with the findings?
+1. **Document only** — Research, synthesize, and present findings for your review
+2. **Document then implement** — Research, present findings, then act on approved recommendations
+```
+
+Default to **document only** for research and planning tasks. If the user's opening message is analytical/strategic (not "build X" or "fix Y"), assume document-only mode unless told otherwise. Do not jump to implementation during a research session without explicit approval.
+
+## Verification of External Claims
+
+When researching external APIs, services, or platform capabilities:
+- **Verify before asserting**: Do not claim an API supports a feature without confirming via documentation or API exploration
+- **Cite sources**: Link to docs or show API responses that confirm capabilities
+- **Flag uncertainty**: If you can't verify a claim, say "I believe X but haven't confirmed" rather than stating it as fact
+
 ## Process
 
 ### Step 1: Scope the Research

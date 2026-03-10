@@ -442,6 +442,7 @@ If matches are found, update the E2E tests in the same commit. Prefer migrating 
 - **Test-Driven When Appropriate**: Write tests as you build
 - **Incremental Progress**: Complete one task fully before moving to next
 - **Incremental Commits**: Commit after each meaningful milestone
+- **Commit Checkpoints Before Git-Touching Operations**: Before running any task that touches git state (worktrees, branch switching, publishing to other branches), commit all pending changes first. Uncommitted work + branch-switching = data loss. This is especially critical for delivery agents, deployment scripts, and anything that creates or enters git worktrees.
 - **Scope Awareness**: Periodically verify scope hasn't exceeded plan estimates (Step 1.5)
 
 ## Next Steps

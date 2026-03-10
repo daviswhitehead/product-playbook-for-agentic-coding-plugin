@@ -61,6 +61,16 @@ Before starting, ensure:
 
 ## Process
 
+### Step 0.5: Triage — Is This Related to Current Changes?
+
+**For CI/test failures or issues discovered during development:**
+
+1. Check if the error is in code you modified: `git diff --name-only | grep <failing-file>`
+2. If the issue exists on the base branch too, it's pre-existing — report it and decide whether to fix or skip
+3. If the issue is clearly unrelated to current work (e.g., flaky test in an unmodified module), flag it to the user rather than spending time investigating
+
+This prevents wasting debugging cycles on pre-existing issues that aren't related to the current task.
+
 ### Step 1: Initial Problem Assessment
 
 1. Gather problem description from user
