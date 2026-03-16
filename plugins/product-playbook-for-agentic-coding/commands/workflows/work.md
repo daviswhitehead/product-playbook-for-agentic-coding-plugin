@@ -190,17 +190,34 @@ Acceptance criteria: [list from tasks doc]"
 
 **CRITICAL**: Before presenting work to the user, maximize autonomous progress. The goal is to catch every obvious issue so the user's review focuses on taste, direction, and edge cases — not bugs you could have found yourself.
 
-#### 1. Run Automated Checks
+#### 1. Discover and Run Project Validation
+
+Before running generic commands, discover the project's validation setup:
+
+1. **Check CLAUDE.md** for pre-push/pre-PR checklist instructions — these override defaults
+2. **Check package.json** for validation scripts in priority order:
+   - `ci:local` — local CI gate (preferred for npm projects)
+   - `test:verify` — comprehensive pre-push validation
+   - `test:pre-push` — fast local CI gate
+3. **Fall back to individual commands** if no composite script exists:
+   ```bash
+   npm run lint && npm run typecheck && npm test
+   ```
+
+Run the most comprehensive available validation:
 ```bash
-# Run relevant tests
-npm test  # or pytest, cargo test, etc.
+# Use the project's validation script (discovered above)
+npm run ci:local   # or test:verify — whatever exists
 
-# Run linter/type checker
-npm run lint && npm run typecheck
-
-# Verify build succeeds
-npm run build
+# If no composite script exists, run individually:
+npm run lint       # Full-project linting
+npm run typecheck  # Full-project type checking
+npm test           # Unit tests (at minimum)
 ```
+
+**Why discovery matters**: `npm test` often runs only unit tests. The project may have a comprehensive validation script that also catches lint, typecheck, and build failures. Always check.
+
+**Timeout note**: If validation takes >2 minutes, run it with an explicit Bash timeout (e.g., `timeout: 300000`) to avoid Claude Code's default 120s timeout killing the process.
 
 #### 2. Walk Through the Feature Yourself
 
