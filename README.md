@@ -98,15 +98,21 @@ This plugin uses a marketplace-embedded structure (plugin source is inside the m
 |---------|-------------|
 | `/playbook:design-critique` | Facilitate a design critique to analyze visual designs |
 | `/playbook:design-spec` | Create a high-fidelity design specification for complex UI features |
+| `/playbook:design-system` | Extract or create a canonical DESIGN.md from Stitch screens |
+| `/playbook:design-to-code` | Transform Stitch screen HTML into project components |
+| `/playbook:design-verify` | Compare running implementation against Stitch mockups |
+| `/playbook:mockups` | Batch-generate Stitch screens from prompts with auto-naming |
 
 ### Review & Improvement Commands
 | Command | Description |
 |---------|-------------|
 | `/playbook:critique` | Run parallel multi-persona critiques on documents with versioning and synthesis |
+| `/playbook:rubric` | Run quality rubrics against code to validate implementations |
 | `/playbook:review-autonomy` | Review project readiness for autonomous execution |
 | `/playbook:identify-improvements` | Identify top 10 improvements from a coding session |
 | `/playbook:prompt-coaching` | Get real-time coaching on your prompts |
 | `/playbook:improve-playbook` | Analyze sessions to identify patterns and implement playbook improvements |
+| `/playbook:review-playbook` | Systematically review and optimize the playbook/plugin |
 
 ### Git Commands
 | Command | Description |
@@ -148,6 +154,7 @@ This plugin uses a marketplace-embedded structure (plugin source is inside the m
 | `cross-reference-validator-agent` | Validate consistency across interconnected documents |
 | `playbook-improvement-agent` | Analyze sessions, identify patterns, and propose playbook improvements |
 | `prd-drafting-agent` | Autonomously draft agent-ready PRDs from available context |
+| `insights-pipeline-agent` | Analyze chat sessions, brainstorm improvements, RICE-score ideas, generate reports |
 
 ## Skills
 
@@ -157,6 +164,10 @@ This plugin uses a marketplace-embedded structure (plugin source is inside the m
 | `learning-capture` | Multi-trigger, dual-target learning capture |
 | `autonomous-execution` | Patterns for autonomous project execution |
 | `mobile-debugging` | Patterns for debugging mobile-specific issues on iOS Safari and Android Chrome |
+| `stitch-integration` | Shared patterns and best practices for Google Stitch design pipeline |
+| `session-checkpoint` | Patterns for session checkpoint and context preservation |
+| `user-journey-testing` | Patterns for user journey testing and validation |
+| `chat-insights` | Patterns for analyzing chat sessions to extract product insights |
 
 ## Key Features
 
@@ -236,10 +247,14 @@ product-playbook-for-agentic-coding-plugin/
 │       ├── agents/
 │       │   └── workflow/    # Phase-specific agents
 │       ├── skills/
+│       │   ├── autonomous-execution/
+│       │   ├── chat-insights/
 │       │   ├── codebase-docs-search/
 │       │   ├── learning-capture/
-│       │   ├── autonomous-execution/
-│       │   └── mobile-debugging/
+│       │   ├── mobile-debugging/
+│       │   ├── session-checkpoint/
+│       │   ├── stitch-integration/
+│       │   └── user-journey-testing/
 │       └── resources/
 │           ├── templates/   # Document templates
 │           └── personas/    # Reusable critique personas
