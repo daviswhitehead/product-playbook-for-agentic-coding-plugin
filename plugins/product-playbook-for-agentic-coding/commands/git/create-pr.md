@@ -46,6 +46,21 @@ git branch -r | grep -E 'origin/(main|production|master)' | head -1
 
 Only ask the user if there's clear context indicating a different target branch is needed.
 
+### Step 2.5: Run Pre-Push Validation
+
+Before pushing, run the project's full validation suite:
+
+1. **Discover validation command** — check CLAUDE.md / package.json for `ci:local`, `test:verify`
+2. **Run it** with explicit timeout (validation may take 2-5 minutes):
+   ```bash
+   npm run ci:local  # or test:verify — whatever exists
+   ```
+   Use Bash timeout of 300000ms (5 minutes) to avoid Claude Code's default 2-minute timeout.
+3. **If validation fails**: Fix issues before pushing. Do not push broken code to trigger CI.
+4. **Skip if the user explicitly requests it**: Note the risk of CI failure.
+
+**Why**: Every push triggers CI. Validating locally first means CI should pass on the first try, saving minutes and money. The pre-push git hook provides a safety net, but running validation explicitly avoids timeout issues.
+
 ### Step 3: Push Branch to Remote (if needed)
 
 Check if the branch exists on remote and push if needed:
@@ -56,11 +71,17 @@ git push -u origin HEAD
 
 ### Step 4: Create Pull Request
 
-Create PR using GitHub CLI with a descriptive title and body:
+Create PR using GitHub CLI. **Default to draft** unless the user explicitly requests a ready PR:
 
 ```bash
+# Default: draft PR (fast CI only, mark ready when full CI needed)
+gh pr create --draft --base <target-branch> --title "<descriptive title>" --body "<description>"
+
+# Only if user explicitly requests non-draft:
 gh pr create --base <target-branch> --title "<descriptive title>" --body "<description>"
 ```
+
+**Why draft by default**: Draft PRs typically skip expensive CI (E2E, integration). Mark as "Ready for review" when the full suite should run. This is the primary mechanism for CI cost control in projects with tiered CI.
 
 **PR Title**: Use conventional commit format when possible:
 - `feat: add new feature`
