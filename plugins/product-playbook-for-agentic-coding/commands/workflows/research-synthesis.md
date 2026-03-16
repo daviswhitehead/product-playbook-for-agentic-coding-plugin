@@ -59,7 +59,7 @@ Search extensively for research materials:
 ```
 Search order:
 1. --context path (if provided)
-2. projects/, docs/, docs/research/
+2. projects/, docs/
 3. Data analysis files, reports, dashboards
 4. Interview notes, user research, feedback
 5. Product critiques, competitive analyses
@@ -155,7 +155,6 @@ Research synthesis should tell a story, not present a data dump. Lead with the i
 
 Create the synthesis document at an appropriate location:
 - Default: `projects/[project-name]/research-synthesis.md`
-- Or: `docs/research/[topic]-synthesis.md`
 - Or: Path specified by user
 
 ## Next Steps
