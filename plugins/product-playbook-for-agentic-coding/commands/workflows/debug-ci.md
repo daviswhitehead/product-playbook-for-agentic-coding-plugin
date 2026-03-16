@@ -257,16 +257,6 @@ supabase migration list
 - Check for `addInitScript` timing issues in headless Chrome
 - Consider retry mechanisms as last resort
 
-## Key Principles
-
-1. **Policy First**: Check test policy compliance before investigating infrastructure
-2. **Timing Analysis**: For sharded suites, compare shard durations to find outliers
-3. **Latest Run Focus**: Always check the most recent CI run
-4. **Systematic Analysis**: Follow the same process each time
-5. **One Fix at a Time**: Isolate changes to identify what works
-6. **Local Reproduction**: Try to reproduce failures locally first
-7. **Context Budget**: Split investigation and implementation if reading 15+ files
-
 ### Step 9: Prevent Recurrence in Local Validation
 
 After fixing a CI failure, consider whether it should be caught locally:
@@ -281,6 +271,16 @@ After fixing a CI failure, consider whether it should be caught locally:
 3. **Should CLAUDE.md be updated?** If this is a novel failure mode, add it to Known Issues with the prevention mechanism.
 
 **Principle**: The fix is worth 1x; preventing the CI failure from ever reaching CI again is worth 100x.
+
+## Key Principles
+
+1. **Policy First**: Check test policy compliance before investigating infrastructure
+2. **Timing Analysis**: For sharded suites, compare shard durations to find outliers
+3. **Latest Run Focus**: Always check the most recent CI run
+4. **Systematic Analysis**: Follow the same process each time
+5. **One Fix at a Time**: Isolate changes to identify what works
+6. **Local Reproduction**: Try to reproduce failures locally first
+7. **Context Budget**: Split investigation and implementation if reading 15+ files
 
 ## Next Steps
 
