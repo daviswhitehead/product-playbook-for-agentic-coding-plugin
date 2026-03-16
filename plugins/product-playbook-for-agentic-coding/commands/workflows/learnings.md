@@ -53,6 +53,40 @@ Before proceeding, consider what tools are available:
 
 ## Process
 
+### Pre-Check: Prior Learnings Search (ALL Trigger Types)
+
+**Before starting any retrospective**, search for prior learnings to enable cross-session pattern detection:
+
+1. **Search for existing learnings docs**: `docs/learnings/*.md`, `docs/solutions/*.md`
+2. **Read YAML frontmatter** of each to understand categories, tags, and severity
+3. **Search for prior improvement ideas**: Look for `## Action Items` or `## Future Work` sections in prior learnings docs — these contain ideas that were documented but may never have been implemented
+4. **Build a "recurring patterns" list**: If the current project's themes (e.g., "CI churn", "testing gaps", "context loss") match tags or content from prior learnings, flag them:
+
+```
+Prior learnings search found N existing docs.
+
+Recurring patterns detected:
+- "[pattern]" — appeared in [N] prior learnings ([dates/titles])
+  → Prior proposed fix: [what was proposed before]
+  → Was it implemented? [yes/no/partially]
+
+These recurring patterns should be prioritized HIGHEST in this
+retrospective — they represent problems that documentation alone
+hasn't solved and likely need systemic fixes (automation, tooling,
+workflow changes), not more documentation.
+```
+
+5. **If prior improvement ideas were never implemented**, surface them:
+
+```
+Unimplemented improvement ideas from prior retrospectives:
+- [Idea] (from [date] learnings) — still relevant? [y/n]
+```
+
+**Why this matters**: Without this search, the same problems get documented repeatedly across retrospectives without escalation. A pattern that appears in 3 retrospectives needs a systemic fix, not a 4th documentation entry.
+
+---
+
 ### Pre-Check: Validation Status (Project Completion Only)
 
 **Before capturing learnings for a completed project**, run two pre-checks:
@@ -509,6 +543,41 @@ Which should we proceed with? (I recommend executing all High priority items.)"
 
 **Key**: Present codebase and plugin items separately — the user may want to execute codebase items immediately but batch plugin items into a single PR. Ask the user for their preferred execution strategy before starting.
 
+#### 9.1b: Systemic Analysis — Think Bigger (Project Completion Only)
+
+> **Why this step exists**: The natural tendency is to propose incremental fixes (add a CLAUDE.md rule, update a doc). But if the same class of problem keeps appearing, the fix isn't another rule — it's a systemic change (automation, tooling, workflow redesign). This step forces that elevation.
+
+**After presenting the initial action plan, before the user approves:**
+
+1. **Group findings into root problems**: Look across all findings — do multiple symptoms point to the same underlying cause? Name the root problems explicitly (e.g., "The Trust Gap", "CI Feedback Loop Tax").
+
+2. **Check against prior learnings**: If recurring patterns were found in the Pre-Check, escalate them:
+   ```
+   "[Pattern] has appeared in [N] prior retrospectives. Previous fixes were
+   [documentation/rules]. Since it recurred, a systemic solution is needed —
+   not another documentation entry."
+   ```
+
+3. **Propose systemic solutions**: For each root problem, brainstorm solutions at multiple levels:
+   - **Code/automation**: Can this be enforced by a hook, script, or lint rule?
+   - **Tooling**: Can a new skill, command, or framework prevent this?
+   - **Process**: Does the workflow need a new step or gate?
+   - **Architecture**: Does the system design need to change?
+
+4. **Present a prioritized list** with rationale (impact × feasibility × leverage) alongside the incremental fixes. Let the user decide which level to invest in.
+
+```
+"Before you approve the action items — I've also identified [N] root
+problems that these symptoms point to:
+
+[Root problem analysis + systemic solutions]
+
+Would you like to:
+1. Execute the incremental fixes only
+2. Execute incremental fixes + implement systemic solutions
+3. Review the systemic proposals first"
+```
+
 #### 9.2: Execute Codebase Improvements
 
 For each approved codebase action:
@@ -562,38 +631,61 @@ For each systemic finding (especially from deep analysis), check if it should in
 
 **How to apply**: Don't just note "we should do X next time" — actually edit the template so the next project starts with the improved structure. Add template changes to the plugin PR (Step 9.3).
 
-### Step 10: Improve This Workflow (Meta-Retrospective)
+### Step 10: Improve This Workflow (Meta-Retrospective) — MANDATORY
 
-> **Why this step exists**: The learnings workflow itself is a product. Every time you run it, you discover gaps between what the skill prescribes and what actually works. This step closes the loop — the retrospective retrospectes on itself.
+> **This step is MANDATORY and must ALWAYS be the final step. Never skip it. Never forget it.** The learnings workflow itself is a product. Every time you run it, you discover gaps between what the skill prescribes and what actually works. This step closes the loop — the retrospective retrospectes on itself.
+
+> **Why mandatory**: In the recipes project retrospective (2026-03-16), the agent skipped this step entirely. The user had to prompt twice — first to "think bigger" about solutions, then to reflect on the learnings phase itself. Both prompts produced the most impactful improvements of the session. Skipping this step means leaving the highest-value learnings on the table.
+
+**Part A: Agent self-reflection (do this BEFORE asking the user)**
+
+Compare what the skill prescribed vs what actually happened:
+1. Which steps did you skip, rush, or do out of order?
+2. Where did the user have to redirect you? (These are the most important signals.)
+3. What did you do that the skill didn't tell you to do? (These might be improvements to add.)
+4. Did you search prior learnings? Did you propose systemic solutions or just incremental fixes?
+5. Did you batch approvals or fragment them?
+
+Present your self-assessment honestly:
+```
+"Here's my honest assessment of how this learnings session went:
+
+**Steps I followed well**: [list]
+**Steps I skipped or rushed**: [list]
+**Places you had to redirect me**: [list with what I should have done]
+**Proposed improvements to the learnings workflow**: [list]
+
+Do you have additional observations about the process?"
+```
+
+**Part B: User input**
 
 Ask the user:
-
 ```
-"Before we wrap up — did anything about the learnings process itself
-feel like it could be improved? For example:
+"Did anything about the learnings process itself feel like it could
+be improved? For example:
 
 - Steps that were missing or out of order
 - Questions that weren't asked but should have been
 - Parts that felt redundant or too slow
-- Things we did that the skill didn't guide us to do
-
-If yes, I'll add those improvements to the plugin PR."
+- Things we did that the skill didn't guide us to do"
 ```
 
-**If the user identifies improvements:**
+**Part C: Implement improvements**
 
-1. Compare what the skill prescribed vs what actually happened in this session
-2. Identify concrete gaps (missing steps, missing data sources, missing integrations)
-3. Propose specific edits to `learnings.md`
-4. Add the changes to the plugin PR created in Step 9.3 (or create one if none exists)
-
-**If the user says no**, skip — don't force meta-reflection when there's nothing to improve.
+For ALL identified improvements (from both agent self-reflection and user input):
+1. Propose specific edits to `learnings.md`
+2. Add the changes to the plugin PR created in Step 9.3 (or create one if none exists)
+3. Do not ask "should we do this?" — improvements to the learnings workflow are always worth implementing
 
 **Examples of improvements discovered this way:**
 - Git history analysis was missing as a data source (found during subscriptions-v1 retro)
 - Step 9 (Execute Improvements) didn't exist — the skill stopped at documentation
 - /compound integration wasn't suggested for significant solved problems
 - No guidance for large session sets (>20 sessions)
+- Prior learnings search was missing — recurring patterns never got escalated (found during recipes retro)
+- Systemic analysis ("think bigger") step was missing — agent defaulted to incremental fixes (found during recipes retro)
+- Meta-retrospective was skippable — agent skipped it, losing the highest-value improvements (found during recipes retro)
 
 ---
 

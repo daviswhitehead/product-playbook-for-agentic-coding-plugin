@@ -35,6 +35,32 @@ Ask the user about the design critique context:
 - What design challenges or questions are they trying to answer?
 - Is there an existing Product Requirements document to inform?
 
+### Step 1b: Agree on Methodology
+
+Before executing any critique, align on approach with the user:
+
+**Personas**: Which perspectives matter for this critique?
+- Default: 5 parallel personas (Luxury Brand Director, Day-1 User, Day-30 Power User, Mobile UX Specialist, Design System Auditor)
+- User may want fewer for speed, or different roles for their specific context
+- Present the proposed personas and ask for approval
+
+**Source of Truth**: What are we critiquing against?
+- Live code screenshots (default — code is truth)
+- Figma mockups
+- Competitor reference screenshots
+- A combination
+
+**Output Format**:
+- Structured report with prioritized findings (default)
+- Comparative table
+- Quick bullet list
+
+**Scope**: Which screens/components are in scope?
+- Explicitly confirm what's IN scope and what's OUT
+- Don't critique screens the user didn't ask about
+
+**Present the proposed methodology and get explicit user approval before proceeding. Do NOT start generating critique content until methodology is confirmed.** This prevents the pattern of generating a full critique and then redoing it because the approach was wrong.
+
 ### Step 2: Gather Visual References
 
 **Auto-fetch from Stitch (if available):**
