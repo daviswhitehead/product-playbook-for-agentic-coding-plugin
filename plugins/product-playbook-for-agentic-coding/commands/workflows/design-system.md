@@ -140,7 +140,7 @@ If no Stitch screens exist, skip this step. If no codebase tokens exist, skip th
 ### Step 6: Save
 
 1. Ask the user for the project name (if not provided as an argument)
-2. Write the DESIGN.md to: `docs/projects/[project-name]/DESIGN.md`
+2. Write the DESIGN.md to: `projects/[project-name]/DESIGN.md`
 3. If a drift report was generated, include it as an appendix at the bottom of the DESIGN.md
 4. Confirm the file path with the user
 

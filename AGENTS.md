@@ -175,8 +175,7 @@ How to apply this learning in the future...
 ### Searching Project Documentation
 Standard locations to check:
 1. `docs/` - Primary documentation
-2. `docs/projects/` - Project-specific docs
-3. `projects/` - Alternative project location
+2. `projects/` - Project-specific docs
 4. `CLAUDE.md` - Project AI instructions
 5. `AGENTS.md` - Universal AI instructions
 6. `README.md` - Project overview

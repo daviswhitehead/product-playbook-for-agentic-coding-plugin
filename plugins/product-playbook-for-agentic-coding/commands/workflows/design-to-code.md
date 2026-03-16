@@ -58,9 +58,9 @@ Load the `stitch-integration` skill via the Skill tool. This provides convention
 
 Before starting, locate these project artifacts:
 
-1. **Mockups manifest** — search for `docs/projects/*/mockups-manifest.md`. This contains Stitch screen IDs and the generation context. If the user passed an argument (screen ID or manifest path), use that instead.
-2. **DESIGN.md** — search for `docs/projects/*/DESIGN.md` or `DESIGN.md` at the repo root. This is the token translation reference (Stitch colors to project tokens).
-3. **Component map** (if exists) — search for `docs/projects/*/component-map.md`. A previous run may have already started mapping components.
+1. **Mockups manifest** — search for `projects/*/mockups-manifest.md`. This contains Stitch screen IDs and the generation context. If the user passed an argument (screen ID or manifest path), use that instead.
+2. **DESIGN.md** — search for `projects/*/DESIGN.md` or `DESIGN.md` at the repo root. This is the token translation reference (Stitch colors to project tokens).
+3. **Component map** (if exists) — search for `projects/*/component-map.md`. A previous run may have already started mapping components.
 
 If no mockups manifest and no screen ID are provided:
 
@@ -311,7 +311,7 @@ Document the full translation from Stitch screen elements to project components.
 ### Step 7: Save
 
 1. **Component scaffolds** — write to the codebase in the directories determined in Step 5. Confirm each file path with the user before writing.
-2. **Component map** — save to `docs/projects/[project-name]/component-map.md`. If the user has not specified a project name, ask for one.
+2. **Component map** — save to `projects/[project-name]/component-map.md`. If the user has not specified a project name, ask for one.
 3. **Summary** — present what was created:
    - Number of new components scaffolded (with file paths)
    - Number of existing components reused

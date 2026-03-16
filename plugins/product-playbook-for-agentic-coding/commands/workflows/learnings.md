@@ -103,7 +103,7 @@ Unimplemented improvement ideas from prior retrospectives:
 
 #### Pre-Check B: Validation Tasks
 
-1. **Locate the tasks document** for the project (typically `projects/[project-name]/tasks.md` or `docs/projects/*/tasks.md`)
+1. **Locate the tasks document** for the project (typically `projects/[project-name]/tasks.md`)
 2. **Search for validation/QA tasks** — look for tasks related to the project's actual validation needs. Common examples include: test coverage, integration testing, CI pipeline verification, performance profiling, security review, manual smoke testing. Don't assume UI-specific checks (Lighthouse, accessibility audit, visual review) apply to every project — match validation to what the project actually built.
 3. **Check their status**:
    - If validation tasks exist and are **incomplete**, warn the user:

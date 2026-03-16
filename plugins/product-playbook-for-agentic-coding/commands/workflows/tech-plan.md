@@ -80,7 +80,7 @@ When planning integrations with external services or APIs:
 
 Before starting, search for existing project documentation:
 1. **Find Product Requirements**: This is required input—locate the PRD first
-2. **Search for docs**: Look in `projects/`, `docs/projects/`, `docs/` for relevant context
+2. **Search for docs**: Look in `projects/`, `docs/` for relevant context
 3. **Check for instructions**: Look for `CLAUDE.md`, `AGENTS.md`, `README.md`
 
 Use Glob -> Grep -> Read strategy to find and incorporate relevant context.
