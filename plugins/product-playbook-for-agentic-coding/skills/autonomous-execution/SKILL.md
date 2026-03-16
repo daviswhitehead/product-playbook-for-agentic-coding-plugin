@@ -142,12 +142,17 @@ When stopping:
 ## Quality Gates
 
 ### Pre-Commit Gates
-Before each commit, verify:
-- [ ] No skipped tests
+Before each commit, discover and run project-specific validation (from CLAUDE.md / package.json):
+- Discover: `ci:local` > `test:verify` > `test:pre-push` > individual commands
+- If composite script exists (e.g., `npm run ci:local`): run it instead of individual commands
+- Run with explicit Bash timeout (300000ms) if validation takes >2 minutes
+
+At minimum verify:
+- [ ] No skipped tests (.skip)
 - [ ] No focused tests (.only)
-- [ ] Unit tests pass
-- [ ] Type checking passes
 - [ ] Linting passes
+- [ ] Type checking passes
+- [ ] Unit tests pass
 
 ### Pre-Phase Gates
 Before proceeding to next phase:
