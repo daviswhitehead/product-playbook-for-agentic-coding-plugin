@@ -45,7 +45,7 @@ Load the `stitch-integration` skill via the Skill tool. This provides the feed-f
 This command needs **structured prompts** to generate screens from. Check for them in this order:
 
 1. **Argument provided** — if the user passed a path to a prompts file or a Stitch project ID, use that.
-2. **design-spec-prompts.md** — search for `docs/projects/*/design-spec-prompts.md` in the codebase. If found, confirm with the user which one to use.
+2. **design-spec-prompts.md** — search for `projects/*/design-spec-prompts.md` in the codebase. If found, confirm with the user which one to use.
 3. **User-provided prompts** — the user may paste prompts directly.
 
 If no prompts are found anywhere:
@@ -53,7 +53,7 @@ If no prompts are found anywhere:
 > **No screen prompts found.**
 > This command generates screens from structured prompts. Run `/playbook:design-spec` first to create a design spec with Stitch-ready prompts, then re-run `/playbook:mockups`.
 
-Also check for **DESIGN.md** — search for `docs/projects/*/DESIGN.md` or `DESIGN.md` in the project root. If found, its design system sections will be injected into every generation prompt per the `stitch-integration` skill rules. If not found, warn the user:
+Also check for **DESIGN.md** — search for `projects/*/DESIGN.md` or `DESIGN.md` in the project root. If found, its design system sections will be injected into every generation prompt per the `stitch-integration` skill rules. If not found, warn the user:
 
 > **DESIGN.md not found.** Screens will be generated without a design system reference, which reduces consistency. Consider running `/playbook:design-system` first.
 
@@ -163,7 +163,7 @@ If high-severity drift is detected, recommend using `edit_screens` to bring the 
 
 Write a mockups manifest documenting everything that was generated:
 
-**File path**: `docs/projects/[project-name]/mockups-manifest.md`
+**File path**: `projects/[project-name]/mockups-manifest.md`
 
 **Manifest format**:
 

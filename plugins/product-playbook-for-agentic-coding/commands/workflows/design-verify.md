@@ -55,9 +55,9 @@ Load the `stitch-integration` skill via the Skill tool. This provides convention
 
 Before starting, locate these project artifacts:
 
-1. **Mockups manifest** — search for `docs/projects/*/mockups-manifest.md`. This maps screen names to Stitch screen IDs and defines the verification scope. If the user passed a manifest path as an argument, use that.
-2. **Component map** (if exists) — search for `docs/projects/*/component-map.md`. This maps Stitch elements to file paths, enabling precise fix suggestions.
-3. **DESIGN.md** — search for `docs/projects/*/DESIGN.md` or `DESIGN.md` at the repo root. This provides the token reference for color and spacing verification.
+1. **Mockups manifest** — search for `projects/*/mockups-manifest.md`. This maps screen names to Stitch screen IDs and defines the verification scope. If the user passed a manifest path as an argument, use that.
+2. **Component map** (if exists) — search for `projects/*/component-map.md`. This maps Stitch elements to file paths, enabling precise fix suggestions.
+3. **DESIGN.md** — search for `projects/*/DESIGN.md` or `DESIGN.md` at the repo root. This provides the token reference for color and spacing verification.
 4. **App URL** — the user must provide either a URL (e.g., `https://staging.example.com`) or `localhost` (which will be resolved to the local dev server URL, typically `http://localhost:3000`).
 
 If no mockups manifest and no mockup images are available:
@@ -86,7 +86,7 @@ Take screenshots of the running application at each route and viewport that corr
 1. Navigate to the route for each screen
 2. Wait for the page to be fully loaded (network idle, no loading spinners)
 3. Capture a full-page screenshot at each viewport size
-4. Save screenshots to `docs/projects/[project-name]/verification-screenshots/`
+4. Save screenshots to `projects/[project-name]/verification-screenshots/`
 
 **If Playwright is not available**, ask the user to provide screenshots manually. Provide the exact viewport dimensions and routes needed.
 
@@ -214,7 +214,7 @@ For each discrepancy found in Step 3, produce a structured entry with severity, 
 
 ### Step 5: Save
 
-Write the full verification report to: `docs/projects/[project-name]/design-verification.md`
+Write the full verification report to: `projects/[project-name]/design-verification.md`
 
 **Report format:**
 
@@ -255,7 +255,7 @@ Write the full verification report to: `docs/projects/[project-name]/design-veri
 
 ## Verification Screenshots
 
-Implementation screenshots saved to: `docs/projects/[project-name]/verification-screenshots/`
+Implementation screenshots saved to: `projects/[project-name]/verification-screenshots/`
 
 | Screen | Viewport | File |
 |--------|----------|------|

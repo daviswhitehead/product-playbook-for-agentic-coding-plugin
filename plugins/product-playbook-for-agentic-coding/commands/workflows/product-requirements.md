@@ -150,7 +150,7 @@ Search extensively for existing documentation:
 ```
 Context sources (search in order):
 1. --context path (if provided)
-2. projects/, docs/projects/, docs/
+2. projects/, docs/
 3. CLAUDE.md, AGENTS.md, README.md
 4. Strategy and foundation docs (mission, vision, retention framework, personas)
 5. Any files mentioned in user's description
@@ -232,7 +232,7 @@ Ask the user about their project:
 Before deep discovery, search for existing documentation:
 1. **Strategy docs**: Look for mission, vision, retention frameworks, strategic priorities
 2. **Research and data**: Look for analyses, user research, product critiques, meeting notes
-3. **Project docs**: Look in `projects/`, `docs/projects/`, `docs/` for relevant context
+3. **Project docs**: Look in `projects/`, `docs/` for relevant context
 4. **Instructions**: Look for `CLAUDE.md`, `AGENTS.md`, `README.md`
 5. **Prior work**: Search for existing PRDs, feature specs, or planning docs
 

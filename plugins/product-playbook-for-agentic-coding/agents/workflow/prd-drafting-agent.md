@@ -1,6 +1,6 @@
 ---
 name: prd-drafting-agent
-description: "Use this agent to autonomously draft a Product Requirements Document from available context. Optimized for creating agent-ready PRDs that enable autonomous technical planning and implementation. <example>\\nContext: User has existing research and wants a PRD drafted.\\nuser: \\\"Draft a PRD from the research in docs/projects/feature-x/\\\"\\nassistant: \\\"I'll use the prd-drafting-agent to analyze your research and draft a comprehensive PRD.\\\"\\n<commentary>\\nSince the user has context and wants autonomous drafting, use the prd-drafting-agent.\\n</commentary>\\n</example>\\n<example>\\nContext: User has a brief idea and wants to skip the interview process.\\nuser: \\\"I need a PRD for adding dark mode - just draft it based on what you know about our codebase\\\"\\nassistant: \\\"I'll use the prd-drafting-agent to search the codebase for context and draft a PRD for dark mode.\\\"\\n<commentary>\\nThe user wants autonomous drafting without discovery questions, which is the prd-drafting-agent's specialty.\\n</commentary>\\n</example>"
+description: "Use this agent to autonomously draft a Product Requirements Document from available context. Optimized for creating agent-ready PRDs that enable autonomous technical planning and implementation. <example>\\nContext: User has existing research and wants a PRD drafted.\\nuser: \\\"Draft a PRD from the research in projects/feature-x/\\\"\\nassistant: \\\"I'll use the prd-drafting-agent to analyze your research and draft a comprehensive PRD.\\\"\\n<commentary>\\nSince the user has context and wants autonomous drafting, use the prd-drafting-agent.\\n</commentary>\\n</example>\\n<example>\\nContext: User has a brief idea and wants to skip the interview process.\\nuser: \\\"I need a PRD for adding dark mode - just draft it based on what you know about our codebase\\\"\\nassistant: \\\"I'll use the prd-drafting-agent to search the codebase for context and draft a PRD for dark mode.\\\"\\n<commentary>\\nThe user wants autonomous drafting without discovery questions, which is the prd-drafting-agent's specialty.\\n</commentary>\\n</example>"
 model: inherit
 ---
 
@@ -43,7 +43,7 @@ Search extensively for relevant documentation:
 ```
 Priority order:
 1. Specified context path(s)
-2. projects/, docs/projects/, docs/
+2. projects/, docs/
 3. CLAUDE.md, AGENTS.md, README.md
 4. Strategy and foundation docs (mission, vision, retention framework, personas)
 5. Research files, meeting notes, data analysis

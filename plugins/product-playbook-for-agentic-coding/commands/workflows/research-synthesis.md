@@ -59,7 +59,7 @@ Search extensively for research materials:
 ```
 Search order:
 1. --context path (if provided)
-2. projects/, docs/projects/, docs/, docs/research/
+2. projects/, docs/, docs/research/
 3. Data analysis files, reports, dashboards
 4. Interview notes, user research, feedback
 5. Product critiques, competitive analyses

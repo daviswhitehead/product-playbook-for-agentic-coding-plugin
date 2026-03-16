@@ -261,26 +261,26 @@ product-playbook-for-agentic-coding-plugin/
 # 0b. (Optional) Synthesize research into opportunities
 /playbook:research-synthesis --context docs/research/
 # Combine quant + qual + taste research into strategic narrative
-# Output: docs/projects/my-feature/research-synthesis.md
+# Output: projects/my-feature/research-synthesis.md
 
 # 0c. (Optional) Prioritize opportunities
 # Use resources/templates/prioritization.md to score and rank ideas
-# Output: docs/projects/my-feature/prioritization.md
+# Output: projects/my-feature/prioritization.md
 
 # 1. Define product requirements
 /playbook:product-requirements
 # Answer questions, define the problem, users, and success criteria
-# Output: docs/projects/my-feature/product-requirements.md
+# Output: projects/my-feature/product-requirements.md
 
 # 2. Plan the technical approach
 /playbook:tech-plan
 # Design architecture, sequencing, and technical approach
-# Output: docs/projects/my-feature/tech-plan.md
+# Output: projects/my-feature/tech-plan.md
 
 # 3. Break down into tasks
 /playbook:tasks
 # Create specific, actionable tasks with acceptance criteria
-# Output: docs/projects/my-feature/tasks.md
+# Output: projects/my-feature/tasks.md
 
 # 4. Execute tasks one by one
 /playbook:work

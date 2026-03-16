@@ -162,14 +162,14 @@ For each screen defined in the design spec:
 **Dark mode**: [Yes — include variant | No — light only]
 ```
 
-**Save prompts to**: `docs/projects/[project-name]/design-spec-prompts.md`
+**Save prompts to**: `projects/[project-name]/design-spec-prompts.md`
 
 Include a header in the output file:
 
 ```markdown
 # Design Spec Prompts — [Project Name]
 
-Generated from: `docs/projects/[project-name]/design-spec.md`
+Generated from: `projects/[project-name]/design-spec.md`
 Design system: `DESIGN.md`
 Date: [current date]
 

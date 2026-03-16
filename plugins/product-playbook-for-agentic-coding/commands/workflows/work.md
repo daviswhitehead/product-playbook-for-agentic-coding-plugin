@@ -92,7 +92,7 @@ Before starting, ensure:
 
 ### Step 1: Locate and Review Tasks Document
 
-1. Locate the Tasks Document (typically `projects/[project-name]/tasks.md` or `docs/projects/[project-name]/tasks.md`)
+1. Locate the Tasks Document (typically `projects/[project-name]/tasks.md`)
 2. Read the "Current Focus" section to identify the active task
 3. If no active task is specified, identify the next task that:
    - Has status "Not Started" or "In Progress"

@@ -67,11 +67,11 @@ Before executing any critique, align on approach with the user:
 
 Before asking the user for manual screenshots, check for a mockups manifest:
 
-1. Look for `docs/projects/[project]/mockups-manifest.md` in the codebase
+1. Look for `projects/[project]/mockups-manifest.md` in the codebase
 2. If found:
    - Parse the manifest for screen IDs and names
    - Use the `stitch-integration` skill and Stitch `get_screen` tool to fetch each screen's current state
-   - Save screenshots to the project folder (e.g., `docs/projects/[project]/critique-screenshots/`)
+   - Save screenshots to the project folder (e.g., `projects/[project]/critique-screenshots/`)
    - Log which screens were fetched and their versions
 3. Also check for a `DESIGN.md` (project-level or repo root) — use it as ground truth for brand and design system consistency checks in Step 4
 4. If no manifest is found, fall back to the manual process below

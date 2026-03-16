@@ -151,7 +151,7 @@ Commands should search for project context:
 ## Project Context
 
 Search for relevant documentation:
-- `docs/`, `docs/projects/`, `projects/`
+- `docs/`, `projects/`
 - `CLAUDE.md`, `AGENTS.md`, `README.md`
 
 Use Glob → Grep → Read strategy to find and incorporate relevant context.
