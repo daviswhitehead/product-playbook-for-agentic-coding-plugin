@@ -98,8 +98,9 @@ For each task:
    - Write tests if applicable
    - Keep changes focused
 
-3. **Validate**
-   - Run relevant tests
+3. **Validate** (before committing):
+   - Run project validation: check CLAUDE.md / package.json for `ci:local` or `test:verify`
+   - At minimum: `npm run lint && npm run typecheck && npm test`
    - Check acceptance criteria
    - Verify no regressions
 
@@ -182,7 +183,7 @@ To verify all changes:
 
 ## Key Principles
 
-1. **Momentum Over Perfection**: Keep moving, don't get stuck
+1. **Momentum With Guardrails**: Keep moving, but never commit code that fails lint, typecheck, or unit tests. A 3-minute local validation saves 30+ minutes of CI iteration.
 2. **Lower Risk First**: Build confidence with safer tasks
 3. **Atomic Changes**: One task, one commit
 4. **Document Everything**: Clear notes help validation

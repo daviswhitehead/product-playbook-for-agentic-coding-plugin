@@ -29,6 +29,27 @@ Identify:
 - New/untracked files
 - Staged vs unstaged changes
 
+### Step 1.5: Run Pre-Commit Validation
+
+Before creating any commits, verify the code is in a good state:
+
+1. **Discover project validation** — check CLAUDE.md and package.json for:
+   - `ci:local` (local CI simulation — preferred)
+   - `test:verify` (comprehensive)
+   - Individual: `lint`, `typecheck`, `test`
+
+2. **Run at minimum**:
+   ```bash
+   npm run lint && npm run typecheck
+   npm test
+   ```
+
+3. **If validation fails**: Fix issues before committing. Do not commit broken code.
+
+4. **Skip if explicitly requested**: If the user says "just commit" or "commit without tests", respect that — but note the risk.
+
+**Why**: The pre-commit hook catches some issues on staged files, but a full-project lint and typecheck catches cross-file breakage that staged-file-only checks miss.
+
 ### Step 2: Analyze and Plan
 
 Review all changes and create a plan of commits. For each potential commit, identify:

@@ -257,6 +257,21 @@ supabase migration list
 - Check for `addInitScript` timing issues in headless Chrome
 - Consider retry mechanisms as last resort
 
+### Step 9: Prevent Recurrence in Local Validation
+
+After fixing a CI failure, consider whether it should be caught locally:
+
+1. **Could `ci:local` have caught this?** If the failure was lint, typecheck, or unit tests — it should have been caught by the pre-push hook (`npm run ci:local`). If it wasn't, check:
+   - Is lefthook installed? (`ls .git/hooks/pre-push`)
+   - Did the agent bypass it with `--no-verify` or `LEFTHOOK=0`?
+   - Does `ci:local` cover this check?
+
+2. **Should `ci:local` be extended?** If CI caught something `ci:local` doesn't cover (e.g., a new lint rule, a missing check), propose adding it.
+
+3. **Should CLAUDE.md be updated?** If this is a novel failure mode, add it to Known Issues with the prevention mechanism.
+
+**Principle**: The fix is worth 1x; preventing the CI failure from ever reaching CI again is worth 100x.
+
 ## Key Principles
 
 1. **Policy First**: Check test policy compliance before investigating infrastructure
