@@ -208,6 +208,23 @@ Co-Authored-By: AI Assistant <noreply@example.com>
 - Reference task ID when relevant
 - Don't commit broken code
 
+## Long-Running Session Patterns
+
+### Session Checkpoints
+When executing 3+ tasks in sequence, write a session checkpoint after every 3rd completed task:
+- Write to `docs/checkpoints/latest.md`
+- Include: current task, completed tasks, key decisions, next steps, hot files
+- This preserves context if compaction occurs during long runs
+
+### Status Updates
+After completing each task, emit a brief status update:
+```
+✓ Task [X.Y] done — [one-line summary]
+→ Next: Task [X.Y] — [one-line description]
+```
+
+Keep updates terse. The orchestrator or user should be able to glance at progress without parsing paragraphs.
+
 ## Key Principles
 
 ### Focus and Momentum

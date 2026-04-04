@@ -63,6 +63,17 @@ Before starting autonomous work, verify:
 3. Commit only if validation passes
 4. Repeat with next small change
 
+### Checkpoint Integration
+
+For runs spanning 3+ tasks, use the `session-checkpoint` skill to preserve context:
+
+- **Write checkpoints** every 3 completed tasks (or when context feels deep)
+- **Write to** `docs/checkpoints/latest.md`
+- **Include**: current task, decisions made, next steps, hot files
+- **Why**: Context compaction destroys working memory. Checkpoints preserve decisions and rationale that git can't capture.
+
+See the `session-checkpoint` skill for the full checkpoint format.
+
 ## Self-Validation Strategies
 
 ### Task-Level Validation

@@ -474,6 +474,10 @@ When all tasks are complete, follow this end-to-end flow:
 ```
 Implement (all tasks done)
   ↓
+Reconcile All Tasks — Sweep every task in the Tasks Document and assign a final disposition:
+  Done | Blocked (reason) | Deferred (reason) | Cancelled (reason)
+  Update the Tasks Document before proceeding. No task should be left without a status.
+  ↓
 Automated Testing — Run full test suite, lint, typecheck, build
   ↓
 Local Review — Walk through the feature yourself (browser, endpoints, etc.)
