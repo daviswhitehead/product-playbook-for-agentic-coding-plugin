@@ -29,7 +29,7 @@ Before proceeding, inventory available tools:
 1. **Commands**: Other `/playbook:*` commands (debug, learnings)
 2. **Agents**: Specialized agents via Task tool (delivery-agent)
 3. **MCP Tools**: External service integrations via ToolSearch
-4. **Skills**: Domain expertise via Skill tool (autonomous-execution)
+4. **Skills**: Domain expertise via Skill tool (autonomous-execution, session-checkpoint)
 
 Select the most appropriate tools for the task at hand.
 
@@ -117,6 +117,22 @@ For each task:
    - Don't stop unless blocked
    - Continue until all viable tasks complete
 
+7. **Checkpoint (Every 3 Tasks)**
+   - After completing every 3rd task, write a session checkpoint using the `session-checkpoint` skill pattern
+   - Write to `docs/checkpoints/latest.md` with: current task, what's done, key decisions, next steps, hot files
+   - This preserves context across compaction events in long autonomous runs
+   - **Skip** if fewer than 3 tasks remain
+
+8. **Status Update (Between Tasks)**
+   - After completing each task, emit a brief structured update:
+     ```
+     ✓ Task [X.Y] done — [one-line summary of what was built/fixed]
+     → Next: Task [X.Y] — [one-line description]
+     Progress: [N/M tasks] | Blocked: [N] | Deferred: [N]
+     ```
+   - Keep updates to 3 lines max. The user should be able to glance at progress without reading paragraphs.
+   - Do NOT summarize what you're about to do in detail — just the task name and progress count.
+
 ### Step 3: Handle Blockers
 
 If you encounter a blocker:
@@ -125,6 +141,22 @@ If you encounter a blocker:
 2. **Set status** to "Blocked"
 3. **Move to next task** - don't get stuck
 4. **Note for summary** - user needs to know
+
+### Step 3.5: Reconcile All Tasks (Before Stopping)
+
+**CRITICAL**: Before producing the completion summary, sweep EVERY task in the Tasks Document — not just the ones you worked on. For each task, assign a final disposition:
+
+| Disposition | Meaning | When to Use |
+|-------------|---------|-------------|
+| **Done** | Completed this session with all acceptance criteria met | Task was implemented and validated |
+| **Blocked** (with reason) | Cannot proceed without external input | Missing dependency, unclear requirement, external service issue |
+| **Deferred** (with reason) | Deliberately skipped | Too risky for autonomous execution, out of scope for this session |
+| **Cancelled** (with reason) | No longer needed | Superseded by another task, requirement changed |
+| **Not Reached** | Session ended before getting to this task | Ran out of time/context, lower priority |
+
+**Why this matters**: Without explicit reconciliation, the most common failure mode in long autonomous runs is silent task loss — the agent completes 8/10 tasks, stops, and nobody notices 2 tasks were never addressed. Every task must have an explicit disposition.
+
+Update the Tasks Document with dispositions before producing the summary.
 
 ### Step 4: Provide Completion Summary
 

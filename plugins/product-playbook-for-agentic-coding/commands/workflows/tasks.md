@@ -160,6 +160,7 @@ Ensure all sections are filled:
 - Task Dependencies (critical path and parallel opportunities)
 - Task-by-Task Summary Table
 - Progress Tracking (current status)
+- Project Reconciliation section (pre-populated from template — completed at project end)
 
 ### Step 5: Validate Completeness
 

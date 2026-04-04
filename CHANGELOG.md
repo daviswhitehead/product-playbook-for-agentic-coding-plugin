@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.18.0] - 2026-04-04
+
+### Added
+- **Plan Reconciliation** — New Step 3.5 in `work-multiple` and end-of-project flow in `work` that forces explicit disposition (Done/Blocked/Deferred/Cancelled) for every task before declaring work complete. Prevents silent task loss in long autonomous runs.
+- **Compaction-Aware Checkpointing** — `work-multiple` and `delivery-agent` now trigger session checkpoints every 3 tasks during long runs. `autonomous-execution` skill references `session-checkpoint` as a companion.
+- **Mid-Rollout Communication** — Structured 3-line status updates between tasks in `work-multiple` and `delivery-agent`. Users can track progress without waiting for the final summary.
+- **Reconciliation Section in Tasks Template** — Every new tasks document now includes a Project Reconciliation table for tracking final dispositions.
+
+### Changed
+- `commands/workflows/work-multiple.md` — Added Steps 3.5 (reconciliation), checkpoint triggers, and status update cadence
+- `commands/workflows/work.md` — Added reconciliation to end-of-project flow
+- `agents/workflow/delivery-agent.md` — Added checkpoint and communication patterns
+- `skills/autonomous-execution/SKILL.md` — Added checkpoint integration section
+- `resources/templates/tasks.md` — Added Project Reconciliation section
+- `commands/workflows/tasks.md` — Referenced reconciliation in task creation
+
+### Rationale
+Inspired by OpenAI's Codex prompting guide (March 2026), which identifies three key patterns for reliable long-running agent workflows:
+1. **Reconcile every plan item** before finishing (Done/Blocked/Cancelled)
+2. **Checkpoint context** to survive compaction in multi-hour sessions
+3. **Structured mid-rollout updates** (brief acknowledgment → next steps → progress count)
+
+These address the most common failure modes in autonomous execution: silent task loss, context amnesia after compaction, and user anxiety during long silent runs.
+
 ## [0.14.0] - 2026-02-02
 
 ### Added
@@ -270,6 +294,7 @@ These tools were identified by analyzing patterns across 30+ coding sessions in 
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 0.18.0 | 2026-04-04 | Plan reconciliation, compaction-aware checkpointing, mid-rollout communication |
 | 0.13.0 | 2026-01-30 | Multi-persona critique: `/playbook:critique` command, 5 personas, synthesis + issue tracker templates |
 | 0.12.0 | 2026-01-29 | Agent-ready PRD system: new template, two-mode command, `prd-drafting-agent` |
 | 0.11.0 | 2026-01-29 | Meta-improvement: `/playbook:improve-playbook` command and `playbook-improvement-agent` |

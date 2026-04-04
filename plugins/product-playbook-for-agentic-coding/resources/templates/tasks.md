@@ -248,6 +248,26 @@
 
 ---
 
+## Project Reconciliation
+
+> **Complete this section when all planned work is done** (or when stopping work on this project). Every task must have an explicit final disposition — no task should be left in an ambiguous state.
+
+| Task | Final Disposition | Notes |
+|------|------------------|-------|
+| Task 1.1 | Done / Blocked / Deferred / Cancelled | [Brief note] |
+| Task 1.2 | Done / Blocked / Deferred / Cancelled | [Brief note] |
+
+**Disposition Guide:**
+- **Done**: Completed with all acceptance criteria met
+- **Blocked** (with reason): Cannot proceed without external input
+- **Deferred** (with reason): Deliberately postponed to a future session/PR
+- **Cancelled** (with reason): No longer needed (requirement changed, superseded)
+
+**Reconciliation Check:**
+- [ ] Every task has a disposition (no tasks left as "Not Started" or "In Progress")
+- [ ] Blocked/Deferred tasks have clear reasons and ownership
+- [ ] Cancelled tasks have rationale documented
+
 ## Final Verification Checklist
 
 **Before marking all tasks complete**, verify:
