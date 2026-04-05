@@ -63,14 +63,15 @@ Before starting autonomous work, verify:
 3. Commit only if validation passes
 4. Repeat with next small change
 
-### Checkpoint Integration
+### Checkpoint Integration (Mandatory)
 
-For runs spanning 3+ tasks, use the `session-checkpoint` skill to preserve context:
+Write session checkpoints — context compaction is inevitable in long runs, not an edge case:
 
-- **Write checkpoints** every 3 completed tasks (or when context feels deep)
+- **Write checkpoints** every 3 completed tasks — this is not optional
 - **Write to** `docs/checkpoints/latest.md`
 - **Include**: current task, decisions made, next steps, hot files
-- **Why**: Context compaction destroys working memory. Checkpoints preserve decisions and rationale that git can't capture.
+- **Also write before stopping** for any reason (blockers, session end, user interrupt)
+- **Why**: Context compaction destroys working memory. Checkpoints are the only mechanism that preserves decisions and rationale across compaction events. Treat them as mandatory infrastructure, not a nice-to-have.
 
 See the `session-checkpoint` skill for the full checkpoint format.
 
