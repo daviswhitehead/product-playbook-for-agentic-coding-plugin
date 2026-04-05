@@ -85,6 +85,29 @@ When selecting tasks to work on, prioritize in this order:
 3. Score each task for risk and priority
 4. Create execution order
 
+### Step 1.5: Dry Run (First Task with Full Visibility)
+
+Before running autonomously, execute the first task with full transparency:
+
+1. **Show the plan**: Present the task, your implementation approach, and expected changes
+2. **Execute the first task**: Implement it following the standard process (Steps 2.1-2.5)
+3. **Present results explicitly**: Show what was done, files changed, tests passing
+4. **Get confirmation**: Ask the user to confirm the approach before proceeding autonomously
+
+Present to user:
+
+> Dry run complete for [Task X.Y]. Here's what I did:
+>
+> **Approach**: [brief summary]
+> **Files changed**: [list]
+> **Validation**: [tests, lint, typecheck status]
+>
+> Does this approach look right? If yes, I'll continue autonomously with the remaining [N] tasks.
+
+**Why this matters**: A single verified task catches prompt misunderstandings, wrong patterns, and misread acceptance criteria before they compound across N tasks. Fixing one task is cheap; fixing 8 is expensive.
+
+**Skip when**: The user explicitly says "run all tasks without stopping" or passes a `--no-dry-run` flag.
+
 ### Step 2: Execute Tasks in Sequence
 
 For each task:
