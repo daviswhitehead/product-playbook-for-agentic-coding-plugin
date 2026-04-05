@@ -1,6 +1,6 @@
 ---
 name: playbook:product-requirements
-description: Draft product requirements with multi-persona discovery process. Supports autonomous and interview modes.
+description: Draft product requirements with multi-persona discovery process. Supports autonomous and interview modes. Don't use when requirements already exist and you want to plan implementation (use /playbook:tech-plan instead), or for ad-hoc feature requests that don't need a full PRD.
 argument-hint: "[--autonomous] [--context <path>] [brief project description]"
 ---
 
