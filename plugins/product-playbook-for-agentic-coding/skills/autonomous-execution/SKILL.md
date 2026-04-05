@@ -75,6 +75,22 @@ Write session checkpoints — context compaction is inevitable in long runs, not
 
 See the `session-checkpoint` skill for the full checkpoint format.
 
+### Worktree Isolation
+
+When running multiple independent tasks, consider whether to use git worktrees for isolation:
+
+| Scenario | Recommendation | Reason |
+|----------|---------------|--------|
+| Sequential tasks in one subsystem | Stay on branch | Low isolation benefit, worktree overhead not worth it |
+| Independent tasks across 2+ subsystems | Parallel worktrees | Tasks can't interfere with each other, enables parallel agents |
+| Background maintenance tasks (lint fixes, doc updates) | Always use worktree | Keeps primary branch clean for feature work |
+| Risky or experimental changes | Use worktree | Easy to discard without affecting main work |
+
+**When NOT to use worktrees:**
+- Tasks that depend on each other's output
+- Tasks that modify shared state (same config files, same database schema)
+- When the project is small enough that all tasks touch the same files
+
 ## Self-Validation Strategies
 
 ### Task-Level Validation
