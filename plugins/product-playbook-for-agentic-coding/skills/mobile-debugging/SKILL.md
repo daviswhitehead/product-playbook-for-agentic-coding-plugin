@@ -1,6 +1,6 @@
 ---
 name: mobile-debugging
-description: Patterns for debugging mobile-specific issues on iOS Safari and Android Chrome. Use this skill when encountering viewport, keyboard, or touch-related bugs that only reproduce on real mobile devices.
+description: Patterns for debugging mobile-specific issues on iOS Safari and Android Chrome. Use this skill when encountering viewport, keyboard, or touch-related bugs that only reproduce on real mobile devices. Don't use for general debugging (use /playbook:debug instead), or for desktop browser issues.
 ---
 
 # Mobile Debugging

@@ -1,6 +1,6 @@
 ---
 name: autonomous-execution
-description: Patterns for autonomous project execution with minimal human intervention. Use this skill when executing well-defined tasks autonomously, including validation strategies, stop conditions, and quality gates.
+description: Patterns for autonomous project execution with minimal human intervention. Use this skill when executing well-defined tasks autonomously, including validation strategies, stop conditions, and quality gates. Don't use when doing a single task interactively with the user, or when the project lacks a tasks document.
 ---
 
 # Autonomous Execution
