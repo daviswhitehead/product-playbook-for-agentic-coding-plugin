@@ -117,11 +117,11 @@ For each task:
    - Don't stop unless blocked
    - Continue until all viable tasks complete
 
-7. **Checkpoint (Every 3 Tasks)**
+7. **Checkpoint (Every 3 Tasks — Mandatory)**
    - After completing every 3rd task, write a session checkpoint using the `session-checkpoint` skill pattern
    - Write to `docs/checkpoints/latest.md` with: current task, what's done, key decisions, next steps, hot files
-   - This preserves context across compaction events in long autonomous runs
-   - **Skip** if fewer than 3 tasks remain
+   - **This is mandatory, not optional** — context compaction will destroy working memory in long runs. Checkpoints are the only way to preserve decisions and rationale that git can't capture.
+   - Also write a checkpoint before stopping for any reason (blockers, end of session, user interrupt)
 
 8. **Status Update (Between Tasks)**
    - After completing each task, emit a brief structured update:
