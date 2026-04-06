@@ -1,6 +1,6 @@
 ---
 name: stitch-integration
-description: Shared patterns and best practices for Google Stitch MCP integration. Referenced by all design pipeline commands (design-system, design-spec, mockups, design-critique, design-to-code, design-verify).
+description: Shared patterns and best practices for Google Stitch MCP integration. Referenced by all design pipeline commands (design-system, design-spec, mockups, design-critique, design-to-code, design-verify). Don't use when the project doesn't use Stitch for design, or for general UI implementation without mockups.
 ---
 
 # Stitch Integration

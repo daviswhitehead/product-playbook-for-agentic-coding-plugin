@@ -1,6 +1,6 @@
 ---
 name: user-journey-testing
-description: Patterns for defining and executing end-to-end user journeys via browser automation at major milestones. Catches integration bugs that component tests miss.
+description: Patterns for defining and executing end-to-end user journeys via browser automation at major milestones. Catches integration bugs that component tests miss. Don't use for unit testing, API testing, or debugging a single component. Don't use mid-task — use at milestone boundaries only.
 ---
 
 # User Journey Testing

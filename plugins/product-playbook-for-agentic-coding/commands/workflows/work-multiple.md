@@ -1,6 +1,6 @@
 ---
 name: playbook:work-multiple
-description: Work autonomously on multiple tasks without interruption
+description: Work autonomously on multiple tasks without interruption. Don't use when tasks document doesn't exist, when only 1 task remains, or when tasks require heavy user input (use /playbook:work instead).
 argument-hint: "[optional: number of tasks or specific task IDs]"
 ---
 
@@ -85,6 +85,29 @@ When selecting tasks to work on, prioritize in this order:
 3. Score each task for risk and priority
 4. Create execution order
 
+### Step 1.5: Dry Run (First Task with Full Visibility)
+
+Before running autonomously, execute the first task with full transparency:
+
+1. **Show the plan**: Present the task, your implementation approach, and expected changes
+2. **Execute the first task**: Implement it following the standard process (Steps 2.1-2.5)
+3. **Present results explicitly**: Show what was done, files changed, tests passing
+4. **Get confirmation**: Ask the user to confirm the approach before proceeding autonomously
+
+Present to user:
+
+> Dry run complete for [Task X.Y]. Here's what I did:
+>
+> **Approach**: [brief summary]
+> **Files changed**: [list]
+> **Validation**: [tests, lint, typecheck status]
+>
+> Does this approach look right? If yes, I'll continue autonomously with the remaining [N] tasks.
+
+**Why this matters**: A single verified task catches prompt misunderstandings, wrong patterns, and misread acceptance criteria before they compound across N tasks. Fixing one task is cheap; fixing 8 is expensive.
+
+**Skip when**: The user explicitly says "run all tasks without stopping" or passes a `--no-dry-run` flag.
+
 ### Step 2: Execute Tasks in Sequence
 
 For each task:
@@ -117,11 +140,11 @@ For each task:
    - Don't stop unless blocked
    - Continue until all viable tasks complete
 
-7. **Checkpoint (Every 3 Tasks)**
+7. **Checkpoint (Every 3 Tasks — Mandatory)**
    - After completing every 3rd task, write a session checkpoint using the `session-checkpoint` skill pattern
    - Write to `docs/checkpoints/latest.md` with: current task, what's done, key decisions, next steps, hot files
-   - This preserves context across compaction events in long autonomous runs
-   - **Skip** if fewer than 3 tasks remain
+   - **This is mandatory, not optional** — context compaction will destroy working memory in long runs. Checkpoints are the only way to preserve decisions and rationale that git can't capture.
+   - Also write a checkpoint before stopping for any reason (blockers, end of session, user interrupt)
 
 8. **Status Update (Between Tasks)**
    - After completing each task, emit a brief structured update:

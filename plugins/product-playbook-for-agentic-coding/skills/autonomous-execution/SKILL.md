@@ -1,6 +1,6 @@
 ---
 name: autonomous-execution
-description: Patterns for autonomous project execution with minimal human intervention. Use this skill when executing well-defined tasks autonomously, including validation strategies, stop conditions, and quality gates.
+description: Patterns for autonomous project execution with minimal human intervention. Use this skill when executing well-defined tasks autonomously, including validation strategies, stop conditions, and quality gates. Don't use when doing a single task interactively with the user, or when the project lacks a tasks document.
 ---
 
 # Autonomous Execution
@@ -63,16 +63,33 @@ Before starting autonomous work, verify:
 3. Commit only if validation passes
 4. Repeat with next small change
 
-### Checkpoint Integration
+### Checkpoint Integration (Mandatory)
 
-For runs spanning 3+ tasks, use the `session-checkpoint` skill to preserve context:
+Write session checkpoints — context compaction is inevitable in long runs, not an edge case:
 
-- **Write checkpoints** every 3 completed tasks (or when context feels deep)
+- **Write checkpoints** every 3 completed tasks — this is not optional
 - **Write to** `docs/checkpoints/latest.md`
 - **Include**: current task, decisions made, next steps, hot files
-- **Why**: Context compaction destroys working memory. Checkpoints preserve decisions and rationale that git can't capture.
+- **Also write before stopping** for any reason (blockers, session end, user interrupt)
+- **Why**: Context compaction destroys working memory. Checkpoints are the only mechanism that preserves decisions and rationale across compaction events. Treat them as mandatory infrastructure, not a nice-to-have.
 
 See the `session-checkpoint` skill for the full checkpoint format.
+
+### Worktree Isolation
+
+When running multiple independent tasks, consider whether to use git worktrees for isolation:
+
+| Scenario | Recommendation | Reason |
+|----------|---------------|--------|
+| Sequential tasks in one subsystem | Stay on branch | Low isolation benefit, worktree overhead not worth it |
+| Independent tasks across 2+ subsystems | Parallel worktrees | Tasks can't interfere with each other, enables parallel agents |
+| Background maintenance tasks (lint fixes, doc updates) | Always use worktree | Keeps primary branch clean for feature work |
+| Risky or experimental changes | Use worktree | Easy to discard without affecting main work |
+
+**When NOT to use worktrees:**
+- Tasks that depend on each other's output
+- Tasks that modify shared state (same config files, same database schema)
+- When the project is small enough that all tasks touch the same files
 
 ## Self-Validation Strategies
 

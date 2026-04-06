@@ -1,6 +1,6 @@
 ---
 name: learning-capture
-description: Multi-trigger, dual-target learning capture patterns. Use this skill to understand how to capture learnings at different points in the development workflow and route them to appropriate targets (codebase docs or plugin improvements).
+description: Multi-trigger, dual-target learning capture patterns. Use this skill to understand how to capture learnings at different points in the development workflow and route them to appropriate targets (codebase docs or plugin improvements). Don't use when saving session state for resumption (use session-checkpoint instead), or for analyzing chat sessions at scale (use chat-insights instead).
 ---
 
 # Learning Capture

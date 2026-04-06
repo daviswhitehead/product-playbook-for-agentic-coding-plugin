@@ -1,6 +1,6 @@
 ---
 name: playbook:debug
-description: Systematic debugging workflow with verification-first approach
+description: Systematic debugging workflow with verification-first approach. Don't use for CI/CD-specific failures (use /playbook:debug-ci instead), or for general code review without a specific bug.
 argument-hint: "[optional: brief description of the issue]"
 ---
 

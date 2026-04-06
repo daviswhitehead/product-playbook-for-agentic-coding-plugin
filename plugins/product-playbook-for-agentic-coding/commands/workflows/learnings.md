@@ -1,6 +1,6 @@
 ---
 name: playbook:learnings
-description: Capture learnings to improve docs and workflows
+description: Capture learnings to improve docs and workflows. Don't use for saving session state for later resumption (use session-checkpoint skill), or for analyzing chat sessions at scale (use /playbook:improve-playbook instead).
 argument-hint: "[optional: trigger type - chat-session|project-completion|blocker-overcome]"
 ---
 

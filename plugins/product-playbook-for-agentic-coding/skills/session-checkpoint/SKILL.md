@@ -1,6 +1,6 @@
 ---
 name: session-checkpoint
-description: Persist working context across sessions and context compaction events. Write checkpoints at session end, read at session start. Prevents re-orientation tax from context amnesia.
+description: Persist working context across sessions and context compaction events. Write checkpoints at session end, read at session start. Prevents re-orientation tax from context amnesia. Don't use when the session is short (fewer than 3 tasks), or for capturing learnings (use learning-capture instead).
 ---
 
 # Session Checkpoint

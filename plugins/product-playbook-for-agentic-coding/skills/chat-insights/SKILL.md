@@ -1,6 +1,6 @@
 ---
 name: chat-insights
-description: Patterns for analyzing chat sessions to extract product insights. Covers session sampling, evidence validation, idea deduplication, PII handling, data quality assessment, and prompt injection defense.
+description: Patterns for analyzing chat sessions to extract product insights. Covers session sampling, evidence validation, idea deduplication, PII handling, data quality assessment, and prompt injection defense. Don't use for capturing a single session's learnings (use learning-capture instead), or for improving the playbook itself (use /playbook:improve-playbook instead).
 ---
 
 # Chat Insights

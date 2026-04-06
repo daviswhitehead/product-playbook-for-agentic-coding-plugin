@@ -1,6 +1,6 @@
 ---
 name: codebase-docs-search
-description: Patterns for finding and using project documentation at runtime. Use this skill when you need to search for existing documentation, solutions, patterns, or learnings in a codebase before starting work.
+description: Patterns for finding and using project documentation at runtime. Use this skill when you need to search for existing documentation, solutions, patterns, or learnings in a codebase before starting work. Don't use when you already know the file path, or when searching for code (use Grep/Glob directly).
 ---
 
 # Codebase Documentation Search
