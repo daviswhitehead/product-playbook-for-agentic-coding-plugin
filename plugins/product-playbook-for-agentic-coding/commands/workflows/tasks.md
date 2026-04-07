@@ -34,11 +34,18 @@ Before starting, search for existing project documentation:
 
 Use Glob -> Grep -> Read strategy to find and incorporate relevant context.
 
-## Prerequisites
+## Prerequisites (Hard Gate)
 
 Before starting, ensure:
 - Tech Plan Document exists and is reviewed
 - User understands the technical architecture and sequencing
+
+**CRITICAL — Sequential Pipeline Enforcement:**
+This command must NOT run until the tech plan is fully drafted and reviewed. The pipeline is strictly sequential: **PRD → Tech Plan → Tasks**.
+
+- **Do NOT write tasks in parallel with the tech plan.** Task-level details (file paths, line numbers, exact code changes) must derive from the tech plan's architecture decisions. Writing them simultaneously causes contradictions — e.g., the tech plan says "use approach A" but tasks independently assume "approach B."
+- **Read the tech plan thoroughly before drafting any tasks.** Copy specific decisions (component names, API patterns, data models) verbatim from the tech plan rather than paraphrasing. Paraphrasing introduces drift.
+- If the tech plan doesn't exist yet, stop and run `/playbook:tech-plan` first. Do not proceed without it.
 
 ## Process
 

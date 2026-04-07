@@ -20,6 +20,7 @@ What type of work is this?
    Examples: new page, new integration, new data model, new user flow
    → Full pipeline: PRD → Tech Plan → Tasks → Work → Learnings
    → **If UI-heavy**: PRD → Design System → Design Spec → Mockups → Design Critique → Tech Plan → Tasks → Work → Design Verify → Learnings
+   → **CRITICAL**: Each planning doc must be written SEQUENTIALLY (PRD, then tech plan, then tasks). Never write tech plan and tasks in parallel — tasks must derive from the tech plan's decisions.
 
 2. **UI polish / iteration** — Known scope, feedback-driven, just needs execution
    Examples: spacing fixes, animation tweaks, responsive adjustments, copy changes

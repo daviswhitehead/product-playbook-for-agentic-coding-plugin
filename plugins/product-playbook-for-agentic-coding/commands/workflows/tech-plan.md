@@ -105,11 +105,18 @@ Grep: "module: [module-name]" in docs/
 
 Review any relevant learnings before making architectural decisions. Prior solutions may inform current approach.
 
-## Prerequisites
+## Prerequisites (Hard Gate)
 
 Before starting, ensure:
 - Product Requirements Document exists and is reviewed
 - User understands the high-level solution vision from Product Requirements
+
+**CRITICAL — Sequential Pipeline Enforcement:**
+The planning pipeline is strictly sequential: **PRD → Tech Plan → Tasks**. Each document must be fully drafted and reviewed before the next one begins.
+
+- **Do NOT write the tech plan and tasks document in parallel.** Tasks must derive from the tech plan's architecture decisions — writing them simultaneously causes contradictions (e.g., different URL construction strategies, conflicting line number references).
+- **Do NOT start the tech plan before reading the PRD.** The PRD defines what to build; the tech plan defines how. Skipping the PRD leads to architecture that doesn't match requirements.
+- If the user asks you to "write all the planning docs," still write them sequentially — PRD first, then tech plan, then tasks. Speed comes from concise writing, not parallel drafting.
 
 ## Process
 
