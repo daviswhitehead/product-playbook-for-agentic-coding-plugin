@@ -541,7 +541,9 @@ Gather ALL actionable improvements from Steps 3 through 8 (standard findings, de
 Which should we proceed with? (I recommend executing all High priority items.)"
 ```
 
-**Key**: Present codebase and plugin items separately — the user may want to execute codebase items immediately but batch plugin items into a single PR. Ask the user for their preferred execution strategy before starting.
+**Key**: Present codebase and plugin items separately — but **default to executing both**. Do not defer plugin improvements to "next time" or "when you next improve the playbook." The whole point of the learnings phase is to close the loop in this session.
+
+**Default execution strategy**: Execute codebase improvements immediately, then locate the plugin repo and make plugin edits in the same session. Only defer if the user explicitly asks to skip plugin work. If you find yourself writing "these are documented in the learnings doc for when you next improve the playbook" — stop. That means you're deferring instead of executing.
 
 #### 9.1b: Systemic Analysis — Think Bigger (Project Completion Only)
 
