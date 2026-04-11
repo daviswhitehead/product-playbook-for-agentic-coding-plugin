@@ -142,7 +142,8 @@ Options:
 2. Identify the implementation approach
 3. Consider architectural patterns from Tech Plan
 4. Identify potential challenges or edge cases
-5. Plan testing strategy
+6. Plan testing strategy
+5. **When multiple viable approaches exist**, present 2-3 options with clear tradeoffs (pros, cons, complexity) and a recommendation before implementing. Do not default to the most sophisticated approach — the simplest correct solution is usually best.
 
 ### Step 4: Execute Implementation
 

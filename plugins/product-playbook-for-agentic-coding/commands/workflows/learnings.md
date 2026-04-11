@@ -118,6 +118,15 @@ Unimplemented improvement ideas from prior retrospectives:
      ```
    - If validation tasks exist and are **complete**, proceed normally
    - If **no validation tasks exist**, note this as a gap in the learnings
+   - If validation tasks exist but **tests were planned in the tasks doc and not created**, flag them:
+     ```
+     "Planned but unimplemented tests found:
+     - [List tests from tasks doc that do not exist as files]
+
+     Would you like to:
+     1. Create the missing tests now, then continue learnings
+     2. Document as a gap and continue"
+     ```
 
 These pre-checks prevent two common patterns: (1) projects skip validation and move directly to learnings/closure, and (2) retrospectives produce vague insights because no one checked what actually shipped vs what was planned.
 
