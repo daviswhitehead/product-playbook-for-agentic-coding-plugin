@@ -61,6 +61,20 @@ Before starting, ensure:
 
 ## Process
 
+### Step 0: Check Observability Before Hypothesizing
+
+**Before forming any hypothesis about the root cause, check available observability sources for direct evidence.** The most common debugging waste is implementing a fix for a guessed root cause when 30 seconds of checking logs would reveal the actual error.
+
+Check whichever of these are available for the project:
+
+1. **Traces/APM**: LangSmith, Datadog, or equivalent — look for the actual error message, stack trace, and timing
+2. **Error tracking**: PostHog, Sentry, or equivalent — check for error events, frequency, and affected users
+3. **Deployment logs**: Railway, Vercel (`vercel logs`), CloudWatch — read the actual error output
+4. **CI/Actions history**: GitHub Actions run logs — check the actual failure output, not just the job name
+5. **Environment config**: Verify required env vars exist in the target environment (`vercel env ls`, `doppler secrets`, `railway variables`)
+
+**Rule**: Never change code based on an unverified hypothesis. If you catch yourself thinking "it's probably X," stop and find evidence first. State what you checked and what you found before proposing any fix.
+
 ### Step 0.5: Triage — Is This Related to Current Changes?
 
 **For CI/test failures or issues discovered during development:**
