@@ -208,6 +208,20 @@
 
 > **This phase is mandatory for ALL projects**, not just UI projects. Backend-only projects still need E2E critical path testing, webhook verification, and boundary condition validation. Skipping this phase leads to bugs discovered only during manual testing — which is expensive and often happens right before launch.
 
+### Task N.0: Agent Smoke Testing (Before Human Review)
+**Description**: Before handing off for human testing, the agent exhaustively tests its own work via browser automation (Playwright, Agent Browser CLI, or equivalent). Define 3-5 end-to-end user journeys, walk through each, and fix any issues found. Document the journeys in a `smoke-test-journeys.md` file. Only hand off to the human after autonomous testing passes.
+
+**Acceptance Criteria**:
+- [ ] 3-5 user journeys defined and documented
+- [ ] Agent walks through each journey via browser automation
+- [ ] Visual polish issues caught and fixed (focus rings, animations, spacing)
+- [ ] Integration timing bugs caught and fixed (async state, real-time updates)
+- [ ] Summary of what was validated vs what still needs human testing
+
+**Status**: [ ] Not Started | [ ] In Progress | [ ] Complete
+
+---
+
 ### Task N.1: E2E Critical Path Testing
 **Description**: Write or verify E2E tests cover every critical user path introduced or modified by this project.
 
