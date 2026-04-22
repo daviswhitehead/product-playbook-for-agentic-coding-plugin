@@ -2,6 +2,8 @@
 name: playbook:work
 description: Execute the next task from the tasks document. Don't use when no tasks document exists (use /playbook:tasks first), or when working on multiple tasks autonomously (use /playbook:work-multiple instead).
 argument-hint: "[optional: specific task ID to work on]"
+recommended-mode: auto-accept
+thinking-depth: normal
 ---
 
 # Work on Next Task

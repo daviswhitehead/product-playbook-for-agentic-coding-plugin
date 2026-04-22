@@ -70,6 +70,16 @@ Different phases benefit from different perspectives:
 - Search existing docs before creating new ones
 - Write for future readers (including AI)
 
+### 6. Concise by Default
+AI output is a draft, not the final artifact. Before presenting any document or communication:
+- Remove AI-characteristic filler (hedge stacking, throat-clearing, motivational padding, restating, meta-commentary)
+- Deduplicate — if a point is made once, don't restate it
+- Prefer fewer pages — multiple readers x inflated text is compounding cost
+See the `conciseness-check` skill for specific patterns.
+
+### 7. Critique Before Checkpoint
+Multi-phase workflows that produce a substantive artifact should run a self-review pass before presenting to the user. Catch structural issues, filler, and missing specifics. Fix silently — the user sees clean output.
+
 ## Safety Rules
 
 ### Code Quality

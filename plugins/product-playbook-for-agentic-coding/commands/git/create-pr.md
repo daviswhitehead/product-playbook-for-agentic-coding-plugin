@@ -2,6 +2,8 @@
 name: playbook:git-pr
 description: Create a pull request with clear title and description using GitHub CLI
 argument-hint: "[optional: target branch, default: main/production]"
+recommended-mode: auto-accept
+thinking-depth: normal
 ---
 
 # Git Create Pull Request

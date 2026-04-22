@@ -2,6 +2,8 @@
 name: playbook:rubric
 description: Run quality rubrics against code to validate implementation quality
 argument-hint: "<rubric-name> [--files <pattern>] [--threshold <score>]"
+recommended-mode: edit
+thinking-depth: think-harder
 ---
 
 # Quality Rubric Validator

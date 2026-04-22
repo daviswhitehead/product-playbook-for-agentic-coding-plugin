@@ -2,6 +2,8 @@
 name: playbook:mockups
 description: Batch-generate Stitch screens from prompts with automatic design consistency enforcement
 argument-hint: "[optional: path to design-spec-prompts.md or Stitch project ID]"
+recommended-mode: auto-accept
+thinking-depth: normal
 ---
 
 # Batch-Generate Mockups

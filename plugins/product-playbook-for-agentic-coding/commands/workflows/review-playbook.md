@@ -2,6 +2,8 @@
 name: playbook:review-playbook
 description: Systematically review and optimize the playbook/plugin using a scoring rubric
 argument-hint: "[optional: scope - full, commands, agents, skills]"
+recommended-mode: edit
+thinking-depth: think-harder
 ---
 
 # Review Playbook

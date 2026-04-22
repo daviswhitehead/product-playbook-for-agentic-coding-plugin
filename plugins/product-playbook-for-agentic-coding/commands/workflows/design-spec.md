@@ -2,6 +2,8 @@
 name: playbook:design-spec
 description: Create a high-fidelity design specification for complex UI features
 argument-hint: "[optional: project name or feature]"
+recommended-mode: edit
+thinking-depth: think-harder
 ---
 
 # Draft Design Spec (Optional)

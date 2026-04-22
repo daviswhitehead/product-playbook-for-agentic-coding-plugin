@@ -2,6 +2,8 @@
 name: playbook:critique
 description: Run parallel multi-persona critiques on documents with versioning and synthesis
 argument-hint: "<path> [--personas list] [--version N] [--rerun]"
+recommended-mode: edit
+thinking-depth: think-harder
 ---
 
 # Document Critique
@@ -38,6 +40,8 @@ Parse the user's input for:
 - **--keep-perspectives** (optional): Keep individual persona critique files in the output directory. By default, individual perspectives are archived to `[output]/archive/` after synthesis — only the synthesis and issue tracker remain in the output directory.
 
 ## Available Personas
+
+In addition to persona-based critique, you can run a **Devil's Advocate review** using `resources/methods/devils-advocate.md`. This is persona-independent — it pressure-tests the decision logic rather than reviewing from a stakeholder perspective.
 
 Reference these persona definitions from `resources/personas/`:
 
@@ -171,6 +175,15 @@ Structure your critique as:
 Monitor all agents until complete. Report progress.
 
 ---
+
+### Completeness Gate
+
+Before synthesizing, verify:
+- [ ] All dispatched persona agents returned results
+- [ ] Any failed agents were retried or noted as gaps
+- [ ] Results cover the requested scope (not just the first section of each document)
+
+If any items are unchecked, go back and address them before continuing.
 
 ### Step 3: Synthesize Findings
 

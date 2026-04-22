@@ -2,6 +2,8 @@
 name: playbook:work-multiple
 description: Work autonomously on multiple tasks without interruption. Don't use when tasks document doesn't exist, when only 1 task remains, or when tasks require heavy user input (use /playbook:work instead).
 argument-hint: "[optional: number of tasks or specific task IDs]"
+recommended-mode: auto-accept
+thinking-depth: normal
 ---
 
 # Work on Multiple Tasks

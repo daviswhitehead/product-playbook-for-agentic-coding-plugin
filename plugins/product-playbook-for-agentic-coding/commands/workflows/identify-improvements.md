@@ -2,6 +2,8 @@
 name: playbook:identify-improvements
 description: Identify top improvements from an agentic coding session for continuous improvement
 argument-hint: "[optional: specific area to focus on]"
+recommended-mode: edit
+thinking-depth: think-harder
 ---
 
 # Identify Top 10 Improvements

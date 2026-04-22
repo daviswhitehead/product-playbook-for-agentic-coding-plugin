@@ -2,6 +2,8 @@
 name: playbook:git-branch-worktree
 description: Create a new branch and worktree together for isolated development
 argument-hint: "<project-name> [source-branch]"
+recommended-mode: auto-accept
+thinking-depth: normal
 ---
 
 # Git Create Branch and Worktree

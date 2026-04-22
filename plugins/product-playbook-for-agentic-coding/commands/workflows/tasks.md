@@ -2,6 +2,8 @@
 name: playbook:tasks
 description: Break down work into specific, actionable tasks. Don't use when no tech plan exists (use /playbook:tech-plan first), or when tasks already exist and you want to execute them (use /playbook:work instead).
 argument-hint: "[optional: path to tech plan]"
+recommended-mode: edit
+thinking-depth: think-harder
 ---
 
 # Draft Tasks

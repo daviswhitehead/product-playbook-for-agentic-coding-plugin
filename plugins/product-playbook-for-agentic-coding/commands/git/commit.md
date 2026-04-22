@@ -2,6 +2,8 @@
 name: playbook:git-commit
 description: Analyze git changes and create well-structured conventional commits
 argument-hint: "[optional: specific files or commit message hint]"
+recommended-mode: auto-accept
+thinking-depth: normal
 ---
 
 # Git Commit

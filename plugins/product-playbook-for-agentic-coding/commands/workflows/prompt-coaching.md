@@ -2,6 +2,8 @@
 name: playbook:prompt-coaching
 description: Get real-time coaching on your prompts to improve agentic coding effectiveness
 argument-hint: "[optional: paste your prompt for analysis]"
+recommended-mode: edit
+thinking-depth: think-harder
 ---
 
 # Prompt Coaching

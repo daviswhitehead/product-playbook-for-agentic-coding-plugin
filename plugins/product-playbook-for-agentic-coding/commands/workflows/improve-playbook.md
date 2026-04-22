@@ -2,6 +2,8 @@
 name: playbook:improve-playbook
 description: Analyze coding sessions to identify patterns, compare against existing playbook capabilities, and implement improvements as a PR.
 argument-hint: "[--sessions <count|range>] [--plugin-path <path>]"
+recommended-mode: edit
+thinking-depth: think-harder
 ---
 
 # Improve Playbook from Session Patterns

@@ -2,6 +2,8 @@
 name: playbook:git-delete-branch
 description: Safely delete a git branch from local and remote after verification
 argument-hint: "<branch-name>"
+recommended-mode: auto-accept
+thinking-depth: normal
 ---
 
 # Git Delete Branch

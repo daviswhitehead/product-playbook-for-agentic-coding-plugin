@@ -2,6 +2,8 @@
 name: playbook:design-verify
 description: Compare running implementation against Stitch mockups and produce a visual diff report
 argument-hint: "[app URL or 'localhost'] [path to mockups manifest]"
+recommended-mode: edit
+thinking-depth: normal
 ---
 
 # Design Verification

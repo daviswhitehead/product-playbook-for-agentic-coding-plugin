@@ -1,6 +1,8 @@
 ---
 name: playbook:hello
 description: Test command to verify plugin installation is working correctly
+recommended-mode: auto-accept
+thinking-depth: normal
 ---
 
 # Hello from Product Playbook

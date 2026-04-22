@@ -2,6 +2,8 @@
 name: playbook:distill
 description: Create focused summaries or quick references from longer documents, optimized for a specific purpose.
 argument-hint: "<purpose> --from <sources> [--max-length <pages>] [--format <format>]"
+recommended-mode: auto-accept
+thinking-depth: normal
 ---
 
 # Document Distillation

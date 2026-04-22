@@ -2,6 +2,8 @@
 name: playbook:help
 description: List all commands and help you choose the right one for your task
 argument-hint: "[optional: what you're trying to do]"
+recommended-mode: edit
+thinking-depth: normal
 ---
 
 # Playbook Help

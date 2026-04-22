@@ -2,6 +2,8 @@
 name: playbook:research-synthesis
 description: Synthesize research from multiple sources into strategic opportunities. Combines quantitative, qualitative, and product taste insights.
 argument-hint: "[--context <path>] [brief description of research focus]"
+recommended-mode: edit
+thinking-depth: think-harder
 ---
 
 # Research Synthesis

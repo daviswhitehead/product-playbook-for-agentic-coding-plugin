@@ -2,6 +2,8 @@
 name: playbook:rubric-doc
 description: Generate a document based on a spec file with rubric/excellence criteria. Searches context directories and produces a cited draft.
 argument-hint: "<doc-type> [--spec <spec-file>] [--context <dir1,dir2>] [--output <path>]"
+recommended-mode: edit
+thinking-depth: think-harder
 ---
 
 # Rubric-Based Document Generator
