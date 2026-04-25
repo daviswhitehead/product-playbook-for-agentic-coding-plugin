@@ -99,6 +99,21 @@ Before starting, ensure:
    - Has all dependencies satisfied
    - Is not blocked
 
+### Step 1b: Read or Create the Project State Artifact
+
+Multi-week projects almost always cross a session/compaction boundary. The agent-activity-ux retro (2026-04-24) measured 50–110× re-reads of the same files because no rolling artifact survived between sessions. Maintain a single project-state file so a fresh session can pick up without re-deriving context.
+
+1. **Locate** `projects/[status]/[project-name]/project-state.md`. If it does not exist, create it.
+2. **Read it before doing anything else** when starting a new session. It must contain (at minimum):
+   - **Architecture decisions**: What patterns were chosen, what was rejected, and why (one line each — link to tech plan / critique for full reasoning).
+   - **Current state**: Which tasks are done, which is in flight, what's blocked.
+   - **Open contracts**: testIDs, SSE event names, file-path conventions, anything multiple files reference.
+   - **Outstanding decisions**: Open questions awaiting user input.
+3. **Update it as you go.** When you make a non-trivial decision, when a task closes, when scope shifts — write a 1–3 line entry. Don't write prose; write an index. The body lives in PRD/tech-plan/tasks/critique.
+4. **Keep it under ~200 lines.** This is an index, not a wiki. If a section grows past 20 lines, it belongs in its own dedicated doc.
+
+This artifact is the single most effective intervention to combat cross-session context loss. Treat updates as part of the task, not as overhead.
+
 ### Step 1.5: Scope Verification (Every 3-5 Tasks)
 
 **From Engineering Manager perspective:**
@@ -220,6 +235,28 @@ npm test           # Unit tests (at minimum)
 
 **Timeout note**: If validation takes >2 minutes, run it with an explicit Bash timeout (e.g., `timeout: 300000`) to avoid Claude Code's default 120s timeout killing the process.
 
+#### 1b. testID / Test Selector Hygiene Check
+
+If the changes you made include **renaming, removing, or moving any test selectors** (testID, data-testid, aria-label used by tests, role-based selectors), you MUST verify the same commit also updates every test that references the old selector. Selector renames without same-commit test updates are the single most common cause of "tests sat broken for days" regressions — see the agent-activity-ux retro (2026-04-24) where a `assistant-thinking → thinking-row` rename broke 11 tests for 11 days.
+
+**Run before declaring the dry-run complete:**
+
+```bash
+# Did this change rename a testID? Check what changed.
+git diff --staged --diff-filter=M -- '*.tsx' '*.ts' | grep -E '^[-+].*testID|^[-+].*data-testid' || echo "no testID changes"
+
+# For every changed testID literal, find references in tests:
+# (replace OLD_NAME with the renamed value)
+grep -rln 'OLD_NAME' frontend/tests app/tests tests/ 2>/dev/null
+
+# If the project has a contract script, run it now:
+npm run check:testid-contracts 2>/dev/null || true
+```
+
+If you find references to the old selector, update them in this same commit. Do NOT push and rely on CI E2E to catch the regression — sharded E2E often runs after fast jobs and the failure surfaces hours later.
+
+**This rule applies to ANY test selector**, not just testIDs: aria-label values, role+name combinations, fixed text content used by `getByText`, etc.
+
 #### 2. Walk Through the Feature Yourself
 
 **For UI changes**: Launch the dev server and use browser tools to verify:
@@ -325,6 +362,25 @@ Before marking task complete, verify:
 - [ ] Quality checks passing
 - [ ] Documentation updated
 - [ ] Tasks Document updated
+
+#### Step 7b: Pre-Merge Hard Gate (Required Before PR Goes Out of Draft)
+
+When the **last task in the project** is complete and you (or the user) are about to mark the PR ready for review, run the project's **full** validation suite — not just `ci:local`. The agent-activity-ux retro (2026-04-24) caught a 4-commit fix-forward cascade after a testID rename that `ci:local` did not catch but `test:verify` would have.
+
+```bash
+# Discover the right command:
+#   1. Read CLAUDE.md / AGENTS.md / GEMINI.md for the project's pre-PR command
+#   2. Otherwise prefer test:verify > ci:local:full > test:full
+npm run test:verify    # runs lint + typecheck + unit + integration + E2E
+
+# If integration/E2E require services, the script should start them. If it
+# does not, start services explicitly first:
+npm run deploy:development:all &  # or the project-specific equivalent
+```
+
+**Do not push and rely on CI** to discover failures. CI failures arrive minutes-to-hours later and frequently mask each other (sharded E2E with `fail-fast: true` reports the first shard's failure and skips the rest, requiring multiple iterations to surface all problems). Local `test:verify` reports everything in one run.
+
+**If `test:verify` does not exist in this project**, propose adding it (see CLAUDE.md guidance) before marking the PR ready. Do not silently downgrade to `ci:local`.
 
 ## Task Execution Workflow
 

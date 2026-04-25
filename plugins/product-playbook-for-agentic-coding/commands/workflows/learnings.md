@@ -95,11 +95,18 @@ Unimplemented improvement ideas from prior retrospectives:
 
 **Run a planned-vs-implemented gap analysis before the retrospective.** This gives the retrospective concrete data instead of relying on memory.
 
-1. **Locate planning docs**: Find the PRD, tech plan, tasks doc, and any v2/revised plans
-2. **Compare planned vs actual**: For each planned component, check if it was implemented, modified, deferred, or dropped
-3. **Write the analysis to a file**: Save as `projects/[project-name]/planned-vs-implemented.md` — this becomes input to the retrospective questions
+1. **Locate planning docs**: Find the PRD, tech plan, tasks doc, and any v2/revised plans.
+2. **Query authoritative sources, do NOT infer**:
+   - **PR state**: Use `gh pr view <number> --json state,isDraft,createdAt,mergedAt,mergeCommit,additions,deletions,changedFiles,commits` (or `gh pr list --search "head:<branch>"` if no number is known). Do not infer "no PR exists" from the absence of a feature branch — draft PRs and squash-merged branches both look like nothing locally.
+   - **Commits**: `git log --oneline <base>..<head>` against the actual base branch the PR targeted (read it from `gh pr view`, do not assume `main`).
+   - **File scope**: `git diff --stat <base>..<head>` for the real change footprint.
+   - For squash-merged PRs, use `gh pr view --json mergeCommit` to find the squash commit on the base branch.
+3. **Compare planned vs actual**: For each planned component, check if it was implemented, modified, deferred, or dropped.
+4. **Write the analysis to a file**: Save as `projects/[project-name]/planned-vs-implemented.md` — this becomes input to the retrospective questions.
 
 **Why this matters**: Without a gap analysis, retrospective questions like "what didn't work?" get vague answers. With a gap analysis, you can ask specific questions like "the tech plan called for GitHub Actions but you used local cron — what drove that decision?"
+
+**Why the `gh pr view` step is required**: The agent-activity-ux retro (2026-04-24) initially asserted "No PR exists after 17 days" — wrong, the PR had been a draft from day 2 and was merged on the same day as the retro. The error came from inferring PR state from local git only. `gh pr view` is the cheap, authoritative cure.
 
 #### Pre-Check B: Validation Tasks
 
@@ -143,10 +150,28 @@ Output defaults to **both** codebase docs and plugin improvements.
 Say so if you only want one target.
 ```
 
-**If the user selects option 2 (project completion)**, check for session history files:
+**If the user selects option 2 (project completion)**, also check whether a project directory exists:
 
-1. Search for SpecStory session files: `.specstory/history/*.md`
-2. If session files exist within the project's date range, **default to deep retrospective**:
+1. **Check for a project dir** in `projects/in-progress/` or `projects/done/` matching this work. If **none exists** (often the case for ad-hoc incident response), prompt the user:
+
+   ```
+   No project directory was found for this work. This typically happens with
+   ad-hoc incident response or short reactive fixes that grew larger than
+   expected.
+
+   Would you like to:
+   A. Create `projects/done/[name]/` retroactively with a README capturing the
+      context, fix, and link to the learnings doc (recommended for multi-hour work).
+   B. Skip — keep the learnings doc only (fine for short fixes or hygiene work).
+   ```
+
+   If the user picks A, create the dir at the end (Step 9) so it links to the
+   completed learnings doc and any commits/PRs.
+
+2. Then check for session history files:
+
+3. Search for SpecStory session files: `.specstory/history/*.md`
+4. If session files exist within the project's date range, **default to deep retrospective**:
 
 ```
 Session history files found (N files from [date range]).
@@ -507,6 +532,29 @@ Implement all approved edits after a single approval. Do not ask per-item.
 - [ ] **Are planning docs still accurate?** If the project evolved beyond the original tech plan or tasks doc, mark stale docs as superseded with a deprecation notice pointing to the current source of truth.
 - [ ] **Are there standalone critique/review docs that were never referenced?** Synthesize key warnings into the tasks doc as inline notes, then consider archiving the standalone files to reduce directory noise.
 - [ ] **Does an architecture README exist?** If agents spent significant time re-discovering the codebase structure, create or update a README in the relevant directory. This is the single highest-ROI action for multi-session projects.
+
+#### Step 7b: Loose Artifacts Sweep
+
+Multi-week generative projects accumulate untracked artifacts: design exploration screenshots, draft HTML comparison files, side-by-side prototypes, intermediate analysis docs. The agent-activity-ux retro (2026-04-24) found 9 such files dangling in `projects/in-progress/` — useful work that was never tied back to the project's history.
+
+**Run this sweep before declaring the retrospective complete:**
+
+```bash
+# 1. List untracked or untracked-but-modified files in the project directory
+git status --porcelain projects/[status]/[project-name]/
+
+# 2. List untracked files anywhere that look related (loose screenshots, HTMLs)
+git ls-files --others --exclude-standard | grep -iE "[project-keyword]" || true
+```
+
+For each file the sweep returns, decide:
+- **Commit it** alongside the retro if it informed a decision or shows an alternative considered (variant exploration, before/after screenshots, side-by-side comparisons). Move into `projects/[status]/[project-name]/` if it lives elsewhere.
+- **Delete it** if it was an intermediate scratch artifact with no ongoing value.
+- **Move it** into `docs/learnings/assets/` if it has cross-project value (a generic pattern, a reusable diagram).
+
+Do NOT leave files dangling. Either it's worth keeping (so commit it where future-you will find it) or it isn't (so remove it). The mid-state — in the working tree, untracked, undocumented — is the worst outcome.
+
+This sweep is mandatory for **deep** project-completion retros. For incident retros and lighter triggers, skim and skip if nothing turns up.
 
 ### Step 8: Validate Completeness
 
