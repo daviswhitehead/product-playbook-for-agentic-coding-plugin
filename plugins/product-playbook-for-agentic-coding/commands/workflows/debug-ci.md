@@ -2,6 +2,8 @@
 name: playbook:debug-ci
 description: Debug CI/CD failures systematically using GitHub CLI
 argument-hint: "[PR number or workflow run ID]"
+recommended-mode: auto-accept
+thinking-depth: think-harder
 ---
 
 # Debug CI Failures

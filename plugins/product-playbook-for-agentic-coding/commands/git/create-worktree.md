@@ -2,6 +2,8 @@
 name: playbook:git-worktree
 description: Create a git worktree for isolated parallel development
 argument-hint: "<branch-name> [worktree-path]"
+recommended-mode: auto-accept
+thinking-depth: normal
 ---
 
 # Git Create Worktree

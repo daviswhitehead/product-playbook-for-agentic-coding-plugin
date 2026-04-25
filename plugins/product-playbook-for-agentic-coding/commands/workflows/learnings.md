@@ -2,6 +2,8 @@
 name: playbook:learnings
 description: Capture learnings to improve docs and workflows. Don't use for saving session state for later resumption (use session-checkpoint skill), or for analyzing chat sessions at scale (use /playbook:improve-playbook instead).
 argument-hint: "[optional: trigger type - chat-session|project-completion|blocker-overcome]"
+recommended-mode: edit
+thinking-depth: think-harder
 ---
 
 # Draft Learnings
@@ -433,6 +435,16 @@ Based on trigger type, fill appropriate sections:
 - Root cause analysis
 - Prevention strategy
 
+
+### Completeness Gate
+
+Before proceeding to promotion, verify:
+- [ ] Scanned for code patterns worth documenting
+- [ ] Scanned for workflow improvements
+- [ ] Scanned for template fixes or enhancements
+- [ ] Scanned for recurring issues that need prevention
+
+If any items are unchecked, go back and address them before continuing.
 
 ### Step 6: Promote Learnings to Point-of-Use
 

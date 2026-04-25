@@ -2,6 +2,8 @@
 name: playbook:git-move-changes
 description: Move uncommitted changes to a new branch without committing
 argument-hint: "<new-branch-name>"
+recommended-mode: auto-accept
+thinking-depth: normal
 ---
 
 # Git Move Changes to New Branch

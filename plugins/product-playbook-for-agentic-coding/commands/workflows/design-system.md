@@ -2,6 +2,8 @@
 name: playbook:design-system
 description: Extract or create a canonical DESIGN.md from Stitch screens, codebase tokens, or guided interview
 argument-hint: "[optional: project name or path to existing design tokens]"
+recommended-mode: edit
+thinking-depth: think-harder
 ---
 
 # Extract / Create Design System (DESIGN.md)

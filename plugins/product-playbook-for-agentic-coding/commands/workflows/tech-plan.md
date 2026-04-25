@@ -2,6 +2,8 @@
 name: playbook:tech-plan
 description: Create technical plan with architecture and sequencing. Don't use when product requirements don't exist yet (use /playbook:product-requirements first), or when you already have a plan and want to create tasks (use /playbook:tasks instead).
 argument-hint: "[optional: path to product requirements]"
+recommended-mode: edit
+thinking-depth: think-harder
 ---
 
 # Draft Tech Plan
@@ -168,6 +170,10 @@ Building before architecture is confirmed leads to wasted effort on unused code.
 4. **Also seed `project-state.md`** in the same project directory if it does not exist. This is the rolling state file that survives session/compaction boundaries (see `/playbook:work` Step 1b for the full pattern). Initial contents: a one-line link to this tech plan, the chosen architecture name/summary, and an empty "Open contracts" section. Do not skip — projects that lack this artifact pay 50–110× context-loss tax across sessions (see agent-activity-ux retro, 2026-04-24).
 
 ### Step 3: Facilitate Technical Planning
+
+#### Optional: Apply Strategy Kernel
+
+When validating the architecture connects diagnosis to actions, load `resources/methods/strategy-kernel.md`. Verify the plan has a clear diagnosis (the technical challenge), guiding policy (the architectural approach), and coherent actions (the implementation phases).
 
 Drawing from multiple role perspectives, guide the user through technical planning **appropriate to the project size**:
 

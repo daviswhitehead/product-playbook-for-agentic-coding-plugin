@@ -86,6 +86,7 @@ This plugin uses a marketplace-embedded structure (plugin source is inside the m
 | `/playbook:work` | Execute the next task from the tasks document |
 | `/playbook:work-multiple` | Work autonomously on multiple tasks without interruption |
 | `/playbook:learnings` | Capture learnings to improve docs and plugin |
+| `/playbook:close` | Session close-out — uncommitted work check, task cleanup, handoff context, learnings |
 
 ### Debugging & CI Commands
 | Command | Description |
@@ -160,6 +161,7 @@ This plugin uses a marketplace-embedded structure (plugin source is inside the m
 
 | Skill | Description |
 |-------|-------------|
+| `conciseness-check` | AI output quality check — filler detection, critique-before-checkpoint, stakeholder doc structure |
 | `codebase-docs-search` | Patterns for finding and using project documentation |
 | `learning-capture` | Multi-trigger, dual-target learning capture |
 | `autonomous-execution` | Patterns for autonomous project execution |
@@ -257,7 +259,8 @@ product-playbook-for-agentic-coding-plugin/
 │       │   └── user-journey-testing/
 │       └── resources/
 │           ├── templates/   # Document templates
-│           └── personas/    # Reusable critique personas
+│           ├── personas/    # Reusable critique personas
+│           └── methods/     # Reusable thinking frameworks (Socratic Questioning, Strategy Kernel, Impact Estimation, Devil's Advocate)
 └── README.md
 ```
 
@@ -407,6 +410,8 @@ This plugin embodies several key principles:
 - **Learning Compounds**: Captured learnings improve future work
 - **Tool Orchestration**: Leverage the best tool for each task
 - **Documentation Discipline**: Keep docs updated as you work
+- **Concise by Default**: Remove AI filler before presenting output
+- **Critique Before Checkpoint**: Self-review substantive artifacts before the user sees them
 
 ## Development
 

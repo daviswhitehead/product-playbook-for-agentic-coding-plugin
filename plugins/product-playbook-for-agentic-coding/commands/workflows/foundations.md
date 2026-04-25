@@ -2,6 +2,8 @@
 name: playbook:foundations
 description: Build strategy foundations that anchor all downstream product decisions. Creates Mission, Vision, Personas, and Engagement frameworks.
 argument-hint: "[--context <path>] [brief product/project description]"
+recommended-mode: edit
+thinking-depth: think-harder
 ---
 
 # Build Strategy Foundations
@@ -58,6 +60,10 @@ Search order:
 **Track your sources.** Every foundation statement should trace to evidence.
 
 ### Step 3: Build the Stack
+
+#### Validate with Strategy Kernel
+
+After completing the stack, load `resources/methods/strategy-kernel.md` and verify the foundations form a real strategy (diagnosis + guiding policy + coherent actions), not just goals, values, or feature lists.
 
 Work through each section in order, because each builds on the previous.
 

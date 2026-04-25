@@ -2,6 +2,8 @@
 name: playbook:refine-doc
 description: Incorporate new information or feedback into existing documents while maintaining consistency across related docs.
 argument-hint: "<new-context> [--docs <path-or-pattern>] [--check-consistency]"
+recommended-mode: edit
+thinking-depth: think-harder
 ---
 
 # Document Refinement

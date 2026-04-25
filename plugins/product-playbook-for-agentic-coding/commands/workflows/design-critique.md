@@ -2,6 +2,8 @@
 name: playbook:design-critique
 description: Facilitate a design critique to analyze visual designs and inform product decisions
 argument-hint: "[optional: design context or comparison to analyze]"
+recommended-mode: edit
+thinking-depth: think-harder
 ---
 
 # Draft Design Critique

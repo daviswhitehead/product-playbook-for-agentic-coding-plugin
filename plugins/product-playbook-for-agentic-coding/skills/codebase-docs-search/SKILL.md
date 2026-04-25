@@ -144,6 +144,15 @@ This skill is automatically used by:
 - `/playbook:work` - Searches for relevant learnings before starting tasks
 - `/playbook:debug` - Searches for existing solutions to similar problems
 
+## Proactive Invocation
+
+This skill triggers as an internal check, not a user-facing suggestion:
+- When a command needs project context and hasn't searched `docs/` yet
+- Before starting any workflow command that benefits from prior learnings or architecture decisions
+- When encountering unfamiliar code patterns that might be documented
+
+No user prompt needed — search automatically as part of context gathering.
+
 ## Best Practices
 
 1. **Search before creating** - Always check if documentation exists

@@ -2,6 +2,8 @@
 name: playbook:design-to-code
 description: Transform Stitch screen HTML into project component scaffolds matching your codebase architecture
 argument-hint: "[optional: Stitch screen ID or path to mockups manifest]"
+recommended-mode: auto-accept
+thinking-depth: normal
 ---
 
 # Design-to-Code Translation

@@ -283,6 +283,16 @@ This skill supports:
 - `/playbook:debug` (captures blocker-overcome learnings)
 - `/playbook:work` (suggests session learnings)
 
+## Proactive Invocation
+
+This skill should be suggested (not auto-invoked) when:
+- A significant blocker was just overcome (debugging cycle > 15 minutes, workaround discovered, non-obvious root cause found)
+- A surprising behavior or undocumented quirk was discovered
+- The user found a solution that would save time in future projects
+
+Suggested format:
+> "That was a significant find — want to capture it as a learning before we move on?"
+
 ## Best Practices
 
 1. **Capture while fresh** - Don't wait, details fade quickly

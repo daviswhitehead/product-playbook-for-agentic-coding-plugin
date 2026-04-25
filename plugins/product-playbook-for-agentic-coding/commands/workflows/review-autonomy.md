@@ -2,6 +2,8 @@
 name: playbook:review-autonomy
 description: Review a project's readiness for autonomous agentic execution
 argument-hint: "[optional: path to project folder]"
+recommended-mode: edit
+thinking-depth: think-harder
 ---
 
 # Review Project for Autonomous Execution

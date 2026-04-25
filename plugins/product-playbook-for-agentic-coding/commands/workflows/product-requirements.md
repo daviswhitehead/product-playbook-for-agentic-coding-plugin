@@ -2,6 +2,8 @@
 name: playbook:product-requirements
 description: Draft product requirements with multi-persona discovery process. Supports autonomous and interview modes. Don't use when requirements already exist and you want to plan implementation (use /playbook:tech-plan instead), or for ad-hoc feature requests that don't need a full PRD.
 argument-hint: "[--autonomous] [--context <path>] [brief project description]"
+recommended-mode: edit
+thinking-depth: think-harder
 ---
 
 # Draft Product Requirements
@@ -258,6 +260,10 @@ Use Glob → Grep → Read strategy. Summarize what you found — this grounds t
 ### Step 4: Multi-Persona Discovery
 
 **Roles**: Product Manager (lead), Business Stakeholder, Domain Expert, Technical Advisor, User Researcher, Designer, Agentic Engineer.
+
+#### Optional: Load Socratic Questioning Framework
+
+For deeper problem validation, load `resources/methods/socratic-questioning.md` and apply its 5-category framework. Particularly useful for Problem Clarity (category 1) and Success Criteria (category 3).
 
 For each section, ask probing questions from multiple perspectives:
 

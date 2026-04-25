@@ -2,6 +2,8 @@
 name: playbook:organize-files
 description: Organize project files into logical subdirectories based on content analysis
 argument-hint: "[directory path to organize]"
+recommended-mode: auto-accept
+thinking-depth: normal
 ---
 
 # Organize Project Files

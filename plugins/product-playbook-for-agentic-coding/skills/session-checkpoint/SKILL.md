@@ -73,6 +73,16 @@ When the session is wrapping up or getting long:
 3. Use it to orient: pick up the current task, understand decisions made, avoid re-reading hot files
 4. If the checkpoint is stale (>3 days old or branch has changed significantly), note this and do fresh orientation instead
 
+## Proactive Invocation
+
+This skill should be suggested (not auto-invoked) when:
+- The session has been active for ~1 hour or more
+- 5+ tasks have been completed without a checkpoint
+- The conversation is getting deep and context compaction may be approaching
+
+Suggested format:
+> "Want me to write a checkpoint before we continue? It'll help if we need to resume later."
+
 ## Key Principles
 
 - **Brevity over completeness**: A 20-line checkpoint that captures the right things is better than a 100-line dump
