@@ -165,6 +165,7 @@ Building before architecture is confirmed leads to wasted effort on unused code.
 1. Check if a Tech Plan document already exists for this project
 2. If not, use the template pattern from `resources/templates/tech-plan.md`
 3. Create it in an appropriate location (e.g., `projects/[project-name]/tech-plan.md`)
+4. **Also seed `project-state.md`** in the same project directory if it does not exist. This is the rolling state file that survives session/compaction boundaries (see `/playbook:work` Step 1b for the full pattern). Initial contents: a one-line link to this tech plan, the chosen architecture name/summary, and an empty "Open contracts" section. Do not skip — projects that lack this artifact pay 50–110× context-loss tax across sessions (see agent-activity-ux retro, 2026-04-24).
 
 ### Step 3: Facilitate Technical Planning
 
@@ -293,10 +294,15 @@ If the plan introduces shared infrastructure (libraries, runners, delivery mecha
 
 ## Next Steps
 
-Once the Tech Plan Document is complete, guide the user to:
-1. Review and validate the document
-2. **Run a stakeholder critique** — use `/playbook:critique` to get multi-persona feedback on the tech plan. Catching architectural issues before implementation is 10x cheaper than fixing them during delivery.
-3. Proceed to Delivery phase using `/playbook:tasks`
+Once the Tech Plan Document is complete, **STOP** and guide the user through these in order. Do not skip step 2.
+
+1. Review and validate the document.
+2. **MANDATORY: Run `/playbook:critique` before proceeding.** A multi-persona stakeholder critique on the tech plan is required, not optional. Catching architectural issues before implementation is ~10× cheaper than fixing them during delivery.
+   - Save the critique output as `critique.md` (or `critique-tech-plan.md`) alongside the tech plan.
+   - The next phase (`/playbook:tasks`) **gates on the existence of this file**.
+   - If the user asks to skip the critique, push back. Past retros (agent-activity-ux, 2026-04-24) showed that skipping `/playbook:critique` caused architectural rework worth ~1 day per skip. The rule that closes that gap is: critique is mandatory.
+3. Address critique findings in a revised tech plan **or** explicitly note in the critique synthesis which findings were considered and deferred.
+4. Proceed to Delivery phase using `/playbook:tasks`.
 
 ---
 

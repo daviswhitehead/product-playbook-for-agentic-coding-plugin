@@ -36,15 +36,17 @@ Use Glob -> Grep -> Read strategy to find and incorporate relevant context.
 
 ## Prerequisites (Hard Gate)
 
-Before starting, ensure:
-- Tech Plan Document exists and is reviewed
+Before starting, ensure ALL of the following exist:
+- **Tech Plan Document** exists and is reviewed
+- **Critique synthesis** exists alongside the tech plan (e.g., `critique.md`, `critique-tech-plan.md`, or a "Critique findings" section in the tech plan itself). This is the output of `/playbook:critique` run on the tech plan.
 - User understands the technical architecture and sequencing
 
 **CRITICAL — Sequential Pipeline Enforcement:**
-This command must NOT run until the tech plan is fully drafted and reviewed. The pipeline is strictly sequential: **PRD → Tech Plan → Tasks**.
+This command must NOT run until the tech plan is fully drafted, reviewed, AND critiqued. The pipeline is strictly sequential: **PRD → Tech Plan → Critique → Tasks**.
 
 - **Do NOT write tasks in parallel with the tech plan.** Task-level details (file paths, line numbers, exact code changes) must derive from the tech plan's architecture decisions. Writing them simultaneously causes contradictions — e.g., the tech plan says "use approach A" but tasks independently assume "approach B."
-- **Read the tech plan thoroughly before drafting any tasks.** Copy specific decisions (component names, API patterns, data models) verbatim from the tech plan rather than paraphrasing. Paraphrasing introduces drift.
+- **Do NOT skip the critique.** If you cannot find a critique synthesis file or section in the project directory, STOP and run `/playbook:critique` first. The agent-activity-ux retro (2026-04-24) traced ~1 day of architectural rework directly to a skipped critique. This gate exists to close that gap.
+- **Read the tech plan AND critique thoroughly before drafting any tasks.** Copy specific decisions (component names, API patterns, data models) verbatim from the tech plan rather than paraphrasing. Paraphrasing introduces drift. Note any critique findings the tasks must reflect.
 - If the tech plan doesn't exist yet, stop and run `/playbook:tech-plan` first. Do not proceed without it.
 
 ## Process
