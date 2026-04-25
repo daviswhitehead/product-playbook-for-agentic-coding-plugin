@@ -150,10 +150,28 @@ Output defaults to **both** codebase docs and plugin improvements.
 Say so if you only want one target.
 ```
 
-**If the user selects option 2 (project completion)**, check for session history files:
+**If the user selects option 2 (project completion)**, also check whether a project directory exists:
 
-1. Search for SpecStory session files: `.specstory/history/*.md`
-2. If session files exist within the project's date range, **default to deep retrospective**:
+1. **Check for a project dir** in `projects/in-progress/` or `projects/done/` matching this work. If **none exists** (often the case for ad-hoc incident response), prompt the user:
+
+   ```
+   No project directory was found for this work. This typically happens with
+   ad-hoc incident response or short reactive fixes that grew larger than
+   expected.
+
+   Would you like to:
+   A. Create `projects/done/[name]/` retroactively with a README capturing the
+      context, fix, and link to the learnings doc (recommended for multi-hour work).
+   B. Skip — keep the learnings doc only (fine for short fixes or hygiene work).
+   ```
+
+   If the user picks A, create the dir at the end (Step 9) so it links to the
+   completed learnings doc and any commits/PRs.
+
+2. Then check for session history files:
+
+3. Search for SpecStory session files: `.specstory/history/*.md`
+4. If session files exist within the project's date range, **default to deep retrospective**:
 
 ```
 Session history files found (N files from [date range]).
