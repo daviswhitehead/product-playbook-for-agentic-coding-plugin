@@ -154,6 +154,18 @@ Instead:
 
 This ensures critique insights survive into the implementation phase rather than sitting unread in the project directory.
 
+#### 8.5. Gate Task Discipline (CRITICAL)
+
+**From Engineering Manager + DevOps Engineer perspectives:**
+
+For any task that gates phase completion based on a metric (performance gate, quality gate, "GATE: metrics review," etc.), use the `[GATE]` task format from the template (Task 1.G example). **Every gate metric must:**
+
+1. **Declare its `Instrumentation Source`** — exactly which event/property/column/query produces the number. "PostHog event `memory_applied`, property `$duration`" is acceptable. "Dashboard somewhere" is not.
+2. **Provide a `Dry-Run Query`** — the literal command, SQL, or PostHog query the agent will run to read this metric.
+3. **Include a Gate Dry-Run sub-task** that runs the query against production *before* the gate task is allowed to close. Non-null results required. If the metric reads `null` or "no data," the gate task does not close — the instrumentation gap is fixed first.
+
+**Why this is non-negotiable**: Memory & Personalization Phase 1 closed its metrics gate (2026-04-07) as "Conditional GO" with read-latency p95 unmeasurable for 4 weeks. The acceptance criterion read "<200ms p95 from `memory_applied $duration`" but `$duration` was never being set. Nobody noticed until the gate review document was being written. The template's `[GATE]` block + the dry-run sub-task close that gap by making instrumentation a hard prerequisite, not an afterthought.
+
 ### Task Quality Criteria
 
 Create tasks that are:

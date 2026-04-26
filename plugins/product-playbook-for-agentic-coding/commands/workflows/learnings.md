@@ -104,7 +104,9 @@ Unimplemented improvement ideas from prior retrospectives:
    - **File scope**: `git diff --stat <base>..<head>` for the real change footprint.
    - For squash-merged PRs, use `gh pr view --json mergeCommit` to find the squash commit on the base branch.
 3. **Compare planned vs actual**: For each planned component, check if it was implemented, modified, deferred, or dropped.
-4. **Write the analysis to a file**: Save as `projects/[project-name]/planned-vs-implemented.md` — this becomes input to the retrospective questions.
+4. **Write the analysis to a file**: Use the template at `resources/templates/planned-vs-implemented.md`. Save as `projects/[project-name]/planned-vs-implemented.md` — this becomes input to the retrospective questions.
+
+**Note**: If the project was already closed via `/playbook:close-project`, this artifact already exists at `projects/done/[project-name]/planned-vs-implemented.md`. Read it instead of regenerating — close-project produces it as the default close artifact.
 
 **Why this matters**: Without a gap analysis, retrospective questions like "what didn't work?" get vague answers. With a gap analysis, you can ask specific questions like "the tech plan called for GitHub Actions but you used local cron — what drove that decision?"
 

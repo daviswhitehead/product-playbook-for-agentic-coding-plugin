@@ -86,6 +86,35 @@
 
 ---
 
+### Task 1.G: [Gate Task Name] `[GATE]`
+> Use this format for any task that gates phase completion based on a metric (e.g., "performance gate," "quality gate," "metrics review"). **Every gate metric must declare an instrumentation source AND be verified by a real query before the gate can close.**
+
+**Description**: [What the gate measures and why it gates the phase]
+
+**Executor**: `[GATE]` (often `[HUMAN REVIEW]` for go/no-go calls)
+
+**Metrics**:
+| Metric | Threshold | Instrumentation Source | Dry-Run Query | Last Verified |
+|---|---|---|---|---|
+| [Metric 1] | [<200ms p95 / 0% / >80%] | [PostHog event `foo_event`, property `$duration` / SQL `SELECT ... FROM bar`] | [Exact query the agent will run to read this number] | [Date — verified non-null] |
+| [Metric 2] | [Threshold] | [Source] | [Query] | [Date] |
+
+**Gate Dry-Run Sub-task** (must complete BEFORE the gate task can close):
+- [ ] Run each "Dry-Run Query" above against production
+- [ ] Confirm every metric returns a non-null real number (not "no data," not `null`, not "unable to measure")
+- [ ] If any metric is unmeasurable: STOP. Fix the instrumentation, re-run the dry-run, and only then proceed to the gate review.
+
+**Acceptance Criteria**:
+- [ ] All metrics dry-run successfully (non-null values)
+- [ ] All metrics meet their thresholds (or explicit conditional-GO with named follow-up)
+- [ ] Decision recorded with date, owner, and follow-up tasks
+
+**Status**: [ ] Not Started | [ ] In Progress | [ ] Complete
+
+> **Why this matters**: A gate task that closes with one metric reading `null` is not passing — it's broken. The Memory & Personalization Phase 1 gate (2026-04-07) closed as "Conditional GO" with `$duration` unmeasurable for 4 weeks because the gate template didn't require instrumentation verification. The template change above closes that gap by making the instrumentation source and dry-run query mandatory fields.
+
+---
+
 ### Task 1.H: [Human Task Name] `[HUMAN]`
 > Use this format for tasks requiring manual action in external dashboards, third-party services, or physical access that the agent cannot perform.
 

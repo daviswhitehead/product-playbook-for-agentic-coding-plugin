@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.19.0] - 2026-04-26
+
+### Added
+- **`/playbook:close-project`** — New end-of-project lifecycle command that produces a planned-vs-implemented diff, reconciles status drift, archives loose artifacts, moves the project to `done/`, and triggers the retrospective. Closes the gap where projects lingered in `to-do/` or `in-progress/` indefinitely after the gate task closed.
+- **`session-start-status` skill** — 5-bullet session-start orientation summary built from `tasks.md` + recent git log + last specstory tail. Targets the 10-30K tokens/session that multi-week projects burn on cold-start re-orientation.
+- **`[GATE]` task type in tasks template** — Every gate task must now declare an `Instrumentation Source`, a `Dry-Run Query`, and a `Last Verified` date for each metric, plus a `Gate Dry-Run Sub-task` that runs the query and proves the metric returns a non-null number BEFORE the gate task is allowed to close. Prevents the "Conditional GO with one metric unmeasurable for 4 weeks" failure mode.
+- **`planned-vs-implemented.md` template** — Default close-project artifact at `resources/templates/planned-vs-implemented.md`. Captures status drift, deferrals, unplanned scope, and dropped items in a single high-signal diff. Becomes input to retrospective Pre-Check A.
+
+### Changed
+- **`/playbook:critique` perspectives default** — Per-persona critique files now write to `.tmp/critiques/v[N]/` from the start, never touching the project directory by default. Only the synthesis lands in `[output]/`. `--keep-perspectives` opts into copying them to `[output]/perspectives/`. Replaces the previous "write then mv to archive/" pattern (which silently failed and let per-persona files accumulate in project trees — observed across 6 files in a single project).
+- **`/playbook:tasks` Step 8.5** — New "Gate Task Discipline" sub-section that enforces use of the `[GATE]` task format and the dry-run sub-task for any metric-based gate.
+- **`/playbook:learnings` Pre-Check A** — Now points at the new `planned-vs-implemented.md` template and recognizes when `/playbook:close-project` has already produced the artifact (read it instead of regenerating).
+
+### Why
+Driven by the Memory & Personalization Phase 1 retrospective (2026-04-26). Four systemic findings collapsed into these changes:
+1. **Gates as checkboxes** — Task 32 closed with `$duration` literally unmeasurable for the entire 4-week window. The gate template didn't require instrumentation verification. → `[GATE]` task type + dry-run sub-task.
+2. **No closing ritual** — project still lived in `to-do/` 4 weeks after the gate closed; 9 backfill JSONs + 4 PNGs at repo root. → `/playbook:close-project`.
+3. **Critique scaffolding sprawl** — 6 per-persona critique files survived in the project tree, none referenced after synthesis. → critique writes to `.tmp/` by default.
+4. **Cross-session re-orientation tax** — Doppler config rediscovered 4+ sessions; "how do I see what's stored" asked across 3+ sessions. → `session-start-status` skill.
+
 ## [0.18.0] - 2026-04-04
 
 ### Added
