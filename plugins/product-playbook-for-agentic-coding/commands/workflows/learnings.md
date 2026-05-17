@@ -55,6 +55,30 @@ Before proceeding, consider what tools are available:
 
 ## Process
 
+### Pre-Check: CLAUDE.md Size Health (ALL Trigger Types)
+
+**Run this check at the very start**, alongside the prior learnings search. CLAUDE.md is loaded into every agent session, so size growth has compounding cost.
+
+1. Run `wc -c CLAUDE.md` (skip if no CLAUDE.md exists in the project).
+2. **If over 40,000 chars**: trimming is **mandatory** before this retrospective adds any new content. Past this point, CLAUDE.md degrades agent performance. Surface to the user immediately:
+
+   ```
+   CLAUDE.md is at <N> chars — over the 40,000 hard limit.
+   Trimming is required before this retrospective can promote new content.
+
+   Common demotion candidates:
+   - RESOLVED known issues → docs/learnings/resolved-issues.md
+   - Niche/domain-specific guides → docs/guides/[topic].md (keep 1-line ref)
+   - Stale file trees / "(NEW)" markers from past milestones
+   - Duplicated content across sections
+
+   Trim first, then continue the retrospective? Or surface specific candidates?
+   ```
+
+3. **If between 32,000 and 40,000 chars** (80% of limit): flag as approaching threshold but don't block. Note it in the prior-learnings summary so the user can choose to trim opportunistically during Step 6 (Promotion).
+
+**Why pre-flight, not just pre-promotion**: catching size violations before any other work means the user can decide to trim *first* and have a clean baseline. Discovering it mid-promotion (which is where the historical check lived) forces a context-switch when the retrospective should be wrapping up. The Step 6 health check remains as a backstop in case content is added during facilitation.
+
 ### Pre-Check: Prior Learnings Search (ALL Trigger Types)
 
 **Before starting any retrospective**, search for prior learnings to enable cross-session pattern detection:
@@ -452,16 +476,13 @@ If any items are unchecked, go back and address them before continuing.
 
 A learning left in a doc is a learning that will be re-learned the hard way. Promote findings via two parallel tracks.
 
-#### Pre-Promotion: CLAUDE.md Health Check
+#### Pre-Promotion: CLAUDE.md Health Check (Backstop)
 
-**Before adding content to CLAUDE.md**, check its current size:
-1. Run `wc -c CLAUDE.md`
-2. If over **32,000 chars** (80% of 40k limit), trim before adding:
-   - Archive RESOLVED known issues → `docs/learnings/resolved-issues.md`
-   - Move niche/domain-specific guides → `docs/guides/[topic].md` (keep 1-line reference)
-   - Remove content that duplicates the Quick Reference section
-   - Condense verbose sections to a reference + link
-3. If over **40,000 chars**, trimming is **mandatory** — the file will degrade agent performance
+The primary CLAUDE.md size check now runs in **Pre-Check: CLAUDE.md Size Health** at the start of the workflow. This step is a backstop in case content was added during Step 3 facilitation (e.g., new gotchas discovered mid-retrospective). Re-run `wc -c CLAUDE.md`; if it's grown past 40k since pre-flight, apply the same demotion guidance:
+- Archive RESOLVED known issues → `docs/learnings/resolved-issues.md`
+- Move niche/domain-specific guides → `docs/guides/[topic].md` (keep 1-line reference)
+- Remove content that duplicates the Quick Reference section
+- Condense verbose sections to a reference + link
 
 **Demotion checklist** (run before promotion):
 - [ ] Are there RESOLVED known issues still in CLAUDE.md? → Archive

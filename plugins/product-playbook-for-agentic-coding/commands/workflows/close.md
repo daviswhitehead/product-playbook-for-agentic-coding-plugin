@@ -12,11 +12,18 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
 
 ## Phase 1: Uncommitted Work Check
 
-1. Run `git status`.
-2. If there are uncommitted changes:
+1. **Branch state check (do first)**: If the current branch's PR is already merged, new commits on this branch will NOT reach the target. Detection:
+   - `gh pr list --head $(git branch --show-current) --state merged --limit 1` (or check `git log <target>..HEAD` against a known squash-merge commit on the target).
+   - If merged, warn the user and offer to branch off the target before committing:
+     > "Current branch `<name>` is already merged into `<target>` (likely via squash). Any commits made here will be local-only. Want me to branch off `<target>` so the close-out commits reach production?"
+   - If the user approves, create a fresh branch off `origin/<target>` and continue close-out there. Cherry-pick later if needed.
+   - This catches the common case where a session continues *after* the main PR merges (close-out, follow-up docs, learnings). The skill previously assumed the current branch was always a valid commit target.
+
+2. Run `git status`.
+3. If there are uncommitted changes:
    - Show a brief summary (files changed, not full diffs)
    - Offer to commit. If the user approves, draft a commit message and commit.
-3. If the working tree is clean: skip silently.
+4. If the working tree is clean: skip silently.
 
 ## Phase 2: Task Cleanup
 
