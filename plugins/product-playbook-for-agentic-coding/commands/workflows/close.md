@@ -12,12 +12,19 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
 
 ## Phase 1: Uncommitted Work Check
 
-1. **Branch state check (do first)**: If the current branch's PR is already merged, new commits on this branch will NOT reach the target. Detection:
+1. **Branch state check (do first)**: The current branch may not be a valid commit target for your close-out. Two common failure modes:
+
+   **(a) Branch is merged.** If the current branch's PR is already merged, new commits on this branch will NOT reach the target.
    - `gh pr list --head $(git branch --show-current) --state merged --limit 1` (or check `git log <target>..HEAD` against a known squash-merge commit on the target).
    - If merged, warn the user and offer to branch off the target before committing:
      > "Current branch `<name>` is already merged into `<target>` (likely via squash). Any commits made here will be local-only. Want me to branch off `<target>` so the close-out commits reach production?"
-   - If the user approves, create a fresh branch off `origin/<target>` and continue close-out there. Cherry-pick later if needed.
-   - This catches the common case where a session continues *after* the main PR merges (close-out, follow-up docs, learnings). The skill previously assumed the current branch was always a valid commit target.
+
+   **(b) Branch was changed by another agent (parallel-agent workspaces — Conductor, git worktrees, etc.).** If multiple agents share a working directory, the current branch may have been switched while you were sleeping/waiting on tools. Detection:
+   - `git branch --show-current` — does it match the branch *your* session has been working on? Compare against the branch you last pushed to, or the PR head you've been monitoring.
+   - If unfamiliar, ask the user before committing anywhere: it likely belongs to another agent's in-flight work.
+   - Stash any unrelated uncommitted changes (they may be the other agent's WIP) before switching back: `git stash push -m "other-agent-WIP" <paths>`. Restore after your work completes.
+
+   **In both cases**, if the user approves, create a fresh branch off `origin/<target>` and continue close-out there. Cherry-pick later if needed. The skill previously assumed the current branch was always a valid commit target — both (a) (session continues after the main PR merges — close-out, follow-up docs, learnings) and (b) (parallel agents) violate that assumption.
 
 2. Run `git status`.
 3. If there are uncommitted changes:

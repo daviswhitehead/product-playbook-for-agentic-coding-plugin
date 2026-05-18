@@ -55,6 +55,17 @@ Before proceeding, consider what tools are available:
 
 ## Process
 
+### Pre-Check: Branch State (ALL Trigger Types)
+
+**Run this before any other pre-check.** A learnings retrospective ends with commits and a PR — both depend on the current branch being a valid target for *this* session's work. Two failure modes to detect upfront:
+
+1. **Branch is merged.** If the original PR was squash-merged, the local branch still exists but commits to it won't reach the target. Detect: `gh pr list --head $(git branch --show-current) --state merged --limit 1`. If a merged PR comes back, ask the user before committing:
+   > "Current branch `<name>` was merged via PR #<n>. Commits will be local-only. Branch off `<target>` first?"
+
+2. **Branch was switched by another agent (parallel-agent workspaces — Conductor, git worktrees).** If multiple agents share a working directory, your session's branch may have been switched while you were sleeping/awaiting tools. Detect: compare `git branch --show-current` against the branch your session has been working on (last push target, PR head being monitored). If it's unfamiliar, stash any unrelated uncommitted changes (`git stash push -m "other-agent-WIP" <paths>`) and create a fresh branch off the target before continuing. Restore the stash after.
+
+If `/playbook:learnings` was invoked from `/playbook:close`, the close skill's Phase 1 already runs an equivalent check — you can skip this. For standalone invocations or after long wait gaps, run it.
+
 ### Pre-Check: CLAUDE.md Size Health (ALL Trigger Types)
 
 **Run this check at the very start**, alongside the prior learnings search. CLAUDE.md is loaded into every agent session, so size growth has compounding cost.
