@@ -152,6 +152,62 @@ Options:
    - Existing codebase (for patterns and conventions)
 3. Understand what needs to be accomplished
 
+### Step 2.5: Existing-State Audit (Before Planning, MANDATORY for "N of X" tasks)
+
+> **Why this step exists**: Tasks that touch existing modules — "wire up N events", "add N migrations", "convert N color tokens", "extend module X with N new behaviors" — are the #1 source of duplicate/regressive work. The spec was written at a point in time; sibling work since then may have already implemented some of it. Without an audit, you'll rewrite working code, introduce duplicate properties, and miss the actual delta. Two documented incidents:
+>
+> - **2026-02-10 dark-mode** (`docs/learnings/2026-02-10-dark-mode-implementation.md`): scope was estimated from the tech plan; reality had 50% more violations than estimated. Lesson #1 of that retro: "Add 'scope audit' step before estimation."
+> - **2026-05-18 memory-phase-2 task 2c.8** (`docs/learnings/2026-05-18-audit-before-implement-and-real-tokenizer.md`): "wire up 4 PostHog events" — the audit found 3 of the 4 already wired by sibling PRs and the spec had drifted. Delta was 10 minutes; rewriting would have been an hour and introduced bugs.
+
+#### When this step is mandatory
+
+Trigger this step when the task description matches any of these patterns:
+
+- "Wire up N {events, hooks, endpoints, migrations}" in an existing module
+- "Add N {of X}" where X already exists somewhere in the codebase
+- "Implement {feature}" where related code already exists in a sibling module / sibling PR
+- "Extend {module}" with N new capabilities
+- Task lists where earlier sub-tasks (or sibling PRs) may have done partial work
+
+For pure greenfield work (new module, no priors), this step is OPTIONAL — but a 30-second grep is cheap insurance.
+
+#### What to produce
+
+Before writing ANY code, produce an **audit table** as your first deliverable. The audit goes into the task's working notes (or the PR description for `/work` execution). Format:
+
+```markdown
+| Item from spec | Status (grep evidence) | Delta needed |
+|---|---|---|
+| Event X | ✅ wired in `path/to/file.ts:NN` (prior PR #NNN); property shape matches spec | None |
+| Event Y | ⚠️ wired but missing `error_type` property | Add `error_type` to emit site |
+| Event Z | ❌ not wired anywhere | Implement new helper + emit site |
+| Event W | ❌ no callsite found | Implement, including new test |
+```
+
+The audit must cite **grep evidence** (file path + line number, OR a `gh pr view` reference for sibling PRs). "I think this was done in PR #X" is not evidence — show the line.
+
+#### How to audit (mechanically)
+
+1. **Grep for the spec's exact identifiers** — event names, function names, constant names, migration filenames.
+2. **For each match**, read the surrounding code to confirm:
+   - The property shape / signature matches the spec
+   - The behavior matches the spec (not just the name)
+3. **For each non-match**, confirm by grepping for likely aliases (singular/plural, snake_case/camelCase, abbreviated forms) before declaring it absent.
+4. **Cross-check with sibling PRs** if the task references them. Use `gh pr view <N> --json files` to confirm what shipped.
+5. **Write the audit table** into the working notes BEFORE proceeding to Step 3 (Plan Implementation Approach).
+
+#### Failure modes when skipping
+
+- Duplicate event emit sites with conflicting property shapes → telemetry quality regression
+- Re-implementing a helper that already exists under a different name → confusing dual-API state
+- Wasted LLM/test/CI budget on code that gets reverted in review
+- Scope inflation: committing 5 files when 1 line needed editing
+- Hidden behavior changes when the "rewrite" diverges from the original in subtle ways
+
+#### When the audit reveals significant gaps in sibling work
+
+If the audit finds that prior tasks emitted events with the WRONG property shape (not just missing properties), surface this to the user rather than silently fixing. It changes whether this task is "audit + fill" work or "rewrite events" work — and that affects scope, review effort, and PR sizing.
+
 ### Step 3: Plan Implementation Approach
 
 **From Senior Engineer perspective:**
