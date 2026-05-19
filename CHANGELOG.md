@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **`/playbook:monitor-pr`** — New autonomous PR-monitoring workflow. Watches CI to green, fixes failures locally first, and minimizes GitHub Actions minutes via a cost hierarchy (local validation > free rerun > expensive push). Codifies cache-friendly polling intervals, demote-and-re-promote for test/docs-only fixes, false-green sanity checks for path-filtered jobs, and `gh run rerun --failed` over empty-commit retriggers. Designed to be invoked after every PR submission as `/playbook:monitor-pr` (auto-detects PR from branch) or in a loop via `/loop /playbook:monitor-pr`.
+
+### Changed
+- **`/playbook:learnings` Step 9.3** — Plugin PR creation now requires a cross-repo URL resolution check: when the plugin PR description references codebase docs as evidence, those docs must be on the default branch before the plugin PR opens. If they only live on a feature branch, open a thin docs-only PR against the codebase first. Prevents dead-link reviewer friction observed in the 2026-05-18 memory-phase-2 close-out.
+- **`/playbook:learnings` Pre-Promotion check (32k–40k CLAUDE.md band)** — When CLAUDE.md is between the 32k soft limit and the 40k hard limit, the agent must surface the trim/defer-to-guides/skip decision explicitly with a recommendation, instead of silently choosing. Closes a meta-retrospective gap where the choice was being made without user visibility.
+
+### Why
+Captured during the 2026-05-18 memory-phase-2 2c.5–2c.8 close-out session (chef-chopsky PR #283). The user established a pattern of asking an agent to "monitor every PR autonomously while minimizing GitHub Actions minutes" — promoted from a repeated ad-hoc prompt to a first-class workflow. The two `learnings.md` changes came from the meta-retrospective on the same session.
+
 ## [0.19.0] - 2026-04-26
 
 ### Added
