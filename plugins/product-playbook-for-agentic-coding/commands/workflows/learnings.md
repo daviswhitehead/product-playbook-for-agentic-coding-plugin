@@ -122,6 +122,50 @@ Unimplemented improvement ideas from prior retrospectives:
 
 **Why this matters**: Without this search, the same problems get documented repeatedly across retrospectives without escalation. A pattern that appears in 3 retrospectives needs a systemic fix, not a 4th documentation entry.
 
+### When a pattern recurs: append-and-strengthen, don't duplicate
+
+A pattern is **recurring** if the pre-check above finds it in 1+ prior learning docs AND it appeared again in the current session. The correct response is rarely "write a new doc." Instead, **append a dated addendum to the existing doc** with this structure:
+
+```markdown
+---
+
+## YYYY-MM-DD second-incident addendum — recurrence count and the systemic fix
+
+The pattern recurred during the **[current work]** session ([PR link]).
+[Count] separate incidents in one session:
+
+1. [Incident 1 description]
+2. [Incident 2 description]
+...
+
+The recovery-style prevention rules from the original doc all worked, but
+they were applied **per incident, [N] times** instead of preventing the
+incidents.
+
+### The systemic upgrade
+
+> [The new, stronger rule that sidesteps the problem instead of recovering from it.]
+
+**Trigger signal**: [Concrete signals that should fire the new rule, not the old one]
+
+**Pattern**:
+[Code block / command sequence demonstrating the upgrade]
+
+### Updated rule of thumb
+
+| Signal | Old response | New response |
+|---|---|---|
+| [Signal] | [Old recovery] | [New prevention] |
+
+### Why the original prevention rules are insufficient
+
+[One-paragraph explanation of why "recover gracefully" is inferior to
+"don't get into the state at all." This is the load-bearing claim that
+justifies the upgrade.]
+```
+
+The append-and-strengthen pattern preserves the prior incident's evidence (so the recurrence count is visible in one place), names the systemic upgrade explicitly (so future searches surface the *new* rule, not the old one), and forces an honest answer to "why didn't the prior fix work?" — which is exactly the question a 4th documentation entry would dodge.
+
 ---
 
 ### Pre-Check: Validation Status (Project Completion Only)
@@ -637,6 +681,10 @@ Gather ALL actionable improvements from Steps 3 through 8 (standard findings, de
 2. [Action] — [brief description]
 ...
 
+## Template Feed-Forward (N items)
+1. [Action] — [resources/templates/*.md file + change]
+...
+
 ## Deferred (N items)
 1. [Action] — [reason for deferral]
 ...
@@ -647,6 +695,8 @@ Which should we proceed with? (I recommend executing all High priority items.)"
 **Key**: Present codebase and plugin items separately — but **default to executing both**. Do not defer plugin improvements to "next time" or "when you next improve the playbook." The whole point of the learnings phase is to close the loop in this session.
 
 **Default execution strategy**: Execute codebase improvements immediately, then locate the plugin repo and make plugin edits in the same session. Only defer if the user explicitly asks to skip plugin work. If you find yourself writing "these are documented in the learnings doc for when you next improve the playbook" — stop. That means you're deferring instead of executing.
+
+**Template feed-forward is not optional**: Before declaring the action plan complete, walk through the Step 9.5 table (Feed-Forward to Next Project Templates) and surface any template-update items in the same batch summary above. The plan presentation is where the templates get committed-to; Step 9.5 itself is execution. If the action plan doesn't list any template updates and the findings are systemic, double-check — most systemic findings have at least one template that should change.
 
 #### 9.1b: Systemic Analysis — Think Bigger (Project Completion Only)
 
