@@ -78,6 +78,17 @@ When planning integrations with external services or APIs:
 - **Flag assumptions**: If you can't verify, mark as "Assumption — needs verification" in the plan rather than stating as fact
 - This prevents wasted implementation effort on capabilities that don't exist (e.g., planning around a "Date created" field that doesn't exist in GitHub Projects V2)
 
+## Verification of Internal Schema References
+
+The same rule applies to **your own** project's schema, not just external APIs:
+
+- **Grep every column, table, function, env var, or file path** named in the tech plan against the codebase (or a migration in the same PR or earlier) before considering it final.
+- A tech plan that names a non-existent column is load-bearing for nothing — every downstream acceptance criterion built on it inherits the same drift, and the divergence isn't caught until integration-test time.
+- The check is cheap: `grep -r '<identifier>' <migrations-dir>/` or `grep -r '<identifier>' src/` is seconds. The downstream confusion (debug cycles, spec amendments, silent drift) is minutes-to-hours.
+- If a column doesn't exist yet, the migration that creates it must already be in the dependency chain. State this explicitly: "depends on migration `<filename>` creating `<column>`."
+
+Example: a tech plan wrote `messages.created_at` for a sliding-window predicate. The actual schema had only `messages.timestamp`. Caught at integration-test time after acceptance criteria, tasks, and the implementation comments had all repeated the wrong name. One grep at planning time would have prevented all of it. (Chef Chopsky 2c.3, 2026-05-18.)
+
 ## Project Context Discovery
 
 Before starting, search for existing project documentation:

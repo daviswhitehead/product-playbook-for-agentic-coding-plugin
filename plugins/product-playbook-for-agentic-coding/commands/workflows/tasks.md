@@ -104,6 +104,7 @@ Drawing from multiple role perspectives, guide the user through:
 **From Product Manager + QA Specialist perspectives:**
 - Define clear, testable acceptance criteria
 - Specify what "done" looks like for each task
+- **Verify every schema/column reference**: if an acceptance criterion names a database column, file path, function, env var, or other concrete identifier, grep-verify it against the codebase (or a migration in the same PR or earlier) BEFORE finalizing the criterion. An acceptance criterion that names a non-existent identifier is unfalsifiable until implementation hits it — the implementer either silently drifts from spec or has to amend the spec retroactively, and the criterion was load-bearing for nothing in the meantime. One grep is cheaper than every downstream confusion combined. (Pattern observed: Chef Chopsky 2c.3 acceptance wrote `messages.created_at` but the column is `messages.timestamp`. See `docs/learnings/2026-05-18-2c3-session-learnings.md` in that repo.)
 
 #### 6. AI Tool Recommendations
 For each task, recommend:
