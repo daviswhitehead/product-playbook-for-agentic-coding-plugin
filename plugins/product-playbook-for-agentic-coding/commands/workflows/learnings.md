@@ -545,6 +545,23 @@ The primary CLAUDE.md size check now runs in **Pre-Check: CLAUDE.md Size Health*
 - [ ] Is any CLAUDE.md content duplicated across sections? → Consolidate
 - [ ] Are there stale milestone-specific references? → Delete
 
+**When CLAUDE.md is between 32k–40k chars — surface the trim/defer/skip decision explicitly:**
+
+Don't silently choose between trimming and skipping the CLAUDE.md addition. Surface the three options to the user with a recommendation:
+
+```
+CLAUDE.md is currently at <N> chars (over the 32k soft limit, under the 40k hard limit).
+
+I have three options for this finding:
+1. **Trim first** — apply the demotion checklist above, then add the new content (estimated ~10 min of doc surgery)
+2. **Defer to docs/guides/** — write the finding as `docs/guides/[topic].md`; rely on grep-discovery instead of CLAUDE.md (zero CLAUDE.md cost, but the agent has to find it on its own)
+3. **Skip** — the finding isn't important enough to warrant either option
+
+My recommendation: [option] because [rationale tying to finding severity + CLAUDE.md current state].
+```
+
+The recipes retrospective (2026-03-16) and the memory-phase-2 2c.5–2c.8 close-out (2026-05-18) both hit this case. Silent choice in either direction loses information — surfacing it lets the user weigh CLAUDE.md hygiene against discoverability for the specific finding.
+
 ---
 
 #### Track 1: Codebase Promotion
@@ -747,13 +764,28 @@ If the user selected "Both" or "Plugin/workflow" as the output target and improv
 1. **Locate the plugin repo**: Check `.claude/plugins/` for the plugin directory
 2. **Create a feature branch**: `git checkout -b improve/[project-name]-retrospective-learnings`
 3. **Make changes**: Modify the relevant plugin files (commands, templates, skills)
-4. **Create the PR**: Use `gh pr create` with a clear description of what was learned and why each change improves the workflow
-5. **Report the PR URL** to the user
+4. **Cross-repo URL resolution check** (see below) — if the plugin PR's description references codebase docs as evidence, those docs must be on the default branch BEFORE the plugin PR opens
+5. **Create the PR**: Use `gh pr create` with a clear description of what was learned and why each change improves the workflow
+6. **Report the PR URL** to the user
 
 **Common plugin files to improve:**
 - `commands/workflows/*.md` — Workflow steps and guidance
 - `resources/templates/*.md` — Task and document templates
 - `skills/*.md` — Skill definitions and patterns
+
+**Cross-repo URL resolution (load-bearing)**:
+
+When the plugin PR description cites a codebase learnings doc as evidence (typical for systemic-fix PRs grounded in a real incident), the doc URL like `https://github.com/<org>/<repo>/blob/<default-branch>/docs/learnings/<file>.md` will 404 if the doc only lives on a feature branch.
+
+**Before opening the plugin PR**, check:
+
+1. Are the cited codebase docs already on the project's default branch (`production` / `main`)? If yes — open the plugin PR as planned.
+2. If the docs only exist on a feature branch that hasn't merged yet, open a **thin docs-only PR** against the codebase repo FIRST. It typically runs only lint+typecheck+unit-tests (path-filtered jobs skip), so the CI cost is low (~12 min) and the URLs become durable.
+3. Only then open the plugin PR. The two PRs can review and merge in parallel.
+
+**Why this matters**: Reviewers of the plugin PR need to validate the premise (the real incident the change is grounded in). Dead links break that validation. The 2026-05-18 memory-phase-2 2c.5–2c.8 close-out hit this exactly — a plugin PR referenced a learning doc that only existed on a feature branch; a thin docs-only PR was opened so the URLs resolved.
+
+**Heuristic for when this applies**: if the plugin PR body contains a `https://github.com/.../blob/<default-branch>/docs/learnings/` URL, double-check that path resolves before submitting.
 
 #### 9.4: Document Solutions with /compound (If Applicable)
 
