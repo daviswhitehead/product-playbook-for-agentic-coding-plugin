@@ -259,6 +259,27 @@ supabase migration list
 - Check for `addInitScript` timing issues in headless Chrome
 - Consider retry mechanisms as last resort
 
+**Re-running a confirmed flake — use `gh run rerun --failed`, not an empty commit.**
+
+When Step 0 triage confirms a failure is a flake (failing test wasn't modified by the PR; same commit previously passed CI), re-run only the failed jobs instead of pushing an empty commit:
+
+```bash
+# Re-runs ONLY failed jobs in the run — cheapest path
+gh run rerun <RUN_ID> --failed
+
+# vs. pushing an empty commit, which re-runs the FULL suite across all shards
+git commit --allow-empty -m "chore: retrigger CI" && git push
+```
+
+Concrete savings on a typical sharded E2E suite: re-running a single failed shard takes ~20 min vs ~37 min for a full retrigger. Multiply across iterations.
+
+**When NOT to use `--failed`**:
+- The failure is a real regression. Rerunning a real bug 5 times still won't make it pass — push a fix instead.
+- The PR diff actually touches the failing code path. Then it's not a flake; investigate.
+- The user wants explicit confirmation that other shards still pass after a flake-related fix. Then a full re-run is the safer signal.
+
+If a user has explicitly asked to "minimize CI minutes," `gh run rerun --failed` is almost always the right call for triaged flakes.
+
 ### Step 9: Prevent Recurrence in Local Validation
 
 After fixing a CI failure, consider whether it should be caught locally:
