@@ -117,6 +117,20 @@ After completing each task:
    - Add completion notes
    - Update status to "Complete"
 
+### Instrumented-Task Verification Gate (do NOT close on a static check)
+
+If a task's acceptance criterion includes **"event fires", "metric captured", "instrumentation added", or "tracked in <analytics tool>"**, the task **cannot be marked complete on a static/import check** ("the code calls `capture()`", "imports are clean"). Code-is-wired ≠ behavior-verified.
+
+Before marking such a task ✅, require ONE of:
+1. **Runtime evidence** — fire the event yourself (synthetic click in a browser / incognito + DevTools network filter) and confirm it lands in the truth surface (PostHog/analytics/the metric query), OR
+2. **An explicit unverified flag** surfaced to the user: *"Code is wired but I could not verify the event fires at runtime — needs a runtime check before this is truly done."*
+
+Never silently equate the two. This failure mode has recurred across three projects (Memory Phase 1 gates closed with `null` metrics; acquisition T10/T11/T12 closed with zero/deprecated events — `recipe_cta_clicked` logged **zero events for 12 days** after being marked done on "imports are clean"). The symptom of a miss is "No data recorded" for a *shipped* event — treat that as instrumentation-suspect, not "no traffic," and fire a synthetic event to disambiguate.
+
+### Acknowledge Method Substitution (don't silently downgrade verification)
+
+If a task names a **specific verification method** (e.g., "browser automation / E2E test of the full flow") and you cannot or do not perform it, you must **say so explicitly** — never substitute a weaker method (a code trace, a line-number citation, a manual read) and report it as if the named method was performed. State: *"The task asked for an E2E run; I did a code trace instead because <reason>. This is weaker — the browser test still needs to run."* For E2E specs specifically, "wired into the test runner's `testMatch`/suite + seen running in CI" is part of done — a spec file that exists but never runs is zero coverage.
+
 ### Phase-Level Validation
 
 After completing each phase:
@@ -149,6 +163,10 @@ After completing each phase:
 | Performance regression | Investigate, may need guidance |
 | Security concerns | Always ask before proceeding |
 
+### "Sequenced later" is NOT "blocked"
+
+Distinguish a **soft sequencing preference you set** ("do the blog last", "warm outreach after polish") from a **hard external dependency** (missing API key, unmerged upstream PR, a gate that genuinely can't be evaluated yet). A self-imposed "later" is something you can revisit and propose to pull forward; it is not a blocker. When you find yourself idle because of a soft "later", **propose the next viable action** rather than reporting a block and waiting. (Found: agent reported "blog is blocked" and idled until the user said *"We're sitting here idle. Just answer."* — it had mistaken its own sequencing note for an external dependency.)
+
 ### How to Stop Gracefully
 
 When stopping:
@@ -166,6 +184,16 @@ When stopping:
    - Brief description of issue
    - What was tried
    - What's needed to proceed
+
+## Name the Bottleneck — Don't Let Building Substitute for the Scary Work
+
+Autonomous execution has a seductive failure mode: the agent's track is **always** productive. There is always more to build, refactor, document, or instrument. When a project has parallel tracks — "the agent builds infrastructure while the human does the hard manual thing (outreach, sales, recruiting users, a scary conversation)" — the agent can ship indefinitely while the metric that actually defines success stays at zero. The project *looks* productive (tasks closing, PRs merging) while nothing that matters moves.
+
+**The check**: periodically ask *"is my buildable backlog outpacing the metric that defines success?"* If the infrastructure is largely done and the constraint is now the human's manual work, **say so plainly** instead of mining the backlog for more safe tasks:
+
+> "The measurement infrastructure is ~90% built. The bottleneck is no longer engineering — it's getting real traffic through the funnel. Continuing to build is lower-value than unblocking that. What's blocking the outreach?"
+
+Don't let an always-available build queue become a comfortable proxy for harder, scarier real-world validation. (Found: acquisition-engine — 10 weeks of measurement infrastructure shipped, exactly **one** acquisition channel actually run. The agent never surfaced that the bottleneck had shifted; the founder later named it: *"building felt safer than posting."*)
 
 ## Quality Gates
 

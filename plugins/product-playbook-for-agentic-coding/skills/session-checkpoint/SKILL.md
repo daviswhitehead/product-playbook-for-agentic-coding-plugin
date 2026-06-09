@@ -73,6 +73,12 @@ When the session is wrapping up or getting long:
 3. Use it to orient: pick up the current task, understand decisions made, avoid re-reading hot files
 4. If the checkpoint is stale (>3 days old or branch has changed significantly), note this and do fresh orientation instead
 
+### Lead with state — don't make the user ask "where are we?"
+
+When resuming a multi-session project, **open the session by stating the current state** (from the checkpoint) before the user has to ask. A recurring tax signal is the user opening 5+ consecutive sessions with *"remind me where we're at?"* — that means the agent was waiting to be asked instead of leading. Begin with a 3-line orientation: *current task · what's done/verified · the single next action.*
+
+**Status must reflect verified reality, not what `tasks.md` claims.** If tasks.md says a task is ✅ but its instrumentation/runtime behavior was never verified (see the autonomous-execution "Instrumented-Task Verification Gate"), the checkpoint should say so — e.g., *"T11 marked done in tasks.md but event-firing unverified."* A status surface that launders unverified claims into "done" is worse than none.
+
 ## Proactive Invocation
 
 This skill should be suggested (not auto-invoked) when:

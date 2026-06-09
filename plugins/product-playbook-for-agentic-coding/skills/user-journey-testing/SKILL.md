@@ -26,6 +26,12 @@ Journey tests exercise the **real system**:
 
 This is fundamentally different from E2E tests that use stubs for speed/reliability. Both are valuable, but only journey tests answer: **"Does this actually work for a real person?"**
 
+## A written E2E spec that never runs is zero coverage
+
+Writing a `*.spec.ts` (or equivalent) does **not** mean it runs. Test runners (Playwright projects, Jest configs) explicitly enumerate which files they pick up via `testMatch`/`testPathPatterns`/suite registration. A spec file that exists but isn't registered passes CI green with **zero** coverage — the most dangerous kind of false confidence. (Found: `recipe-signup-flow.spec.ts` sat orphaned, not in any Playwright `testMatch`, for ~12 days post-merge; CI was green the whole time.)
+
+**Part of "the journey is tested" is**: (1) the spec is registered in the runner, (2) you ran it once locally and saw it pass, and (3) you confirmed it actually appears in a CI run log. If you did a code trace or manual read **instead of** running the named test, say so explicitly — never report a substituted weaker method as if the real test ran.
+
 ## How to Define a Journey
 
 Structure each journey as a sequence of actions and verifications from the user's perspective:
