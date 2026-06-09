@@ -40,6 +40,7 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    - Check `docs/tasks.md`
 2. If a tasks document exists:
    - Scan for `in_progress` tasks. For each: is the work done? Mark completed or note what's left.
+   - **Instrumented-task check**: before marking complete any task whose acceptance includes "event fires", "metric captured", or "tracked in <analytics>", confirm you have runtime evidence (the event/metric actually landed in the truth surface — PostHog/analytics/the gate query). If you only have static evidence ("the code is wired"), mark it **"done pending runtime verification"**, not ✅. Do not let close-out launder an unverified claim into "complete." (See the autonomous-execution "Instrumented-Task Verification Gate".)
    - Scan for stale tasks (blocked with no recent activity). Propose deletion or deferral.
    - Note pending tasks as carryover.
    - Show a brief summary: "X completed, Y carried forward, Z stale."
