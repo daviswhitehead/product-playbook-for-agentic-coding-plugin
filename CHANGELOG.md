@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **SpecStory Lore (`/lore`) routing across the session-analysis cluster** — `/playbook:improve-playbook`, `/playbook:identify-improvements`, `/playbook:learnings`, `/playbook:close`, and the `playbook-improvement-agent` now apply a shared decision boundary: gaps specific to *this* plugin → playbook track; knowledge to write down → docs; **portable, reusable-across-projects-and-harnesses workflows → `/lore`** (external [SpecStory Lore](https://github.com/specstoryai/getspecstory) skill, which forges such patterns into cross-harness `SKILL.md` packages from your own session history). `/playbook:close` gains an optional Phase 4.5 "Forge Flow" nudge. Lore is an optional external dependency — the playbook only *suggests* `/lore` and never auto-invokes it; all pointers are gated on Lore being installed. README "Forging Reusable Skills with Lore" section added.
 - **`/playbook:monitor-pr`** — New autonomous PR-monitoring workflow. Watches CI to green, fixes failures locally first, and minimizes GitHub Actions minutes via a cost hierarchy (local validation > free rerun > expensive push). Codifies cache-friendly polling intervals, demote-and-re-promote for test/docs-only fixes, false-green sanity checks for path-filtered jobs, and `gh run rerun --failed` over empty-commit retriggers. Designed to be invoked after every PR submission as `/playbook:monitor-pr` (auto-detects PR from branch) or in a loop via `/loop /playbook:monitor-pr`.
 
 ### Changed

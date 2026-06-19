@@ -27,7 +27,7 @@ Before proceeding, inventory available tools:
 1. **Commands**: Other `/playbook:*` commands (learnings, improve-playbook)
 2. **Agents**: Specialized agents via Task tool (playbook-improvement-agent)
 3. **MCP Tools**: External service integrations via ToolSearch
-4. **Skills**: Domain expertise via Skill tool
+4. **Skills**: Domain expertise via Skill tool — including **`lore`** (SpecStory Lore) if installed, which forges portable, cross-harness skills from session history (see the routing note in Step 2).
 
 Select the most appropriate tools for the task at hand.
 
@@ -80,6 +80,8 @@ For each problem identified, brainstorm improvements:
 - **Context**: Missing project context or history
 - **Prompts**: Better prompt patterns
 - **Automation**: Manual steps that could be automated
+
+**Route to `/lore` when applicable**: If an improvement is really a *repeatable workflow you'd reuse across projects and harnesses* (e.g. "I keep doing this same multi-step thing by hand"), note that the user can run **`/lore`** (SpecStory Lore, if installed) to forge it into a reusable, cross-harness skill from their own session history — rather than tracking it here as a one-off improvement. Keep this list focused on improvements specific to *this* project/workflow.
 
 ### Step 3: Prioritize Top 10
 
