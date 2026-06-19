@@ -45,6 +45,8 @@ Both targets are active by default:
 1. **Codebase Documentation** — Patterns, gotchas, architecture decisions, debugging solutions. Location: `[current-codebase]/docs/`
 2. **Plugin Improvements** — Skill/workflow optimizations, missing steps, wrong defaults, new commands. Location: Plugin repository (`commands/`, `skills/`)
 
+> **Portable skills go to `/lore`, not the plugin.** When a learning is really a *repeatable workflow you'd reuse across projects and harnesses* (not specific to this codebase or this plugin), don't capture it as a doc or a new playbook command — recommend the user run **`/lore`** (SpecStory Lore, if installed) to forge it into a reusable, cross-harness skill grounded in their own session history. Target #2 is for improvements to *this* plugin; `/lore` is for general-purpose skills.
+
 ## Available Tools Discovery
 
 Before proceeding, consider what tools are available:

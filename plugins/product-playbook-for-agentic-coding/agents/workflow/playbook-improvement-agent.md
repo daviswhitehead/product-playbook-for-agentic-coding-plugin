@@ -99,6 +99,8 @@ Compare each pattern against existing playbook capabilities:
 
 For each gap (❌) or partial coverage (⚠️), propose a solution:
 
+0. **Portable-workflow check (route to `/lore`)**: First decide whether the pattern is a *general-purpose, repeatable workflow* useful across projects and harnesses, rather than a gap specific to *this* playbook. If it is, recommend the user run **`/lore`** (SpecStory Lore, if installed) to forge it into a reusable, cross-harness skill from their own session history — do not propose a playbook-specific tool for it. Reserve the proposal types below for gaps in *this* plugin. Flag borderline patterns with both options so the user can choose.
+
 1. **Determine tool type**:
    - **Command**: User-invoked workflow with clear inputs/outputs
    - **Agent**: Autonomous multi-step task requiring judgment

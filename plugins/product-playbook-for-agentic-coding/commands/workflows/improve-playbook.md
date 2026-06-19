@@ -29,7 +29,7 @@ Before proceeding, inventory available tools:
 1. **Commands**: Other `/playbook:*` commands (learnings, review-playbook)
 2. **Agents**: Specialized agents via Task tool (playbook-improvement-agent)
 3. **MCP Tools**: External service integrations via ToolSearch (GitHub)
-4. **Skills**: Domain expertise via Skill tool
+4. **Skills**: Domain expertise via Skill tool — including **`lore`** (SpecStory Lore) if installed, which forges portable, cross-harness skills from session history. See the "Portable-workflow check" in Step 4.
 
 Select the most appropriate tools for the task at hand.
 
@@ -169,6 +169,8 @@ Proceed to solution proposals?
 ---
 
 ### Step 4: Propose Solutions
+
+**Portable-workflow check (route to `/lore`)**: Before designing a playbook solution, ask whether the pattern is a *general-purpose, repeatable workflow* that would help across projects and harnesses — not a gap specific to *this* plugin. If so, recommend the user run **`/lore`** (SpecStory Lore, if installed) to forge it into a reusable, cross-harness skill grounded in their own session history, instead of adding a playbook-specific tool. Use the playbook track below only for gaps in *this* plugin. When a pattern is borderline, surface both options and let the user choose.
 
 **4.1 Design Solutions for Each Gap**
 

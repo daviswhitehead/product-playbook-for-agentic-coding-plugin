@@ -234,6 +234,23 @@ This meta-workflow:
 
 The playbook learns from how you actually use it and grows to better support your workflows.
 
+### Forging Reusable Skills with Lore (optional)
+`/playbook:improve-playbook`, `/playbook:identify-improvements`, `/playbook:learnings`, and `/playbook:close` all mine your sessions, but they target *this* plugin and your codebase docs. When a pattern is instead a **portable, repeatable workflow you'd reuse across projects and harnesses**, those commands now point you to [**SpecStory Lore**](https://github.com/specstoryai/getspecstory) (`/lore`) — an external skill that forges such workflows into reusable, cross-harness `SKILL.md` packages grounded in your own session history.
+
+The decision boundary the playbook uses:
+
+| Signal | Route to |
+|--------|----------|
+| Gap specific to *this* plugin | `/playbook:improve-playbook` |
+| Knowledge to write down (codebase/docs) | `/playbook:learnings` |
+| Portable workflow reusable anywhere | `/lore` (SpecStory Lore) |
+
+Lore is an **optional external dependency** — the playbook only suggests `/lore` and never auto-invokes it. Install it globally with:
+
+```bash
+npx skills add specstoryai/getspecstory --skill lore --global
+```
+
 ## Project Structure
 
 ```

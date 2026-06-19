@@ -104,6 +104,16 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
 3. If the user has input: invoke `/playbook:learnings` with `chat-session` trigger.
 4. If the user skips: proceed to Phase 5.
 
+## Phase 4.5: Forge Flow (optional)
+
+Skip silently if `--quick` was passed, or if the `lore` skill is not installed (check `~/.claude/skills/lore` / `Skill` tool availability), or if `.specstory/history/` has no sessions.
+
+Session close-out is a natural moment to turn accumulated work into reusable skills. If this session surfaced a *repeatable workflow you'd reuse across projects* (not a one-off), offer a lightweight nudge — do not run it for them:
+
+> "This session looks like it had a reusable workflow. Want to run `/lore` to forge it (and other patterns in your history) into a cross-harness skill? It mines this project's `.specstory/history`."
+
+`/lore` is interactive and user-driven — only point to it, never auto-invoke. If the user declines or there's nothing notable, skip silently.
+
 ## Phase 5: Summary
 
 Present a one-line status per phase:
@@ -115,6 +125,7 @@ Git: [Committed 3 files / Clean / 2 uncommitted (noted)]
 Tasks: [2 completed, 1 carried forward / No tasks document]
 Handoff: Saved to docs/checkpoints/latest.md
 Learnings: [Captured / Skipped]
+Skills: [Suggested /lore / Not applicable]
 ```
 
 ## Proactive Invocation
@@ -134,6 +145,7 @@ Each phase is independent and fails gracefully:
 - No tasks document? Skip Phase 2.
 - No active project? Write handoff inline instead of to file.
 - User declines learnings? Skip Phase 4.
+- `lore` skill not installed, or no `.specstory/history`? Skip Phase 4.5 silently.
 
 The command should always produce a useful summary, even if every phase is skipped (meaning: the session was clean with nothing to close out).
 
@@ -143,4 +155,5 @@ The command should always produce a useful summary, even if every phase is skipp
 |-----------|-------------|
 | `session-checkpoint` skill | Close-out writes to the same `docs/checkpoints/latest.md` format. The skill provides the format spec; this command orchestrates when and how it's written. |
 | `learnings` command | Close-out invokes learnings as its final phase. Learnings remains standalone for mid-session capture. |
+| `lore` skill (external, SpecStory) | Phase 4.5 points to `/lore` when a session surfaced a portable, reusable workflow. Close-out only suggests it; `/lore` is interactive and never auto-invoked. Learnings/improve-playbook handle plugin-specific gaps; `/lore` handles cross-harness skills. |
 | `autonomous-execution` skill | Already recommends checkpoints every 3 tasks. Close-out handles the end-of-session case. |
