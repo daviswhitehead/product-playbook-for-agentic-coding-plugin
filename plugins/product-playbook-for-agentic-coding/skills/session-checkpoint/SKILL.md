@@ -54,9 +54,14 @@ Write to `docs/checkpoints/latest.md` (always overwritten) and optionally archiv
 ## Hot Files (modified this session)
 - `path/to/file.ts`: <what changed and why>
 
+## Out-of-Repo Changes (runtime / system / external — omit if none)
+<Consequential changes git won't show: config files outside the repo (`~/.config/...`, `~/.<tool>/...`), installed package/tool versions, external service auth/state, infra. Include rollback pointers (backup paths, prior versions). Critical for ops/debugging/infra sessions where most real change happens outside the working tree.>
+
 ## Context the Next Session Needs
 <Anything non-obvious that would take time to re-discover. E.g., "The streaming endpoint returns correlation_id in the last SSE event, not as a header" or "Integration tests need AGENT_PORT=3031 to avoid conflicts">
 ```
+
+> **Ops/debugging/infra sessions:** much of the consequential change lives *outside* the repo — config files, installed versions, external auth. A repo-only checkpoint silently drops exactly the context that "would take time to re-discover" (the skill's whole purpose). Always fill **Out-of-Repo Changes** for these sessions, with rollback pointers.
 
 ## How to Use
 

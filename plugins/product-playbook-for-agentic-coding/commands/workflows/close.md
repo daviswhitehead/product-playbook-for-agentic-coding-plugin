@@ -90,6 +90,9 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
 ## Hot Files (modified this session)
 - `path/to/file`: <what changed and why>
 
+## Out-of-Repo Changes (runtime / system / external — omit if none)
+<Consequential changes git won't show: config files outside the repo (`~/.config/...`, `~/.<tool>/...`), installed package/tool versions, external service auth/state, infra. Include rollback pointers (backup paths, prior versions). Essential for ops/debugging/infra sessions where most real change happens outside the working tree.>
+
 ## Context the Next Session Needs
 <Non-obvious knowledge that would take time to re-discover>
 ```
