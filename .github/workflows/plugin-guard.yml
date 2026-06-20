@@ -1,0 +1,36 @@
+name: Plugin Guard
+
+# Enforces the invariants that keep plugin updates actually reaching users:
+#   1. Structure/consistency: every marketplace.json entry version matches its
+#      plugin.json version (validate-plugin.sh).
+#   2. Propagation: any change to a plugin's files is accompanied by a version
+#      bump (check-version-bump.sh) — because auto-update is version-keyed and an
+#      unbumped change silently never propagates.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history so we can diff against the base branch
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Validate plugin structure + version consistency
+        run: bash scripts/validate-plugin.sh
+
+      - name: Enforce version bump on plugin changes
+        env:
+          BASE_REF: ${{ github.base_ref || 'main' }}
+        run: bash scripts/check-version-bump.sh "origin/${BASE_REF}"
