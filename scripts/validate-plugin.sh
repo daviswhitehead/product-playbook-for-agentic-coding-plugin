@@ -82,7 +82,7 @@ echo "-------------------------------------------"
 
 COMMAND_COUNT=0
 for cmd in $(find "$PLUGIN_DIR/commands" -name "*.md" 2>/dev/null); do
-    ((COMMAND_COUNT++))
+    COMMAND_COUNT=$((COMMAND_COUNT + 1))
     filename=$(basename "$cmd")
 
     # Check for frontmatter
@@ -118,7 +118,7 @@ echo "-------------------------------------------"
 
 AGENT_COUNT=0
 for agent in $(find "$PLUGIN_DIR/agents" -name "*.md" 2>/dev/null); do
-    ((AGENT_COUNT++))
+    AGENT_COUNT=$((AGENT_COUNT + 1))
     filename=$(basename "$agent")
 
     # Check for frontmatter
@@ -154,7 +154,7 @@ echo "-------------------------------------------"
 
 SKILL_COUNT=0
 for skill_dir in $(find "$PLUGIN_DIR/skills" -mindepth 1 -maxdepth 1 -type d 2>/dev/null); do
-    ((SKILL_COUNT++))
+    SKILL_COUNT=$((SKILL_COUNT + 1))
     skill_name=$(basename "$skill_dir")
 
     # Check for SKILL.md
@@ -196,7 +196,7 @@ echo "-------------------------------------------"
 
 TEMPLATE_COUNT=0
 for template in $(find "$PLUGIN_DIR/resources/templates" -name "*.md" 2>/dev/null); do
-    ((TEMPLATE_COUNT++))
+    TEMPLATE_COUNT=$((TEMPLATE_COUNT + 1))
     filename=$(basename "$template")
     success "Template exists: $filename"
 done
