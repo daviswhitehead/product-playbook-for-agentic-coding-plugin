@@ -16,6 +16,12 @@
       "source": "./plugins/openai-image-gen",
       "description": "Generate images using OpenAI's API (gpt-image-1, DALL-E) for logos, illustrations, and marketing assets",
       "version": "1.0.0"
+    },
+    {
+      "name": "google-tasks",
+      "source": "./plugins/google-tasks",
+      "description": "Create and manage Google Tasks from Claude Code via a zero-dependency MCP server (create_google_task, list_google_task_lists)",
+      "version": "1.0.0"
     }
   ]
 }
