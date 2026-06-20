@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-06-19
+
+### Fixed
+- **Plugin version drift across manifests** — `marketplace.json` had fallen 4 versions behind `plugin.json` (0.17.0 vs 0.21.0). Synced all manifests to a single version and backfilled the missing 0.20.0/0.21.0 CHANGELOG sections. The previously-shipped-but-undelivered "Out-of-Repo Changes" checkpoint work (committed at 0.21.0 without a version bump, so auto-update never re-pulled it) now ships under this release.
+
+### Added
+- **Release-propagation guardrails** — New `scripts/check-version-bump.sh` fails CI when any plugin's files change without a `plugin.json` version bump (the root cause of stale installs: auto-update is version-keyed, so content changes at an unchanged version silently never reach users). `scripts/validate-plugin.sh` now also asserts every `marketplace.json` entry's `version` matches the plugin's own `plugin.json` version. Both run on every PR to `main` via the new `.github/workflows/plugin-guard.yml`.
+- **`scripts/sync-version.sh <version>`** — One command bumps `plugin.json` and the `marketplace.json` entry together so the two can never drift apart, and reminds you to update the CHANGELOG.
+
+### Changed
+- **CLAUDE.md / README — propagation model documented** — Versioning Requirements now explains that a version bump is the update trigger and a content change without a bump never propagates; the Quality Checklist references the new guard scripts. README "Updating the Plugin" documents the verified refresh path.
+
+### Why
+Driven by a sync session (2026-06-19): a content-only commit (`914709f`, the out-of-repo checkpoint feature) shipped at the same 0.21.0 version, so every local install silently stayed stale despite `autoUpdate: true`. Root cause: auto-update keys off the version number, and nothing enforced "content changed ⇒ version bumped." These guardrails make that failure mode impossible to merge.
+
+## [0.21.0] - 2026-06-18
+
 ### Added
 - **SpecStory Lore (`/lore`) routing across the session-analysis cluster** — `/playbook:improve-playbook`, `/playbook:identify-improvements`, `/playbook:learnings`, `/playbook:close`, and the `playbook-improvement-agent` now apply a shared decision boundary: gaps specific to *this* plugin → playbook track; knowledge to write down → docs; **portable, reusable-across-projects-and-harnesses workflows → `/lore`** (external [SpecStory Lore](https://github.com/specstoryai/getspecstory) skill, which forges such patterns into cross-harness `SKILL.md` packages from your own session history). `/playbook:close` gains an optional Phase 4.5 "Forge Flow" nudge. Lore is an optional external dependency — the playbook only *suggests* `/lore` and never auto-invokes it; all pointers are gated on Lore being installed. README "Forging Reusable Skills with Lore" section added.
 - **`/playbook:monitor-pr`** — New autonomous PR-monitoring workflow. Watches CI to green, fixes failures locally first, and minimizes GitHub Actions minutes via a cost hierarchy (local validation > free rerun > expensive push). Codifies cache-friendly polling intervals, demote-and-re-promote for test/docs-only fixes, false-green sanity checks for path-filtered jobs, and `gh run rerun --failed` over empty-commit retriggers. Designed to be invoked after every PR submission as `/playbook:monitor-pr` (auto-detects PR from branch) or in a loop via `/loop /playbook:monitor-pr`.
@@ -30,6 +47,19 @@ Captured during the 2026-05-18 memory-phase-2 2c.5–2c.8 close-out session (che
 **2026-06-18 OpenClaw runtime-outage session** — The checkpoint "Out-of-Repo Changes" element came from a long ops/debugging session that fixed a Mini Me / OpenClaw Codex outage. ~90% of the consequential changes were outside the repo (a `@openai/codex` upgrade, an OpenClaw `2026.2.3 → 2026.6.1` migration, OAuth re-auth, runtime config edits). The repo-only checkpoint format had no home for any of it — exactly the "would take time to re-discover" context the skill exists to preserve — so the handoff had to be hand-adapted. Promoted that adaptation into the format.
 
 **2026-06-08 acquisition-engine deep retrospective** — The `autonomous-execution`, `user-journey-testing`, `session-checkpoint`, `close`, and `learnings` Pre-Check A changes came from a deep retrospective on chef-chopsky's 10-week acquisition project. Two root causes drove every finding: **comfort with proxies for real validation** — static checks substituting for runtime truth (T11 `recipe_cta_clicked` shipped zero events for 12 days after being marked done on "imports are clean"; the zero-event symptom was visible 6 weeks before root-cause and rationalized away as "no traffic") — and **building substituting for the scary manual work** (10 weeks of measurement infra, exactly one acquisition channel actually run). The foundation-consistency check and the recency-before-drift rule came from the meta-retrospective on this same session.
+
+## [0.20.0] - 2026-04-22
+
+### Added
+- **`conciseness-check` skill** — Cross-pollinated from the ai-native-product-playbook, plus AGENTS.md principles 6 (Concise by Default) and 7 (Critique Before Checkpoint).
+- **Methods Library (`resources/methods/`)** — 4 standalone thinking frameworks: Socratic Questioning, Strategy Kernel, Impact Estimation, Devil's Advocate.
+- **`/playbook:close`** — Session close-out command with a 5-phase workflow (git check → task cleanup → handoff context → learnings → summary).
+
+### Changed
+- **Architectural patterns across the plugin** — `recommended-mode` and `thinking-depth` frontmatter added to all 36 commands, proactive invocation on 4 skills, completeness gates on `learnings` and `critique`, and method references in 4 commands. 48 files changed.
+
+### Why
+Cross-pollinated four workstreams (conciseness & AI-filler, methods library, session close-out, architectural patterns) from the ai-native-product-playbook into this plugin.
 
 ## [0.19.0] - 2026-04-26
 

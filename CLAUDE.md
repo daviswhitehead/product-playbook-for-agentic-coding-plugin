@@ -1,17 +1,54 @@
 # Product Playbook Plugin Development
 
-## Versioning Requirements
+## Versioning & Propagation (read this first)
 
-**IMPORTANT**: Every change to this plugin MUST include updates to:
+**The propagation model — why the version bump is not optional:**
+Claude Code's marketplace auto-update is **version-keyed**. A user's install only
+re-pulls a plugin when its **version number changes**. This means:
 
-1. **`.claude-plugin/plugin.json`** - Bump version using semver
-2. **`README.md`** - Verify/update component counts and tables
+> **A content change shipped at an unchanged version silently NEVER reaches users —
+> even with `autoUpdate: true`.** The install stays stale until the version bumps.
+
+This bit us once already: a content-only commit shipped at the same version, and
+every local install silently stayed on the old copy. The guardrails below make that
+mistake impossible to merge.
+
+**IMPORTANT**: Every change to a plugin MUST bump its version in **both** files, which
+must always match:
+
+1. **`plugins/<plugin-name>/.claude-plugin/plugin.json`** — the plugin's own version
+2. **`.claude-plugin/marketplace.json`** — the marketplace entry's `version`
+
+Do the bump with the helper (it edits both together so they can't drift):
+
+```bash
+scripts/sync-version.sh <new-version>          # e.g. 0.22.0
+# then add a "## [<new-version>] - YYYY-MM-DD" section to CHANGELOG.md
+```
+
+Also update **`README.md`** if component counts/tables changed.
 
 ### Version Bumping Rules
 
 - **MAJOR** (1.0.0 → 2.0.0): Breaking changes, major reorganization
 - **MINOR** (1.0.0 → 1.1.0): New commands, agents, or skills
 - **PATCH** (1.0.0 → 1.0.1): Bug fixes, doc updates, minor improvements
+
+### Enforcement
+
+Two guards run on every PR to `main` (`.github/workflows/plugin-guard.yml`), and you
+can run them locally:
+
+- `scripts/validate-plugin.sh` — asserts each `marketplace.json` entry's version
+  matches the corresponding `plugin.json` version.
+- `scripts/check-version-bump.sh [base-ref]` — fails if any plugin's files changed
+  versus the base branch without a `plugin.json` version bump.
+
+### Delivering an update to installed machines
+
+Because this is a marketplace-embedded plugin (plugin source is a relative path
+inside the marketplace repo), a pushed-to-`main` version bump is the trigger, but a
+machine may need a marketplace refresh to pull it. See README → "Updating the Plugin".
 
 ## Directory Structure
 
@@ -172,7 +209,10 @@ Two output targets:
 
 Before committing changes:
 
-- [ ] Version bumped in plugin.json
+- [ ] Version bumped in **both** `plugin.json` and `marketplace.json` (use `scripts/sync-version.sh`)
+- [ ] `CHANGELOG.md` has a section for the new version
+- [ ] `scripts/validate-plugin.sh` passes (incl. version consistency)
+- [ ] `scripts/check-version-bump.sh` passes (plugin changed ⇒ version bumped)
 - [ ] README.md updated if components changed
 - [ ] All commands have proper frontmatter (name, description)
 - [ ] All agents have proper frontmatter (name, description, model)

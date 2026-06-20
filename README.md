@@ -56,22 +56,34 @@ Not every project needs every step. A small feature might start at PRD. A new pr
 
 ### Updating the Plugin
 
-This plugin uses a marketplace-embedded structure (plugin source is inside the marketplace repo). The "Update now" button in the plugin UI won't work directly—this is expected behavior for this type of plugin architecture.
+Updates are **version-keyed**: a Claude Code install only picks up a new copy when the
+plugin's **version number changes**. A change published at the *same* version will not
+propagate — installs stay on the old copy even with `autoUpdate` enabled. (Maintainers:
+every change bumps the version; this is enforced in CI — see `CLAUDE.md` → "Versioning &
+Propagation".)
 
-**To update to the latest version:**
+This plugin also uses a marketplace-embedded structure (plugin source is a relative path
+inside the marketplace repo), so a machine may need a marketplace refresh to pull a new
+version, and the "Update now" button on the *plugin* won't work directly.
 
-1. **Update the marketplace** (pulls latest from GitHub):
+**To pull the latest version onto a machine:**
+
+1. **Refresh the marketplace** (pulls latest from GitHub):
    ```
    /plugin → Marketplaces tab → select "product-playbook-marketplace" → Update now
    ```
 
-2. **Reinstall the plugin**:
+2. **Reinstall the plugin** if it didn't refresh to the new version automatically:
    ```
    /plugin → Installed tab → select the plugin → Uninstall
    /plugin → Marketplaces tab → select marketplace → Install
    ```
 
-**Note:** The "Local plugins cannot be updated remotely" message appears because the plugin uses a relative path source within the marketplace. This is the same pattern used by many plugins in Anthropic's official marketplace.
+You can confirm the live version under `/plugin → Installed`.
+
+**Note:** The "Local plugins cannot be updated remotely" message appears because the
+plugin uses a relative path source within the marketplace. This is the same pattern used
+by many plugins in Anthropic's official marketplace.
 
 ## Commands
 

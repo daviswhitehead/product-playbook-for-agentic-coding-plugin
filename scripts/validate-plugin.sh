@@ -23,13 +23,13 @@ echo ""
 # Function to report error
 error() {
     echo -e "${RED}ERROR: $1${NC}"
-    ((ERRORS++))
+    ERRORS=$((ERRORS + 1))
 }
 
 # Function to report warning
 warning() {
     echo -e "${YELLOW}WARNING: $1${NC}"
-    ((WARNINGS++))
+    WARNINGS=$((WARNINGS + 1))
 }
 
 # Function to report success
@@ -82,7 +82,7 @@ echo "-------------------------------------------"
 
 COMMAND_COUNT=0
 for cmd in $(find "$PLUGIN_DIR/commands" -name "*.md" 2>/dev/null); do
-    ((COMMAND_COUNT++))
+    COMMAND_COUNT=$((COMMAND_COUNT + 1))
     filename=$(basename "$cmd")
 
     # Check for frontmatter
@@ -118,7 +118,7 @@ echo "-------------------------------------------"
 
 AGENT_COUNT=0
 for agent in $(find "$PLUGIN_DIR/agents" -name "*.md" 2>/dev/null); do
-    ((AGENT_COUNT++))
+    AGENT_COUNT=$((AGENT_COUNT + 1))
     filename=$(basename "$agent")
 
     # Check for frontmatter
@@ -154,7 +154,7 @@ echo "-------------------------------------------"
 
 SKILL_COUNT=0
 for skill_dir in $(find "$PLUGIN_DIR/skills" -mindepth 1 -maxdepth 1 -type d 2>/dev/null); do
-    ((SKILL_COUNT++))
+    SKILL_COUNT=$((SKILL_COUNT + 1))
     skill_name=$(basename "$skill_dir")
 
     # Check for SKILL.md
@@ -196,7 +196,7 @@ echo "-------------------------------------------"
 
 TEMPLATE_COUNT=0
 for template in $(find "$PLUGIN_DIR/resources/templates" -name "*.md" 2>/dev/null); do
-    ((TEMPLATE_COUNT++))
+    TEMPLATE_COUNT=$((TEMPLATE_COUNT + 1))
     filename=$(basename "$template")
     success "Template exists: $filename"
 done
@@ -225,6 +225,46 @@ if [ -f ".claude-plugin/marketplace.json" ]; then
     done
 else
     error "Missing marketplace.json"
+fi
+
+echo ""
+
+# 8. Check version consistency between marketplace.json entries and plugin.json files
+# WHY: auto-update is version-keyed; if these two disagree, the marketplace listing
+# and what actually installs can diverge. They must match for every plugin.
+echo "Checking version consistency (marketplace.json <-> plugin.json)..."
+echo "-------------------------------------------"
+
+if [ -f ".claude-plugin/marketplace.json" ]; then
+    CONSISTENCY_REPORT="$(python3 - <<'PY'
+import json, os
+with open(".claude-plugin/marketplace.json") as f:
+    market = json.load(f)
+for entry in market.get("plugins", []):
+    name = entry.get("name", "?")
+    mver = entry.get("version")
+    src = (entry.get("source") or "").lstrip("./")
+    pj = os.path.join(src, ".claude-plugin", "plugin.json")
+    if not src or not os.path.isfile(pj):
+        print(f"WARN|{name}|marketplace entry has no resolvable plugin.json at '{pj}'")
+        continue
+    with open(pj) as f:
+        pver = json.load(f).get("version")
+    if mver == pver:
+        print(f"OK|{name}|{pver}")
+    else:
+        print(f"ERR|{name}|marketplace={mver} plugin.json={pver}")
+PY
+)"
+    while IFS='|' read -r status name detail; do
+        case "$status" in
+            OK)   success "$name versions match ($detail)" ;;
+            WARN) warning "$name: $detail" ;;
+            ERR)  error "$name version mismatch: $detail (run scripts/sync-version.sh)" ;;
+        esac
+    done <<< "$CONSISTENCY_REPORT"
+else
+    error "Cannot check version consistency: marketplace.json missing"
 fi
 
 echo ""
