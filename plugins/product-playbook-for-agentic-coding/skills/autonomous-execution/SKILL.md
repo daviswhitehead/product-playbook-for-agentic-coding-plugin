@@ -195,6 +195,22 @@ Autonomous execution has a seductive failure mode: the agent's track is **always
 
 Don't let an always-available build queue become a comfortable proxy for harder, scarier real-world validation. (Found: acquisition-engine — 10 weeks of measurement infrastructure shipped, exactly **one** acquisition channel actually run. The agent never surfaced that the bottleneck had shifted; the founder later named it: *"building felt safer than posting."*)
 
+## Subagent Dispatch Hygiene (Multi-Agent / Shared-Workspace Execution)
+
+When executing via dispatched subagents (implementer-per-task patterns) — especially in shared working directories (Conductor workspaces, git worktrees used by parallel sessions):
+
+### Commit-surface verification (every commit-producing dispatch)
+
+1. **Dispatch instruction**: every subagent that commits must stage **explicit paths only** (`git add <files>`, or at widest `git add -A <task-dir>`). Never `git add -A` / `git commit -am` at repo root — in a shared workspace, foreign uncommitted files (another session's WIP) get silently swept into the commit.
+2. **Name the foreign files**: if the working tree contains uncommitted files from another session, list them in every dispatch prompt as never-stage.
+3. **Controller verification**: before recording a task complete, verify the reported commit's `git show --stat --name-only <sha>` against the task's expected file surface. A commit touching files outside the surface is a **failed task** requiring history repair (amend + `rebase --onto` + force-push), not a bookkeeping note.
+
+> Origin: 2026-07-07 agent-workforce retro — a fix-subagent's repo-wide staging swept another session's files into a commit; caught only at final whole-branch review, requiring history rewrite. Two prior shared-workspace incidents existed; per-incident recovery rules did not prevent the third.
+
+### Reviewer context (plan-derived tasks)
+
+When task briefs are derived from a design doc, give per-task **reviewers the design doc reference, not just the brief**. Plans narrow designs; implementers faithfully transcribe the narrower version; only a reviewer holding the design catches the fidelity gap. (Two contract gaps in the same retro were caught exactly this way; briefs alone would have passed both.)
+
 ## Quality Gates
 
 ### Pre-Commit Gates

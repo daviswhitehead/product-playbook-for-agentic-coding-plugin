@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.22.1] - 2026-07-11
+
+### Changed
+- **`autonomous-execution` skill — Subagent Dispatch Hygiene** — New section for multi-agent / shared-workspace execution: commit-producing subagents must stage explicit paths only (never repo-root `git add -A`), dispatch prompts must name foreign uncommitted files as never-stage, and the controller verifies each commit's `--name-only` file list against the task surface before recording it complete. Also: per-task reviewers receive the design doc (not just the brief) when briefs derive from one. From the 2026-07-07 agent-workforce retro (3rd/4th shared-workspace staging incidents).
+- **`tasks` template — default `[ACTIVATION]` task** — New "Activation & Wiring Verification" task included by default for anything that runs outside the repo after merge (cron, scheduled workflow, webhook, deployed service). Checklist requires evidence (read back the scheduler entry, confirm runtime config/deps, one end-to-end run from the runtime environment, failure-visibility check). 5th incident of the verify-cron/pipeline-wiring pattern.
+
 ## [0.22.0] - 2026-06-19
 
 ### Fixed
