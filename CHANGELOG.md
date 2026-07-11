@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.22.2] - 2026-07-11
+
+### Changed
+- **`/playbook:monitor-pr` — SKIPPED checks are conditionally green** — Step 1 no longer counts `COMPLETED + SKIPPED` as unconditionally green. A short audit distinguishes legitimate path-filter skips from never-armed suites: if the PR's diff touches the skipped job's path filter, the suite never ran (most common cause: PR created non-draft, so the one-shot `ready_for_review` full-CI trigger never fired) — arm full CI and re-run before classifying. Step 4's terminal all-green state requires SKIPPED checks to have passed the audit. From chef-chopsky PR #294: 6 weeks all-green while integration tests and evals were silently SKIPPED.
+
+## [0.22.1] - 2026-07-11
+
+### Changed
+- **`autonomous-execution` skill — Subagent Dispatch Hygiene** — New section for multi-agent / shared-workspace execution: commit-producing subagents must stage explicit paths only (never repo-root `git add -A`), dispatch prompts must name foreign uncommitted files as never-stage, and the controller verifies each commit's `--name-only` file list against the task surface before recording it complete. Also: per-task reviewers receive the design doc (not just the brief) when briefs derive from one. From the 2026-07-07 agent-workforce retro (3rd/4th shared-workspace staging incidents).
+- **`tasks` template — default `[ACTIVATION]` task** — New "Activation & Wiring Verification" task included by default for anything that runs outside the repo after merge (cron, scheduled workflow, webhook, deployed service). Checklist requires evidence (read back the scheduler entry, confirm runtime config/deps, one end-to-end run from the runtime environment, failure-visibility check). 5th incident of the verify-cron/pipeline-wiring pattern.
+
 ## [0.22.0] - 2026-06-19
 
 ### Fixed

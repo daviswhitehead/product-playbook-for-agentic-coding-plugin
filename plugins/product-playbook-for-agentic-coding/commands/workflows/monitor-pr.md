@@ -71,9 +71,21 @@ Classify each check into one of:
 
 | State | Action |
 |---|---|
-| `COMPLETED` + `SUCCESS` / `SKIPPED` / `NEUTRAL` | green — count it |
+| `COMPLETED` + `SUCCESS` / `NEUTRAL` | green — count it |
+| `COMPLETED` + `SKIPPED` | conditionally green — run the SKIPPED audit below |
 | `IN_PROGRESS` / `QUEUED` | waiting — go to Step 2 |
 | `COMPLETED` + `FAILURE` / `CANCELLED` / `TIMED_OUT` | red — go to Step 3 |
+
+**SKIPPED audit** — a skipped job is either a legitimate path-filter skip or a
+symptom that the full suite was never armed. Distinguish them before counting it green:
+
+1. Does the PR's diff touch the skipped job's path filter (e.g., integration/eval jobs
+   for `agent/**`, E2E for `frontend/**`)? If **no** → legitimate skip, count green.
+2. If **yes** → the suite never ran. Most common cause: the PR was **created non-draft**,
+   so a one-shot `ready_for_review` full-CI trigger never fired — the PR can sit for weeks
+   looking all-green while its required jobs stay SKIPPED (chef-chopsky PR #294: 6 weeks,
+   integration + evals skipped). Arm the full suite (e.g., `ci:full`-style label or the
+   project's equivalent), re-run, and only then classify.
 
 If **all green and nothing waiting**: jump to Step 4 (terminal).
 If **anything waiting and nothing red**: Step 2 (poll).
@@ -178,7 +190,8 @@ This saves ~17 min per iteration. **Do NOT use this for behavioral code changes*
 
 When `gh pr view --json statusCheckRollup` shows 0 non-success/skip checks:
 
-1. **Confirm** `mergeable: MERGEABLE` and `state: OPEN`.
+1. **Confirm** `mergeable: MERGEABLE` and `state: OPEN`, and that every SKIPPED check
+   passed the Step 1 SKIPPED audit (path-filter skip, not a never-armed suite).
 2. **Check the user's original prompt** for "merge ready" or "ready to review" language. If present and `isDraft: true`, run `gh pr ready <PR>` and wait for the full-CI run that triggers.
 3. **Report back** with:
    - PR URL
