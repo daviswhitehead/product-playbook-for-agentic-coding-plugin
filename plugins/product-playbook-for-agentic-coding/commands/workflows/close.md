@@ -32,6 +32,13 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    - Offer to commit. If the user approves, draft a commit message and commit.
 4. If the working tree is clean: skip silently.
 
+5. **Stash check (do even when the working tree is clean and every commit is pushed).** A branch can have every commit in its PR yet still have work hiding in a `git stash` that vanishes when the worktree/branch is archived. "All commits pushed" ≠ "everything is safe." Run `git stash list` and look for entries whose label references the branch being closed (`stash@{N}: On <branch>: ...` or `WIP on <branch>: ...`).
+   - **For each stash tagged to this branch**, decide: is it unique work or already superseded by what's committed? Compare the stash's file versions against current `HEAD` — a rebased/orphaned stash base makes `git diff <base>..<stash>` misleading, so diff `HEAD <stash>` per file instead. For large diffs, dispatch a subagent so the comparison doesn't flood context.
+   - **If superseded** → safe to `git stash drop` (with the user's ok).
+   - **If unique or uncertain** → preserve it durably BEFORE dropping — you likely didn't create it. Salvage to a branch and push: `git branch <archive-name> stash@{N} && git push -u origin <archive-name>`. Then it's captured off the stash list and off this worktree; the user can review/discard later.
+   - **Leave stashes tagged to OTHER branches alone** — they're separate work streams; dropping them can destroy another effort's WIP.
+   - This closes a real gap: the working-tree check above catches uncommitted changes but not stashes. A user asking "is everything in the PR / safe to archive?" needs both checked.
+
 ## Phase 2: Task Cleanup
 
 1. Search for an active tasks document:

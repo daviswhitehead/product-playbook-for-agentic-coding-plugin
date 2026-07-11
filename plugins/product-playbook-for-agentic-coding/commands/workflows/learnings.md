@@ -66,7 +66,9 @@ Before proceeding, consider what tools are available:
 
 2. **Branch was switched by another agent (parallel-agent workspaces — Conductor, git worktrees).** If multiple agents share a working directory, your session's branch may have been switched while you were sleeping/awaiting tools. Detect: compare `git branch --show-current` against the branch your session has been working on (last push target, PR head being monitored). If it's unfamiliar, stash any unrelated uncommitted changes (`git stash push -m "other-agent-WIP" <paths>`) and create a fresh branch off the target before continuing. Restore the stash after.
 
-If `/playbook:learnings` was invoked from `/playbook:close`, the close skill's Phase 1 already runs an equivalent check — you can skip this. For standalone invocations or after long wait gaps, run it.
+3. **Work hiding in a stash.** A branch can have every commit pushed yet still have uncommitted work in a `git stash` that's lost when the worktree/branch is archived. Before treating the branch as "everything captured," run `git stash list` and check for entries tagged to it (`On <branch>:` / `WIP on <branch>:`). For each: compare against `HEAD` (diff `HEAD <stash>` per file, not `<base>..<stash>` — the base may be rebased away); if superseded, drop it; if unique/uncertain, salvage to a pushed branch before dropping. Leave other branches' stashes alone.
+
+If `/playbook:learnings` was invoked from `/playbook:close`, the close skill's Phase 1 already runs an equivalent check (including the stash check) — you can skip this. For standalone invocations or after long wait gaps, run it.
 
 ### Pre-Check: CLAUDE.md Size Health (ALL Trigger Types)
 
