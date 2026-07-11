@@ -113,6 +113,11 @@
 
 > **Why this matters**: A gate task that closes with one metric reading `null` is not passing — it's broken. The Memory & Personalization Phase 1 gate (2026-04-07) closed as "Conditional GO" with `$duration` unmeasurable for 4 weeks because the gate template didn't require instrumentation verification. The template change above closes that gap by making the instrumentation source and dry-run query mandatory fields.
 
+**Cron/pipeline wiring criterion** — for any task whose output is produced by a scheduled or pipeline entrypoint (cron handler, queue consumer, webhook), acceptance criteria MUST include:
+- [ ] An integration test drives the REAL entrypoint (e.g., the cron handler function) against seeded input and asserts the side effect persisted — NOT a test that seeds the output artifact and verifies the read path.
+
+> **Why**: Twice in the same project (Memory & Personalization: Phase 1 `$duration`, Phase 2c summaries), the module existed and its unit tests passed, but the runtime entrypoint never called it — `summaries_generated=0` was invisible for 24 days because tests seeded the artifact under test. Gate dry-runs catch this late; the wiring criterion catches it at task close.
+
 ---
 
 ### Task 1.H: [Human Task Name] `[HUMAN]`

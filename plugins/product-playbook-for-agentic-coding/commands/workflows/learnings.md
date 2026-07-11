@@ -108,6 +108,7 @@ Recurring patterns detected:
 - "[pattern]" — appeared in [N] prior learnings ([dates/titles])
   → Prior proposed fix: [what was proposed before]
   → Was it implemented? [yes/no/partially]
+  → If "yes": did it actually MERGE? [verify — see below]
 
 These recurring patterns should be prioritized HIGHEST in this
 retrospective — they represent problems that documentation alone
@@ -121,6 +122,8 @@ workflow changes), not more documentation.
 Unimplemented improvement ideas from prior retrospectives:
 - [Idea] (from [date] learnings) — still relevant? [y/n]
 ```
+
+**"Implemented" means MERGED, not written.** When checking whether a prior fix landed, verify it reached the default branch — `git merge-base --is-ancestor <sha> origin/<default>` or `gh pr view` on its PR — not merely that a commit or file exists. The staging-migration-drift fix (chef-chopsky, 2026-04-10 `a675b6ca`) was fully implemented on a workspace branch that never merged; six manual repair incidents followed while every retrospective would have scored it "implemented." A fix on an unmerged branch is an unimplemented fix.
 
 **Why this matters**: Without this search, the same problems get documented repeatedly across retrospectives without escalation. A pattern that appears in 3 retrospectives needs a systemic fix, not a 4th documentation entry.
 
