@@ -147,6 +147,29 @@
 
 ---
 
+### Task 1.A: Activation & Wiring Verification `[ACTIVATION]`
+> Use this format whenever the project delivers something that must run OUTSIDE the repo after merge — a cron job, scheduled workflow, webhook, deployed service, or background pipeline. **The merge is not the finish line; activation is.** Include this task by default for any such project and only delete it with a stated reason.
+
+**Description**: Verify the delivered thing actually runs in its runtime environment — merged code with missing runtime wiring fails silently.
+
+**Executor**: `[AGENT]` on the runtime machine/environment (or `[HUMAN]` if the agent lacks access)
+
+**Verification Checklist** (adapt to the runtime; every line needs evidence, not inference):
+- [ ] Scheduler entry exists (crontab/CI schedule/queue binding) — read it back, don't assume the install script added it
+- [ ] Runtime credentials/config present at the expected path (an EMPTY config dir fails silently)
+- [ ] Dependencies installed in the runtime checkout (not just the dev workspace)
+- [ ] One end-to-end run (dry-run mode if available) succeeds **from the runtime environment**
+- [ ] Failure visibility confirmed: where do errors surface (log path, alert channel), and would a silent failure be noticed?
+
+**Acceptance Criteria**:
+- [ ] Every checklist line verified with command output (the truth surface), not "the install script should have done it"
+
+**Status**: [ ] Not Started | [ ] In Progress | [ ] Complete
+
+> **Why this matters**: The "verify cron/pipeline wiring" pattern hit its 5th incident in the 2026-07-07 agent-workforce activation: an empty `~/.config/<workflow>/` dir, a missing crontab entry, and a stale dependency-install list — all silent, all post-merge, none caught by CI. Activation verification is a task, not an afterthought.
+
+---
+
 ### Task 1.2: [Task Name]
 **Description**: [Detailed task description - specific and actionable]
 
