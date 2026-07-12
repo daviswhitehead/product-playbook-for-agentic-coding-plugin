@@ -201,6 +201,16 @@ Find issues flagged by multiple personas—these are highest priority.
 - **P1 (Should Fix)**: Flagged by 2 personas OR high impact
 - **P2 (Nice to Fix)**: Single persona, lower impact
 
+**3.3b Tag Execution Triage** (required for code critiques; recommended for docs)
+
+Severity says how much a finding matters; the triage tag says **who can act on it**. Tag every P0/P1 finding:
+
+- `[AUTONOMOUS]` — the agent can fix it now without human judgment (e.g., wiring an existing guard, input sanitization, comment/doc fixes). Fix these in the same session; don't wait for review.
+- `[BLOCKED-ON-HUMAN]` — needs a human decision or privileged access (DB-write paths, schema/migration design, production data, budget/scope calls). List them as an explicit sign-off checklist in the synthesis.
+- `[DEFERRED-BY-DESIGN]` — correct to postpone (belongs to a later PR/phase). Name where it lands.
+
+**Why**: The memory-vocab PR-1/PR-2 critique (2026-05, chef-chopsky) triaged this way during overnight autonomous work: two P0 security fixes landed the same night ([AUTONOMOUS]) while two DB-write P0s were correctly held for human sign-off. Without the tags, autonomous sessions either stall on everything or overreach on production-data changes.
+
 **3.4 Generate Synthesis**
 
 Create synthesis document using template from `resources/templates/critique-synthesis.md`:

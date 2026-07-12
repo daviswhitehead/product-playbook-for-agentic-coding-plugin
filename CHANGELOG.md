@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.22.4] - 2026-07-11
+
+### Changed
+- **`/playbook:critique` Step 3.3b — execution-triage tags** — Every P0/P1 finding gets `[AUTONOMOUS]` (fix now, same session), `[BLOCKED-ON-HUMAN]` (explicit sign-off checklist in the synthesis), or `[DEFERRED-BY-DESIGN]` (name where it lands). Severity says how much a finding matters; the tag says who can act on it. From the memory-vocab overnight critique pass: two P0 security fixes landed autonomously the same night while two DB-write P0s were correctly held for human sign-off.
+- **`/playbook:learnings` — "implemented" means MERGED** — The prior-learnings pre-check now verifies a prior fix reached the default branch (`git merge-base --is-ancestor` / `gh pr view`), not merely that a commit exists. The staging-migration-drift fix was fully implemented on a branch that never merged; six manual repair incidents followed.
+- **`tasks` template — cron/pipeline wiring criterion** — Tasks whose output comes from a scheduled/pipeline entrypoint must include an integration test that drives the REAL entrypoint and asserts the persisted side effect — not a test that seeds the output artifact. Second recurrence of the wiring gap (`summaries_generated=0` invisible for 24 days).
+
 ## [0.22.3] - 2026-07-11
 
 ### Changed
