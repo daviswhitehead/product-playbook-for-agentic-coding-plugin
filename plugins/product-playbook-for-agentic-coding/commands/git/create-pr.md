@@ -128,6 +128,7 @@ Brief overview of what this PR does.
 - **Clear title**: Use conventional commit format when possible
 - **Descriptive body**: Include summary, changes, and testing checklist
 - **Share URL**: Always provide the PR URL as a clickable hyperlink
+- **Proof at merge**: When this PR is eventually merged, a proof-of-completion comment is required on it — what shipped, evidence it works, what was deferred (`/playbook:monitor-pr` Step 4)
 
 ---
 

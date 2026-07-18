@@ -165,6 +165,9 @@ After validation passes:
 - [ ] Completion notes added
 - [ ] Ready for next task
 
+### Merge Gate
+- [ ] If delivery ends in merging a PR: proof-of-completion comment posted on the PR first — what shipped, evidence it works, what was deferred (`/playbook:monitor-pr` Step 4)
+
 ## Stop Conditions
 
 **Stop and ask for help when**:
