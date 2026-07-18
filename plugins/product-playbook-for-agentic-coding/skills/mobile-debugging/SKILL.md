@@ -16,6 +16,16 @@ Use this skill when:
 - Overscroll or bounce behavior issues
 - Touch input behaves differently than expected
 
+## Step 0: Verify the Bug Is Actually Mobile-Specific
+
+**Before any device-specific investigation, reproduce in a plain desktop browser at multiple viewport widths** (e.g., 412px and 1440px in Chromium/Playwright). "Reported on a phone" only tells you where someone *looked*, not where the bug *exists*.
+
+Layout leaks, overflow bugs, and unstyled-content flashes are frequently universal — the mobile viewport just makes them prominent (less horizontal space, content pushed into view). If the bug reproduces at desktop width too, it's an ordinary layout/CSS bug: skip this skill's device-testing setup entirely and debug it locally with standard tools.
+
+Real case (chef-chopsky, 2026-07): an "Android Chrome rendering bug" — raw SEO link text leaking into a recipe page — reproduced identically in desktop Chromium at both 412px and 1440px against production. Root cause was a CSS rule that never existed, on every viewport. Device-specific theories (and ngrok + physical-device setup) would have been pure waste.
+
+Only proceed to the sections below once the bug reproduces **exclusively** on real mobile devices or mobile-emulated viewports.
+
 ## Critical Insight: Real Devices Required
 
 **Many mobile bugs cannot be reproduced in:**
