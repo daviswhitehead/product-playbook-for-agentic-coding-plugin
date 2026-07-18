@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.22.5] - 2026-07-17
+
+### Changed
+- **`/playbook:monitor-pr` — shared-worktree mechanics** — Two additions from the merge-open-prs session: (1) Step 3 documents the "PR branch held by another worktree" pattern (`gh pr checkout` fails when any worktree of the shared repo holds the branch; verify the other checkout is clean, then temp branch + `git push origin HEAD:<branch>` — never disturb a possibly-live session's worktree); (2) Step 4 warns that `gh pr merge --delete-branch` silently switches the local checkout to the default branch — re-checkout your working branch afterwards in parallel-agent workspaces.
+
 ## [0.22.4] - 2026-07-11
 
 ### Changed

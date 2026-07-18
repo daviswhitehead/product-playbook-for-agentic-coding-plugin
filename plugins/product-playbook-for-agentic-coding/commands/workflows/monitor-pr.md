@@ -129,6 +129,8 @@ gh run view <RUN_ID> --log-failed > /tmp/failed-<RUN_ID>.log
 
 Read each log end-to-end, not just the first error.
 
+**PR branch held by another worktree** (parallel-agent workspaces — Conductor, git worktrees): `gh pr checkout <N>` fails with "already used by worktree at <path>" when any other worktree of the shared repo has the branch checked out. Don't disturb that worktree (it may be a live session). Instead: verify it's clean and at the PR head (`git -C <path> status --short`), then work from a temp branch — `git checkout -b tmp/pr<N> origin/<branch>`, commit your fix, `git push origin HEAD:<branch>`. Delete the temp branch after merge.
+
 #### 3a. Triage (delegate to `/playbook:debug-ci` Step 0)
 
 For each failure, classify:
@@ -199,6 +201,8 @@ When `gh pr view --json statusCheckRollup` shows 0 non-success/skip checks:
    - Estimated Actions minutes consumed (runs × typical durations)
    - Whether `isDraft` is now false (relevant if user said "merge ready")
    - Confirmation it's ready to merge (and if user pre-approved, run `gh pr merge --squash --delete-branch`)
+
+> **Post-merge local state**: `gh pr merge --delete-branch` silently switches your local checkout to the default branch (and pulls) after deleting the PR branch. In a parallel-agent workspace this can strand your session on the wrong branch — re-checkout your working branch afterwards. If another worktree holds the PR branch, the local delete fails with a warning; that's harmless (the remote branch is still deleted), but the other checkout is left on a branch that no longer exists remotely — worth flagging for cleanup.
 
 ### Step 5: False-Green Sanity Check
 
