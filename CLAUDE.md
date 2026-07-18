@@ -44,6 +44,18 @@ can run them locally:
 - `scripts/check-version-bump.sh [base-ref]` — fails if any plugin's files changed
   versus the base branch without a `plugin.json` version bump.
 
+### Merging multiple open PRs (stacked bumps)
+
+When several content PRs are open at once, none will pass the guard until each
+bumps the version — and they can't all claim the same number. Merge them
+**sequentially, oldest first, one patch version per PR**: check out the PR
+branch (if another worktree holds it, use a temp branch + `git push origin
+HEAD:<branch>`), merge `origin/main` in, run `scripts/sync-version.sh
+<next-patch>`, add the CHANGELOG section, push, wait for the guard, merge, then
+repeat for the next PR against the new main. This keeps CHANGELOG↔PR mapping
+1:1 and lets every merge pass the guard independently. (Proven on the 2026-07
+four-PR backlog: 0.22.1 → 0.22.4.)
+
 ### Delivering an update to installed machines
 
 Because this is a marketplace-embedded plugin (plugin source is a relative path
