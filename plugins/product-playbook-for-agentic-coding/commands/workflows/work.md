@@ -259,6 +259,17 @@ Acceptance criteria: [list from tasks doc]"
    - Validate functionality manually if needed
 3. Fix any issues found
 
+**If the task touched instrumentation** (any analytics event, metric, tracking
+pixel, or telemetry), verification is NOT "the event fired." Run the query,
+dashboard, or report that **consumes** the data and confirm it returns a correct
+non-null value, then paste that output as the evidence.
+
+A 202 from the endpoint, a network request in DevTools, a green unit test
+asserting the tracking call, and the event appearing in a live-events stream are
+all compatible with a metric that reads zero forever. If no consumer exists yet,
+the task is not done — write the query. See the `[INSTRUMENTATION]` task format
+in `resources/templates/tasks.md`.
+
 
 ### Step 5.5: Autonomous Pre-Review (Agent Dry-Run)
 
