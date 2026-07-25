@@ -111,6 +111,15 @@ If a solution exists, apply it. If not, continue with investigation.
    - Can you consistently reproduce it?
    - What are the exact steps to reproduce?
    - Does it happen in all environments or just specific ones?
+   - **Reproduce in the REAL execution context, not a simulation of it.** If the
+     failure occurs under cron, CI, launchd, a container, or any headless/scheduled
+     runner, reproduce it *there* (e.g. a temporary `* * * * *` cron entry writing to
+     /tmp, a scratch CI job) — not in an interactive shell. Interactive shells and
+     `env -i` simulations inherit session properties that env vars don't capture
+     (macOS keychain access, GUI session state, credential helpers) and will
+     false-pass. A fix "verified" only in a simulation is unverified. (Found 2026-07:
+     a Claude CLI keychain failure under cron passed every GUI-shell test for weeks;
+     a real-cron test reproduced it in one minute.)
 
 2. **Verify It's Actually a Problem**:
    - Is this expected behavior?
