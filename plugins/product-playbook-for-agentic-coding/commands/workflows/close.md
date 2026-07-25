@@ -131,8 +131,17 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
 
    ```bash
    git branch --show-current   # still the branch Phase 1 validated?
-   git check-ignore -q docs/checkpoints/ && ADD="git add -f" || ADD="git add"
-   $ADD docs/checkpoints/ && git commit -m "chore: session checkpoint"
+
+   # NOTE: check-ignore must test the FILE, not the directory. A `docs/checkpoints/`
+   # pattern does NOT make `git check-ignore -q docs/checkpoints/` return true, even
+   # though `git add` on that directory refuses. Testing the dir silently picks the
+   # wrong branch here.
+   if git check-ignore -q docs/checkpoints/latest.md; then
+     git add -f docs/checkpoints/
+   else
+     git add docs/checkpoints/
+   fi
+   git commit -m "chore: session checkpoint"
    ```
 
    Two failure modes this closes, both hit in a real run (chef-chopsky, 2026-07-25):
