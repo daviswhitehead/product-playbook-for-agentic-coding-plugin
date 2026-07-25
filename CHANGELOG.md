@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-07-25
+
 ### Added
 - **`tasks` template — `[INSTRUMENTATION]` task format** — Any task adding or changing an analytics event, metric, pixel, or telemetry now declares both **Emission** (where data is produced) and **Consumption** (the exact consuming query, its expected non-null result, and its actual pasted output). Acceptance is the metric reading correctly, not the event firing. Also requires the attribute to live on the same record the metric counts (or explicit justification for the join), plus a runnable regression check validated in *both* directions.
 
