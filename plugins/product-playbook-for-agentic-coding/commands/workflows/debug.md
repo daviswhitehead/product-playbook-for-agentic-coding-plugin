@@ -122,6 +122,24 @@ If a solution exists, apply it. If not, continue with investigation.
    - Environment configuration
    - Recent changes (git log, deployments)
 
+4. **Probe the running system before blaming configuration** (do NOT skip when the suspect is an external service):
+
+   Config files, dashboards, and your mental model all drift from the running system. When a hypothesis implicates external config — an OAuth client, a DNS record, a CDN rule, an IAM policy, a feature flag — **find a request that distinguishes the hypotheses, and make it.** Reading the repo tells you what *should* be true; the live service tells you what *is*.
+
+   ```
+   Hypothesis: "<external thing> is misconfigured"
+   → What single request would return a different answer if it were configured correctly?
+   → Make that request. Then diagnose.
+   ```
+
+   Also verify *which instance* you are talking to. A deployment can point at a different backing service than you assume, which makes a correctly-configured service look broken.
+
+   **Never hand a human step-by-step instructions to change external state on the strength of a config-file reading.** If you're wrong you've cost them time, taught them to distrust the diagnosis, and made the real cause harder to find — they now believe the thing you told them to change was broken. State the evidence and how you got it, so they can spot a bad premise before acting.
+
+   *Found 2026-07-25 (chef-chopsky): a Google `redirect_uri_mismatch` was root-caused to a missing redirect URI, reasoned entirely from repo config, and the user was walked through adding it in Google Cloud Console. The console was already correct — the preview pointed at a different Supabase project than assumed. A ~5-second probe of the live authorize endpoint disproved it, and was only run after the user pushed back with a screenshot.*
+
+5. **Treat never-executed paths as unimplemented.** A `catch`, retry, or fallback branch you have never watched run is untested code, whatever it looks like. If your diagnosis depends on one having worked, make it fire once and read the output. *(Same session: a CI fallback posted to a URL that had always returned 404, hidden behind a poll-count guard and a `::warning::` on a green job. It had never once succeeded.)*
+
 ### Step 4: Systematic Investigation
 
 Use these investigation techniques:

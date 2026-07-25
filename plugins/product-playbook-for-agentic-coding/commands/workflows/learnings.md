@@ -549,10 +549,12 @@ The primary CLAUDE.md size check now runs in **Pre-Check: CLAUDE.md Size Health*
 - Condense verbose sections to a reference + link
 
 **Demotion checklist** (run before promotion):
+- [ ] **Does a CLAUDE.md block restate a `docs/solutions/` or `docs/guides/` doc that already exists? → Condense to a one-line pointer.** Try this first: it deletes duplication rather than knowledge, so nothing is lost and it usually frees enough budget to land the new rule in the same edit. (2026-07-25, chef-chopsky: CLAUDE.md sat at 39,948 of 40,000 chars. Condensing a four-bullet PostHog block that restated two existing solution docs freed ~750 chars and made adding a new CRITICAL rule a net **+22**. The trim/defer/skip decision below never had to be surfaced.)
 - [ ] Are there RESOLVED known issues still in CLAUDE.md? → Archive
 - [ ] Are there niche guides in CLAUDE.md used <1x/month? → Move to `docs/guides/`
 - [ ] Is any CLAUDE.md content duplicated across sections? → Consolidate
 - [ ] Are there stale milestone-specific references? → Delete
+- [ ] **Renaming a CLAUDE.md heading? Grep for it first** — `rg -c "<heading text>" docs/ projects/` — other docs cite rules by heading text, and a rename silently breaks them. Prefer broadening the body over retitling.
 
 **When CLAUDE.md is between 32k–40k chars — surface the trim/defer/skip decision explicitly:**
 
