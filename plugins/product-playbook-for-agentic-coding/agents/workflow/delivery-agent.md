@@ -80,7 +80,40 @@ After completing implementation:
 - [ ] Linting passes
 - [ ] Build succeeds
 - [ ] All acceptance criteria met
+- [ ] **If instrumentation**: the consuming query was RUN and returned a correct
+      non-null value — output pasted into the completion notes (see below)
 ```
+
+#### Instrumentation tasks: the metric is the acceptance criterion
+
+If the task adds or changes any analytics event, metric, tracking pixel, or
+telemetry, **emission evidence is not acceptance**. Each of these is
+insufficient on its own:
+
+- a 200/202 from the analytics or ad endpoint
+- a visible network request in DevTools
+- a passing unit test asserting the tracking function was called
+- the event appearing in a live-events stream
+
+All four are fully compatible with a metric that reads zero forever. Run the
+query, dashboard, or report that **consumes** the data and confirm it returns a
+correct non-null value. Paste that output as the completion evidence.
+
+If no consumer exists yet, the task is not done — write the query. Prefer
+putting the attribute on the same event the metric counts, so no join or
+person-property lookup is needed. Where a pipeline owns its queries, add a check
+that runs them against real data and fails on an empty/null result — and
+validate it in **both** directions, since a check that can't fail on the old
+broken version is a rubber stamp.
+
+> Real incident: an ad conversion pixel was verified end to end — SDK loaded,
+> event accepted with 202, person properties written correctly, unit tests green
+> — and shipped. The query consuming it read a property path the event never
+> carried, so every signup bucketed as "direct (no UTM)". Code review couldn't
+> see it because nothing had ever run the query against an attributed signup.
+> Caught during a pre-launch audit, one click before a paid campaign would have
+> spent its full budget for zero attribution — which that platform cannot
+> backfill.
 
 ### Phase 5: Complete Task
 

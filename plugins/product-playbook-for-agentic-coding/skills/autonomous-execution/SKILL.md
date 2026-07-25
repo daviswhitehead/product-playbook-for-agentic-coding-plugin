@@ -122,10 +122,27 @@ After completing each task:
 If a task's acceptance criterion includes **"event fires", "metric captured", "instrumentation added", or "tracked in <analytics tool>"**, the task **cannot be marked complete on a static/import check** ("the code calls `capture()`", "imports are clean"). Code-is-wired ≠ behavior-verified.
 
 Before marking such a task ✅, require ONE of:
-1. **Runtime evidence** — fire the event yourself (synthetic click in a browser / incognito + DevTools network filter) and confirm it lands in the truth surface (PostHog/analytics/the metric query), OR
+1. **Runtime evidence AND metric evidence** — the two-part rule below, OR
 2. **An explicit unverified flag** surfaced to the user: *"Code is wired but I could not verify the event fires at runtime — needs a runtime check before this is truly done."*
 
 Never silently equate the two. This failure mode has recurred across three projects (Memory Phase 1 gates closed with `null` metrics; acquisition T10/T11/T12 closed with zero/deprecated events — `recipe_cta_clicked` logged **zero events for 12 days** after being marked done on "imports are clean"). The symptom of a miss is "No data recorded" for a *shipped* event — treat that as instrumentation-suspect, not "no traffic," and fire a synthetic event to disambiguate.
+
+#### Emission and the metric are two separate checks
+
+"It landed in the analytics tool" is **emission**, not the metric. Verify both:
+
+1. **Emission** — fire the event yourself (synthetic click / incognito + DevTools network filter) and confirm it arrives.
+2. **The metric** — run the query, dashboard, or report that **consumes** the data and confirm it returns a **correct non-null value**. Paste that output as the evidence.
+
+Step 2 is the one that gets skipped, and skipping it is invisible. A 202 from the endpoint, a network request in DevTools, a green unit test asserting the tracking call, and the event visible in a live-events stream are **all** compatible with a metric that reads zero forever.
+
+> A conversion pixel passed step 1 completely — SDK loaded on both hosts, event accepted 202, attribution param on the payload, person properties written correctly, unit tests green — and was marked done. The consuming query read a property path the event never carried (the event is captured server-side; that path only exists on client captures), so every signup bucketed as "direct (no UTM)". Nothing had run the query against a real attributed signup, so code review couldn't see it. Found in a pre-launch audit, one click before a paid campaign would have spent its full budget for zero attribution — which ad platforms cannot backfill.
+
+Two habits that prevent this class:
+- **Put the attribute on the same record the metric counts.** Joins and person-property lookups are where NULLs and read-time races hide.
+- **Make the consuming query a runnable check** that fails on an empty/null result, and validate it in **both** directions — a check that doesn't fail when pointed at the old broken version is a rubber stamp, not a guard.
+
+If no consumer exists yet, the task is not done: write the query.
 
 ### Acknowledge Method Substitution (don't silently downgrade verification)
 
