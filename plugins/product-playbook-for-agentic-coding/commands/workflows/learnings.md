@@ -74,11 +74,14 @@ If `/playbook:learnings` was invoked from `/playbook:close`, the close skill's P
 
 **Run this check at the very start**, alongside the prior learnings search. CLAUDE.md is loaded into every agent session, so size growth has compounding cost.
 
-1. Run `wc -c CLAUDE.md` (skip if no CLAUDE.md exists in the project).
-2. **If over 40,000 chars**: trimming is **mandatory** before this retrospective adds any new content. Past this point, CLAUDE.md degrades agent performance. Surface to the user immediately:
+1. Run `wc -c -l CLAUDE.md` (skip if no CLAUDE.md exists in the project).
+
+   **Thresholds** (revised 2026-07-26; the old 32k/40k numbers were ~3x published best practice — a file "passed" the check while already being 2.8x Anthropic's guidance): official Anthropic docs target **under 200 lines** ("longer files consume more context and reduce adherence"); community consensus (HumanLayer, Builder.io) puts the ceiling at ~300 lines. The binding constraint is the model's instruction-following budget, not tokens — every low-value line taxes compliance with the critical rules.
+
+2. **If over 24,000 chars or 300 lines**: trimming is **mandatory** before this retrospective adds any new content. Past this point, CLAUDE.md degrades agent performance. Surface to the user immediately:
 
    ```
-   CLAUDE.md is at <N> chars — over the 40,000 hard limit.
+   CLAUDE.md is at <N> chars / <L> lines — over the hard limit (24,000 chars / 300 lines).
    Trimming is required before this retrospective can promote new content.
 
    Common demotion candidates:
@@ -91,9 +94,9 @@ If `/playbook:learnings` was invoked from `/playbook:close`, the close skill's P
    ```
 
    **Trim to a budget, not to the limit.** The content this retrospective promotes *also*
-   counts against the 40k ceiling, so the target is `40,000 − (planned addition) − headroom`,
-   not `40,000`. Estimate the addition first (a substantive new rule runs 600–900 chars), then
-   trim to that number. Landing at 39,985 with 15 chars of headroom is a failed trim — the next
+   counts against the ceiling, so the target is `24,000 − (planned addition) − headroom`,
+   not `24,000`. Estimate the addition first (a substantive new rule runs 600–900 chars), then
+   trim to that number. Landing 15 chars under the limit is a failed trim — the next
    session's first edit breaks the limit again.
 
    **Re-measure after every edit** (`wc -c CLAUDE.md`), and expect condensing rewrites to
@@ -102,7 +105,7 @@ If `/playbook:learnings` was invoked from `/playbook:close`, the close skill's P
    edits haven't moved the number meaningfully, stop nibbling at prose and demote a whole
    section to `docs/guides/` with a one-line reference — that is the only reliably large win.
 
-3. **If between 32,000 and 40,000 chars** (80% of limit): flag as approaching threshold but don't block. Note it in the prior-learnings summary so the user can choose to trim opportunistically during Step 6 (Promotion).
+3. **If between 16,000 and 24,000 chars (or 200–300 lines)**: flag as approaching threshold but don't block. Note it in the prior-learnings summary so the user can choose to trim opportunistically during Step 6 (Promotion). Over the soft limit, promotions should follow **one in, one out**: each new CLAUDE.md rule names a demotion/deletion candidate in the same edit.
 
 **Why pre-flight, not just pre-promotion**: catching size violations before any other work means the user can decide to trim *first* and have a clean baseline. Discovering it mid-promotion (which is where the historical check lived) forces a context-switch when the retrospective should be wrapping up. The Step 6 health check remains as a backstop in case content is added during facilitation.
 
@@ -554,7 +557,7 @@ A learning left in a doc is a learning that will be re-learned the hard way. Pro
 
 #### Pre-Promotion: CLAUDE.md Health Check (Backstop)
 
-The primary CLAUDE.md size check now runs in **Pre-Check: CLAUDE.md Size Health** at the start of the workflow. This step is a backstop in case content was added during Step 3 facilitation (e.g., new gotchas discovered mid-retrospective). Re-run `wc -c CLAUDE.md`; if it's grown past 40k since pre-flight, apply the same demotion guidance:
+The primary CLAUDE.md size check now runs in **Pre-Check: CLAUDE.md Size Health** at the start of the workflow. This step is a backstop in case content was added during Step 3 facilitation (e.g., new gotchas discovered mid-retrospective). Re-run `wc -c -l CLAUDE.md`; if it's grown past 24k chars / 300 lines since pre-flight, apply the same demotion guidance:
 - Archive RESOLVED known issues → `docs/learnings/resolved-issues.md`
 - Move niche/domain-specific guides → `docs/guides/[topic].md` (keep 1-line reference)
 - Remove content that duplicates the Quick Reference section
@@ -571,12 +574,12 @@ The primary CLAUDE.md size check now runs in **Pre-Check: CLAUDE.md Size Health*
 
 **Trimming safety**: if the working tree already has unstaged edits to CLAUDE.md, back it up (`cp CLAUDE.md /tmp/claude-md.bak`) before running `git checkout -- CLAUDE.md`. That command restores from the index and silently discards unstaged trims — hit during the 2026-07-25 retro while negative-testing a size check, costing a full redo of four edits.
 
-**When CLAUDE.md is between 32k–40k chars — surface the trim/defer/skip decision explicitly:**
+**When CLAUDE.md is between 16k–24k chars (or 200–300 lines) — surface the trim/defer/skip decision explicitly:**
 
 Don't silently choose between trimming and skipping the CLAUDE.md addition. Surface the three options to the user with a recommendation:
 
 ```
-CLAUDE.md is currently at <N> chars (over the 32k soft limit, under the 40k hard limit).
+CLAUDE.md is currently at <N> chars / <L> lines (over the 16k-char/200-line soft limit, under the 24k-char/300-line hard limit).
 
 I have three options for this finding:
 1. **Trim first** — apply the demotion checklist above, then add the new content (estimated ~10 min of doc surgery)
