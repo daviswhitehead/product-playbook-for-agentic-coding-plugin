@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.1] - 2026-07-25
+
+### Added
+- **`mobile-debugging` — Step 0 gate: verify the bug is actually mobile-specific** — Before any device-specific investigation, reproduce in a plain desktop browser at multiple viewport widths (e.g. 412px and 1440px). "Reported on a phone" says where someone *looked*, not where the bug *exists*; layout leaks, overflow bugs, and unstyled-content flashes are frequently universal and merely more prominent on a narrow viewport. If it reproduces at desktop width too, skip the device-testing setup and debug it locally. (chef-chopsky, 2026-07: an "Android Chrome rendering bug" reproduced identically in desktop Chromium at 412px *and* 1440px — the ngrok + physical-device setup would have been pure waste.)
+
+### Changed
+- **`/playbook:close` + `session-checkpoint` — committing a gitignored checkpoint** — Both now note that `git add docs/checkpoints/` fails with "paths are ignored" in repos that gitignore the directory: use `git add -f docs/checkpoints/latest.md` when `git ls-files docs/checkpoints/` shows checkpoints are tracked despite the ignore rule; when nothing there is tracked, the checkpoint is local-only by design and the commit is skipped.
+
 ## [0.23.0] - 2026-07-25
 
 ### Added
