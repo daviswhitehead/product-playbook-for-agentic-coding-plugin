@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-07-26
+
+### Added
+- **`autonomous-execution` — "Negative-test every guardrail you add"** — promoted from an instrumentation-only acceptance criterion to a general principle covering ANY guard: lint rules, CI jobs, hooks, schema audits, quality gates, assertion helpers. A guard must be run twice — positive, and against the broken input it exists to catch — and seen to fail with an actionable message. Also warns about guards that become *unsatisfiable* by inheriting a production filter that removes their own fixture. Mirrored as a checkbox in the `tasks` template's Completion Verification.
+
+  This rule was written down after a 2026-05-16 incident (a CI guardrail that never fired) and lived **only in a retrospective for two months** — so the next two guardrails repeated it, including one in the same session that produced this change. Documentation had already failed twice; this puts it in the workflow.
+
+### Changed
+- **`/playbook:learnings` demotion checklist — "Is every rule still TRUE?"** — trimming CLAUDE.md previously only looked for *resolved*, *niche*, *duplicated*, or *stale-milestone* content. It never asked whether a rule was still factually correct. Found 2026-07-25: CLAUDE.md told agents to add new E2E specs to Playwright's `testMatch`, but the config had become a deny-list where specs enroll automatically — an actively misleading rule costing context in every session. A wrong rule is worse than a missing one; delete rather than demote.
+- **`/playbook:learnings` — trimming safety note** — back up CLAUDE.md before `git checkout -- CLAUDE.md`; it restores from the index and silently discards unstaged trims (hit during the 2026-07-25 retro, costing a full redo).
+
 ## [0.23.5] - 2026-07-26
 
 ### Fixed

@@ -81,6 +81,7 @@
 - [ ] **CRITICAL**: ALL acceptance criteria checkboxes above are marked
 - [ ] All dependencies are satisfied
 - [ ] Completion notes added below
+- [ ] **If this task adds a guard** (lint rule, CI job, hook, audit, gate, assertion helper): it was **negative-tested** — run against the broken input it exists to catch, seen to FAIL with an actionable message, then restored. A check only ever observed passing is indistinguishable from a no-op.
 - [ ] **If this task touches instrumentation** (any event, metric, pixel, or telemetry): the CONSUMING query was run and returned a correct non-null value, and its output is pasted in the notes. See the `[INSTRUMENTATION]` task format below — "the event fired" is not acceptance.
 
 **Notes**: [Any relevant notes or blockers]
