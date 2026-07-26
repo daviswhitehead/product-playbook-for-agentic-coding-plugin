@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.3] - 2026-07-25
+
+### Added
+- **`/playbook:debug` Step 3.1 — reproduce in the REAL execution context, not a simulation** — When the failure occurs under cron, CI, launchd, a container, or any headless/scheduled runner, reproduce it *there* (a temporary `* * * * *` cron entry writing to /tmp, a scratch CI job) — not in an interactive shell. Interactive shells and `env -i` simulations inherit session properties that env vars don't capture (macOS keychain access, GUI session state, credential helpers) and will false-pass; a fix "verified" only in a simulation is unverified. (2026-07: a Claude CLI keychain failure under cron passed every GUI-shell test for weeks; a real-cron test reproduced it in one minute.)
+
 ## [0.23.2] - 2026-07-25
 
 ### Added
