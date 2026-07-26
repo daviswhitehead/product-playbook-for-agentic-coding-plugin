@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.2] - 2026-07-26
+
+### Fixed
+- **`/playbook:close` step 4 — the archive-detection check never actually ran** — The one-liner shipped in 0.23.5 interpolated the checkpoint's `**Branch**:` line straight into `grep` as a *regex*. A leading `**` is an invalid repetition operator, so BSD `grep` (the macOS default) aborts with `repetition-operator operand invalid` on **every** invocation — the check that exists to stop another workspace's handoff being overwritten has never once detected an archive. Replaced with a tri-state block printing exactly one of `NO_EXISTING_CHECKPOINT` / `ALREADY_ARCHIVED` / `ARCHIVE_REQUIRED`, using `grep -rlF --` (literal compare, and `--` guards a pattern starting with `-`) and matching the `**Branch**:` line by pattern instead of a hardcoded `sed -n '3p'`.
+
+  Two further defects in the same one-liner, both now closed:
+  - **Empty output was overloaded three ways** — "no `latest.md` at all", "exists but unarchived", and "the command errored" were indistinguishable, and the doc read all three as "rename it first". On a first-ever close-out that means `git mv` on a nonexistent file (`fatal: bad source`, exit 128).
+  - **A blank line 3 produced an empty grep pattern, which matches every file** — reported as "already archived" and green-lit overwriting an irreplaceable handoff. This is the data-loss path the step was written to prevent, reachable whenever the checkpoint's line 3 happens to be blank.
+
+  **Negative-tested in both directions** against four fixtures (no `latest.md`; unarchived; already archived; blank line 3 alongside an unrelated archive). The old form is wrong in all four — silent, fatal-erroring, fatal-erroring, and falsely "already archived" respectively; the new form returns the correct state in all four. Per the "negative-test every guardrail" rule added in 0.24.0.
+- **Step 6 stages an explicit file list, never the directory** — `git add -f docs/checkpoints/` force-commits everything the repo deliberately ignored (other workspaces' checkpoints, local scratch state) under a "session checkpoint" label — step 4's clobbering failure in the opposite direction. Now uses a `CKPT_FILES` array that also carries any archive step 4 created, so the file just rescued doesn't stay untracked under an ignored path. Force-adding overrides a deliberate repo decision, so the step now says to **ask** rather than defaulting to it.
+- **`git mv` caveat** — plain `mv` when the checkpoint isn't tracked, which is the common case under a gitignored path; `git mv` on an untracked file fails with "bad source".
+
 ## [0.24.1] - 2026-07-26
 
 ### Added

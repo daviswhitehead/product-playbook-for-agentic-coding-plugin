@@ -76,16 +76,48 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
 
    ```bash
    # Is there an existing checkpoint, and is its content archived anywhere else?
-   test -s docs/checkpoints/latest.md && \
-     grep -rl "$(sed -n '3p' docs/checkpoints/latest.md)" docs/checkpoints/ | grep -v latest.md
+   # Prints exactly one of: NO_EXISTING_CHECKPOINT | ALREADY_ARCHIVED | ARCHIVE_REQUIRED
+   if [ ! -s docs/checkpoints/latest.md ]; then
+     echo "NO_EXISTING_CHECKPOINT"
+   else
+     branch_line=$(sed -n '/^\*\*Branch\*\*:/p' docs/checkpoints/latest.md | head -1)
+     if [ -z "$branch_line" ]; then
+       echo "ARCHIVE_REQUIRED"   # can't identify it -> never assume it's safe to clobber
+     elif grep -rlF -- "$branch_line" docs/checkpoints/ \
+            | grep -qv '^docs/checkpoints/latest\.md$'; then
+       echo "ALREADY_ARCHIVED"
+     else
+       echo "ARCHIVE_REQUIRED"
+     fi
+   fi
    ```
 
-   If no archived copy comes back, rename it first — do NOT overwrite:
+   - `NO_EXISTING_CHECKPOINT` → nothing to archive; go straight to step 5.
+   - `ALREADY_ARCHIVED` → safe to overwrite in step 5.
+   - `ARCHIVE_REQUIRED` → rename it first, do NOT overwrite:
 
    ```bash
    git mv docs/checkpoints/latest.md docs/checkpoints/<YYYY-MM-DD>-<topic-from-its-title>.md
-   # (plain `mv` if it isn't tracked)
+   # (plain `mv` if it isn't tracked — which is the common case when the path is
+   #  gitignored; see step 6. `git mv` on an untracked file fails with "bad source".)
    ```
+
+   Three things this shape fixes, all of which broke the earlier one-liner:
+
+   - **The branch line was interpolated into `grep` as a regex.** `**Branch**: <name>`
+     starts with `**`, an invalid repetition operator — BSD `grep` (macOS default) and
+     `ugrep` both abort with `repetition-operator operand invalid` / `empty (sub)expression`
+     on *every* run, so the check never actually detected an archive. `-F` compares the
+     literal string; `--` guards a pattern that starts with `-`.
+   - **Empty/absent output was overloaded three ways** — "no `latest.md` at all", "exists
+     but unarchived", and "the command errored" were indistinguishable, and the doc read all
+     of them as "rename it first". On a first-ever close-out that means `git mv` on a
+     nonexistent file (`fatal: bad source`, exit 128). Worse, a `latest.md` whose branch
+     line was missing produced an *empty* grep pattern, which matches every file — reported
+     as "already archived" and green-lit the overwrite. Each state now names itself.
+   - **`sed -n '3p'` hardcoded the line number**, and `grep -v latest.md` was an unanchored
+     regex (`.` matches any character). Match the `**Branch**:` line by pattern and exclude
+     the file by exact path.
 
    Read the file's own `**Branch**:` line to name the archive — it usually identifies the
    workspace and topic. Only skip archiving if the existing checkpoint is demonstrably yours
@@ -132,38 +164,50 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    ```bash
    git branch --show-current   # still the branch Phase 1 validated?
 
+   # Stage ONLY the files this session wrote. Never `git add` the directory.
+   CKPT_FILES=(docs/checkpoints/latest.md)
+   # If step 4 archived a prior checkpoint, it MUST go in this list too — otherwise the
+   # file you just rescued stays untracked under an ignored path, i.e. still expendable.
+   CKPT_FILES+=(docs/checkpoints/<YYYY-MM-DD>-<topic>.md)   # omit if step 4 archived nothing
+
    # NOTE: check-ignore must test the FILE, not the directory. A `docs/checkpoints/`
    # pattern does NOT make `git check-ignore -q docs/checkpoints/` return true, even
    # though `git add` on that directory refuses. Testing the dir silently picks the
    # wrong branch here.
-   #
-   # Force-add the EXPLICIT files this session wrote, never the directory: `git add -f`
-   # on `docs/checkpoints/` commits everything the repo deliberately ignored — other
-   # workspaces' checkpoints, local scratch state — under a "session checkpoint" label.
-   # That is step 4's clobbering failure in the opposite direction. If step 4 archived a
-   # prior checkpoint, add that file here too, or the file you just rescued stays
-   # untracked under an ignored path (i.e. still expendable).
    if git check-ignore -q docs/checkpoints/latest.md; then
-     git add -f -- docs/checkpoints/latest.md    # plus any archive step 4 created
+     # The repo ignores this path on purpose. ASK before overriding that, then:
+     git add -f -- "${CKPT_FILES[@]}"
    else
-     git add -- docs/checkpoints/latest.md       # plus any archive step 4 created
+     git add -- "${CKPT_FILES[@]}"
    fi
    git commit -m "chore: session checkpoint"
    ```
 
-   Two failure modes this closes, both hit in a real run (chef-chopsky, 2026-07-25):
+   Three failure modes this closes, the first two hit in a real run (chef-chopsky,
+   2026-07-25):
 
-   - **`docs/checkpoints/` is frequently gitignored** ("local resume state"). `git add`
-     then silently stages *nothing*, `git commit` reports nothing to commit, and the
-     close-out reports success while the handoff exists only as an untracked file. Git
+   - **`docs/checkpoints/` is frequently gitignored** ("local resume state"). A plain
+     `git add` then silently stages *nothing*, `git commit` reports nothing to commit, and
+     the close-out reports success while the handoff exists only as an untracked file. Git
      treats ignored files as expendable, so **the next `git checkout` overwrites it without
      warning** — the checkpoint is gone with no reflog entry, because it was never an
-     object. If a repo deliberately keeps checkpoints local, that is a decision to make
-     explicitly and state in the summary — not one to arrive at by a silent no-op.
+     object.
    - **The branch can change between Phase 1 and here.** Phase 1's check is a point-in-time
      read; in a shared workspace another agent can switch branches while you are waiting on
      tools. Re-read it immediately before committing, and if it moved, re-run the Phase 1
      branch decision rather than committing to whatever branch you happen to be on.
+   - **`git add -f` on the *directory* commits everything the repo deliberately ignored** —
+     every other workspace's `latest.md` archive, scratch files, local resume state — and
+     buries them in a commit labelled "session checkpoint". That is the same
+     other-agent-clobbering failure step 4 exists to prevent, in the opposite direction.
+     Force-add the explicit file list, never the directory.
+
+   When the path is gitignored, force-adding overrides a deliberate repo decision, so
+   **ask** rather than defaulting. If the user wants checkpoints to stay local, skip the
+   commit and say so explicitly in the Phase 5 summary ("left local — path is gitignored")
+   along with the fact that a `git checkout` can delete it. A repo keeping checkpoints local
+   is a fine choice to make on purpose — just not one to arrive at by a silent no-op, and
+   not one to silently overrule either.
 
 ## Phase 4: Learn Flow
 
