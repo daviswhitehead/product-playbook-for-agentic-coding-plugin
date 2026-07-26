@@ -612,6 +612,8 @@ CI Maximizing — Push and ensure all CI checks pass. Use `/playbook:debug-ci` i
   ↓
 Create PR — Use `/playbook:git:create-pr` or `gh pr create`
   ↓
+Merge — Post the proof-of-completion comment on the PR first (what shipped, evidence, deferrals — `/playbook:monitor-pr` Step 4)
+  ↓
 Learnings — Use `/playbook:learnings` to capture what you learned
 ```
 

@@ -97,6 +97,7 @@ Before declaring close-project done:
 - [ ] No status drift between summary table and task detail sections
 - [ ] No orphan project artifacts at repo root
 - [ ] Project lives under `projects/done/[name]/`
+- [ ] Every merged PR for this project carries a proof-of-completion comment (`/playbook:monitor-pr` Step 4) — post retroactively if missing
 - [ ] Retrospective triggered or explicitly deferred with a tracking task
 
 ## Handoff to Retrospective

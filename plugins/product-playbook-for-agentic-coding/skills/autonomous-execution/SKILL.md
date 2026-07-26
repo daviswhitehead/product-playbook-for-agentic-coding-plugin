@@ -276,6 +276,7 @@ Before marking project complete:
 - [ ] All tests passing
 - [ ] No regressions
 - [ ] Documentation updated
+- [ ] Any merged PR carries a proof-of-completion comment — what shipped, evidence it works, what was deferred (`/playbook:monitor-pr` Step 4). Mandatory for autonomously merged PRs: merge authority is granted in exchange for this audit trail.
 
 ## Progress Tracking
 
