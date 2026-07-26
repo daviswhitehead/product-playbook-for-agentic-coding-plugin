@@ -90,6 +90,18 @@ If `/playbook:learnings` was invoked from `/playbook:close`, the close skill's P
    Trim first, then continue the retrospective? Or surface specific candidates?
    ```
 
+   **Trim to a budget, not to the limit.** The content this retrospective promotes *also*
+   counts against the 40k ceiling, so the target is `40,000 − (planned addition) − headroom`,
+   not `40,000`. Estimate the addition first (a substantive new rule runs 600–900 chars), then
+   trim to that number. Landing at 39,985 with 15 chars of headroom is a failed trim — the next
+   session's first edit breaks the limit again.
+
+   **Re-measure after every edit** (`wc -c CLAUDE.md`), and expect condensing rewrites to
+   *increase* size. Rewriting a section to be "tighter" while folding in new content commonly
+   nets positive; a real trim means deleting or demoting, not rephrasing. If two consecutive
+   edits haven't moved the number meaningfully, stop nibbling at prose and demote a whole
+   section to `docs/guides/` with a one-line reference — that is the only reliably large win.
+
 3. **If between 32,000 and 40,000 chars** (80% of limit): flag as approaching threshold but don't block. Note it in the prior-learnings summary so the user can choose to trim opportunistically during Step 6 (Promotion).
 
 **Why pre-flight, not just pre-promotion**: catching size violations before any other work means the user can decide to trim *first* and have a clean baseline. Discovering it mid-promotion (which is where the historical check lived) forces a context-switch when the retrospective should be wrapping up. The Step 6 health check remains as a backstop in case content is added during facilitation.
@@ -608,6 +620,34 @@ For each finding tagged `plugin` or `both`:
 1. Check CLAUDE.md or MEMORY.md for the plugin repo path
 2. If not found, search: `find ~ -maxdepth 4 -name "product-playbook-for-agentic-coding" -type d 2>/dev/null`
 3. Cache the discovered path in MEMORY.md for future sessions
+
+**Step A2 — Check whether the fix already exists but never merged (do this BEFORE writing one):**
+
+The "'implemented' means MERGED, not written" rule from the prior-learnings pre-check applies to
+the *plugin* too, and it is easy to miss because the plugin repo is not the one you're working in.
+A fix sitting in an open PR still produces the bug in every session — which is precisely why the
+finding reached this retrospective.
+
+```bash
+cd <plugin-repo>
+git fetch -q origin
+git log --oneline origin/main..--all -- <candidate-file>   # fixes on unmerged branches
+gh pr list --state open --json number,title,headRefName    # open PRs touching this area
+git status --short                                          # uncommitted WIP in the checkout
+```
+
+Route on what you find:
+- **Open PR already fixes it** → do NOT write a duplicate. Comment on that PR with this
+  session's independent reproduction (a second real occurrence is the strongest possible
+  argument for merging it) and report the PR to the user as the action item.
+- **Fixed on an unmerged/unpushed branch with no PR** → open the PR; that is the missing step.
+- **Uncommitted WIP in the plugin checkout** → surface it, don't commit it — it is likely
+  another session's in-flight work. Note it as at-risk.
+- **Nothing exists** → proceed to Step B.
+
+**If the plugin checkout is dirty, use a worktree rather than switching branches** —
+`git worktree add -b <branch> /tmp/<name> origin/main` — so your edits can't entangle with or
+clobber the in-flight work. Verify with `git -C <plugin-repo> status --short` afterward.
 
 **Step B — Map findings to skills/commands:**
 
