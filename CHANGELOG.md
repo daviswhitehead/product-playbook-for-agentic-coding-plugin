@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.1] - 2026-07-26
+
+### Added
+- **`/playbook:learnings` Step A2 — check whether the fix already exists, unmerged, before writing one** — The plugin track never asked this. The "'implemented' means MERGED, not written" rule already covered the codebase, but never pointed at the plugin repo — so a finding whose fix was already sitting in an open PR would get a duplicate written for it. A fix in an unmerged PR still produces the bug in every session, which is exactly why it reached the retrospective. Now greps unmerged branches, open PRs, and uncommitted WIP, and routes on the result: comment on the existing PR with the independent reproduction (a second real occurrence is the strongest argument for merging it) rather than duplicating; open the PR when a fix exists on a branch without one; **surface uncommitted WIP as at-risk, don't commit it** — it's likely another session's in-flight work. Also instructs using `git worktree add` rather than switching branches when the plugin checkout is dirty. Found by running `/playbook:learnings` on a real incident retro that hit two `close.md` bugs already fixed in open PR #61.
+
+### Changed
+- **`/playbook:learnings` CLAUDE.md size gate — trim to a budget, not to the limit** — The retrospective's own promoted content counts against the 40k ceiling, so trimming to 40,000 is trimming to failure; the target is `40,000 − addition − headroom`. Landing at 39,985 (15 chars of headroom) is a failed trim dressed as a pass. Also: re-measure after every edit, and expect condensing rewrites to *increase* size — rewriting a section "tighter" while folding in new content commonly nets positive, so a real trim means deleting or demoting, not rephrasing. Once two consecutive edits stop moving the number, demote a whole section to `docs/guides/` rather than nibbling at prose.
+
+### Fixed
+- **Step A2's own unmerged-fix query was a fatal parse error** — `git log --oneline origin/main..--all` exits with `fatal: bad revision 'origin/main..--all'`, so the check this step exists to perform would never have run. Corrected to `git log --oneline --branches --remotes --not origin/main`, which also avoids bare `--all` dragging in agent-harness checkpoint refs (Conductor writes hundreds per session). Verified by running both forms.
+
 ## [0.24.0] - 2026-07-26
 
 ### Added
