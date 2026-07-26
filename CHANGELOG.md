@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.4] - 2026-07-26
+
+### Added
+- **Proof-of-completion comment at every PR merge** — Canonical requirement in `/playbook:monitor-pr` Step 4: every PR (especially autonomously merged ones) gets a comment posted at merge time with (1) what shipped in plain language, (2) evidence it works (test output, green full-CI run link, SQL/API verification for schema/data changes, screenshots for UI), and (3) what was consciously deferred or overridden, with a pointer to where it's tracked — "nothing deferred" is a valid entry, silence is not. Autonomous merge authority is granted in exchange for this reviewable audit trail; green CI alone is not reviewable evidence. Referenced with one-liners from `/playbook:git:create-pr`, `/playbook:work`, `/playbook:work-multiple`, `/playbook:close-project`, the `delivery-agent`, and the `autonomous-execution` skill.
+
 ## [0.23.3] - 2026-07-25
 
 ### Added

@@ -195,12 +195,23 @@ When `gh pr view --json statusCheckRollup` shows 0 non-success/skip checks:
 1. **Confirm** `mergeable: MERGEABLE` and `state: OPEN`, and that every SKIPPED check
    passed the Step 1 SKIPPED audit (path-filter skip, not a never-armed suite).
 2. **Check the user's original prompt** for "merge ready" or "ready to review" language. If present and `isDraft: true`, run `gh pr ready <PR>` and wait for the full-CI run that triggers.
-3. **Report back** with:
+3. **Post the proof-of-completion comment** (see below) if you are about to merge.
+4. **Report back** with:
    - PR URL
    - Number of iteration commits added during monitoring (0 is the ideal)
    - Estimated Actions minutes consumed (runs × typical durations)
    - Whether `isDraft` is now false (relevant if user said "merge ready")
-   - Confirmation it's ready to merge (and if user pre-approved, run `gh pr merge --squash --delete-branch`)
+   - Confirmation it's ready to merge (and if user pre-approved, post the proof-of-completion comment, then run `gh pr merge --squash --delete-branch`)
+
+#### Proof of Completion (Required at Merge — Canonical Definition)
+
+Every PR — **especially autonomously merged ones** — gets a proof-of-completion comment posted on the PR at merge time (`gh pr comment <N> --body-file <file>`). Autonomous merge authority is granted in exchange for a reviewable audit trail; green CI alone is not reviewable evidence. The comment must contain:
+
+1. **What shipped** — plain language, not a commit list.
+2. **Evidence it works** — test output summary, link to the green full-CI run, SQL/API verification results where schema/data changed, screenshots for UI changes.
+3. **What was consciously deferred or overridden** — with a pointer to where each item is tracked (issue, tasks doc, follow-up PR). "Nothing deferred" is a valid entry; silence is not.
+
+Post it immediately before `gh pr merge`. If you find an already-merged PR missing one (e.g., during close-out), post it retroactively. Other workflows reference this section as "proof-of-completion comment (`/playbook:monitor-pr` Step 4)".
 
 > **Post-merge local state**: `gh pr merge --delete-branch` silently switches your local checkout to the default branch (and pulls) after deleting the PR branch. In a parallel-agent workspace this can strand your session on the wrong branch — re-checkout your working branch afterwards. If another worktree holds the PR branch, the local delete fails with a warning; that's harmless (the remote branch is still deleted), but the other checkout is left on a branch that no longer exists remotely — worth flagging for cleanup.
 

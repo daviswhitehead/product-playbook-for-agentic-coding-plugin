@@ -217,7 +217,7 @@ To verify all changes:
 - file2.tsx - [brief description]
 
 ### Next Steps
-1. Review and merge changes
+1. Review and merge changes (post the proof-of-completion comment on the PR at merge — `/playbook:monitor-pr` Step 4)
 2. Address blocked tasks
 3. Continue with `/playbook:work-multiple` for remaining tasks
 ```
