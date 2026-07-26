@@ -81,6 +81,7 @@
 - [ ] **CRITICAL**: ALL acceptance criteria checkboxes above are marked
 - [ ] All dependencies are satisfied
 - [ ] Completion notes added below
+- [ ] **If this task touches instrumentation** (any event, metric, pixel, or telemetry): the CONSUMING query was run and returned a correct non-null value, and its output is pasted in the notes. See the `[INSTRUMENTATION]` task format below — "the event fired" is not acceptance.
 
 **Notes**: [Any relevant notes or blockers]
 
@@ -117,6 +118,38 @@
 - [ ] An integration test drives the REAL entrypoint (e.g., the cron handler function) against seeded input and asserts the side effect persisted — NOT a test that seeds the output artifact and verifies the read path.
 
 > **Why**: Twice in the same project (Memory & Personalization: Phase 1 `$duration`, Phase 2c summaries), the module existed and its unit tests passed, but the runtime entrypoint never called it — `summaries_generated=0` was invisible for 24 days because tests seeded the artifact under test. Gate dry-runs catch this late; the wiring criterion catches it at task close.
+
+---
+
+### Task 1.I: [Instrumentation Task Name] `[INSTRUMENTATION]`
+> Use this format for any task that adds or changes an analytics event, metric, tracking pixel, or telemetry. **The acceptance criterion is the metric reading correctly — not the event firing.**
+
+**Description**: [What is being measured and which decision it informs]
+
+**Emission** (where the data is produced):
+- Event/signal: [`event_name`, pixel call, log line]
+- Call site(s): [`path/to/file.ts:LINE`]
+- Attributes carried: [list — and note whether they ride on the EVENT or on a separate person/user record]
+
+**Consumption** (where the number is read — REQUIRED, not optional):
+| Consumer | Exact query / dashboard | Expected non-null result | Actual result | Date verified |
+|---|---|---|---|---|
+| [e.g. `workflows/.../fetch-metrics.ts`] | [paste the exact query string] | [e.g. a real channel name, not "unknown"] | [paste the real output] | [Date] |
+
+**Acceptance Criteria**:
+- [ ] Emission verified (event/signal reaches the destination)
+- [ ] **The consuming query was RUN and returned a correct non-null value** — actual output pasted above
+- [ ] The attribute lives on the same record the metric counts, OR the join/lookup is explicitly justified (races and NULLs live in joins)
+- [ ] A regression check exists that runs the consuming query against real data and fails on empty/null
+- [ ] That check was validated in BOTH directions — it fails when pointed at the old/broken version
+
+**Status**: [ ] Not Started | [ ] In Progress | [ ] Complete
+
+> **Why this matters**: Emission evidence and metric correctness are independent. A 202 from the analytics endpoint, a network request in DevTools, a green unit test asserting the tracking call, and the event showing in a live-events stream are **all** compatible with a metric that reads zero forever.
+>
+> A conversion pixel was verified end to end — SDK loaded, event accepted 202, person properties written correctly, unit tests green — and marked done. The consuming query read a property path the event never carried, so every signup bucketed as "direct (no UTM)". Code review couldn't catch it because nothing had run the query against a real attributed signup. Found in a pre-launch audit, one click before a paid campaign would have spent its full budget for zero attribution — which ad platforms cannot backfill.
+>
+> If no consumer exists yet, the task is not done: write the query.
 
 ---
 
