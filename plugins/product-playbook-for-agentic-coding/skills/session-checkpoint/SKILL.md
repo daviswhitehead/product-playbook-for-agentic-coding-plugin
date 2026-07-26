@@ -70,7 +70,7 @@ When the session is wrapping up or getting long:
 1. Create `docs/checkpoints/` directory if it doesn't exist
 2. Write `docs/checkpoints/latest.md` with the format above
 3. Optionally archive: copy to `docs/checkpoints/YYYY-MM-DD-HHMM.md`
-4. Commit the checkpoint: `git add docs/checkpoints/ && git commit -m "chore: session checkpoint"`
+4. Commit the checkpoint: `git add docs/checkpoints/ && git commit -m "chore: session checkpoint"`. If the repo gitignores `docs/checkpoints/` (some repos track only selected checkpoint files), plain `git add` fails with "paths are ignored" — use `git add -f docs/checkpoints/latest.md` when `git ls-files docs/checkpoints/` shows checkpoints are tracked despite the ignore rule; if nothing there is tracked, the checkpoint is local-only by design: skip the commit.
 
 ### Reading (at session start)
 1. Check if `docs/checkpoints/latest.md` exists
