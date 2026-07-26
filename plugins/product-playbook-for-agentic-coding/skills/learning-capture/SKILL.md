@@ -150,8 +150,8 @@ When performing a deep retrospective (analyzing SpecStory session files in `.spe
 **Improvement**: If unintentional, add scope-check trigger to MEMORY.md.
 
 ### Pattern: CLAUDE.md Growth
-**Signal**: CLAUDE.md size exceeds 32,000 chars or triggers the performance warning (>40k).
-**How to detect**: Run `wc -c CLAUDE.md`. Check for RESOLVED issues still inline, niche guides that belong in `docs/guides/`, duplicate content (e.g., test commands listed in both Quick Reference and a Common Workflows section).
+**Signal**: CLAUDE.md exceeds 16,000 chars / 200 lines (soft) or 24,000 chars / 300 lines (hard — mandatory trim). Anthropic's official guidance targets under 200 lines; adherence degrades as instruction count grows.
+**How to detect**: Run `wc -c -l CLAUDE.md`. Check for RESOLVED issues still inline, niche guides that belong in `docs/guides/`, duplicate content (e.g., test commands listed in both Quick Reference and a Common Workflows section).
 **Root cause**: The learnings promotion workflow is additive-only — it promotes content UP to CLAUDE.md but never demotes stale content DOWN to docs/guides/ or docs/learnings/.
 **Improvement**: Before promoting new learnings to CLAUDE.md, check size and archive stale content. Resolved issues should be moved to `docs/learnings/resolved-issues.md`. Niche guides should be moved to `docs/guides/` with a 1-line reference in CLAUDE.md.
 
@@ -257,13 +257,13 @@ If session history files are available (`.specstory/history/*.md`):
 ### Step 6: CLAUDE.md Health Check & Promote Key Learnings
 
 **Before promoting**, check CLAUDE.md health:
-1. Run `wc -c CLAUDE.md` to check current size
-2. If over 32,000 chars (80% of 40k limit), trigger a **trimming pass** before adding content:
+1. Run `wc -c -l CLAUDE.md` to check current size
+2. If over 16,000 chars or 200 lines, trigger a **trimming pass** before adding content, and follow **one in, one out** (each promotion names a demotion candidate):
    - Archive RESOLVED known issues to `docs/learnings/resolved-issues.md`
    - Move niche/domain-specific guides to `docs/guides/`
    - Remove content that duplicates the Quick Reference section
    - Condense verbose sections that can be replaced with a 1-line reference + link
-3. If over 40,000 chars, trimming is **mandatory** before any promotion
+3. If over 24,000 chars or 300 lines, trimming is **mandatory** before any promotion
 
 **Promotion hierarchy** (highest = most actionable):
 - **Code/scripts** (automatic) > **CLAUDE.md** (always visible) > **Templates** (on-demand) > **Docs** (reference)
