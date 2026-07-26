@@ -9,7 +9,7 @@
       "name": "product-playbook-for-agentic-coding",
       "source": "./plugins/product-playbook-for-agentic-coding",
       "description": "A structured 4-phase workflow for agentic coding",
-      "version": "0.23.4"
+      "version": "0.23.5"
     },
     {
       "name": "openai-image-gen",
