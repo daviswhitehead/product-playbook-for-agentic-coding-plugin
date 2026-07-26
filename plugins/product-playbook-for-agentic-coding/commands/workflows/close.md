@@ -104,7 +104,7 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
 <Non-obvious knowledge that would take time to re-discover>
 ```
 
-5. Commit the checkpoint: `git add docs/checkpoints/ && git commit -m "chore: session checkpoint"`
+5. Commit the checkpoint: `git add docs/checkpoints/ && git commit -m "chore: session checkpoint"`. If the repo gitignores `docs/checkpoints/` (some repos track only selected checkpoint files), plain `git add` fails with "paths are ignored" — use `git add -f docs/checkpoints/latest.md` when `git ls-files docs/checkpoints/` shows checkpoints are tracked despite the ignore rule; if nothing there is tracked, the checkpoint is local-only by design: skip the commit.
 
 ## Phase 4: Learn Flow
 

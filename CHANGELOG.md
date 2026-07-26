@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.2] - 2026-07-25
+
+### Added
+- **`/playbook:debug` Step 3 — probe the running system before blaming configuration** — When a hypothesis implicates external config (OAuth client, DNS record, CDN rule, IAM policy, feature flag), find the single request that would return a different answer if the thing were configured correctly, and make it. Reading the repo tells you what *should* be true; the live service tells you what *is*. Includes verifying *which instance* you're talking to, and a hard rule: never hand a human step-by-step instructions to change external state on the strength of a config-file reading. (chef-chopsky, 2026-07-25: a `redirect_uri_mismatch` was root-caused from repo config and the user was walked through a Google Cloud Console change that was already correct — the preview pointed at a different Supabase project. A ~5-second probe of the live authorize endpoint disproved it, run only after the user pushed back with a screenshot.)
+- **`/playbook:debug` Step 3 — treat never-executed paths as unimplemented** — A `catch`, retry, or fallback branch you have never watched run is untested code whatever it looks like; if a diagnosis depends on one having worked, make it fire once and read the output. (Same session: a CI fallback posted to a URL that had always 404'd, hidden behind a poll-count guard and a `::warning::` on a green job.)
+
+### Changed
+- **`/playbook:learnings` demotion checklist — try de-duplication first** — New first item: if a CLAUDE.md block restates an existing `docs/solutions/` or `docs/guides/` doc, condense it to a one-line pointer. It deletes duplication rather than knowledge, and usually frees enough budget to land the new rule in the same edit, so the trim/defer/skip decision never has to be surfaced. Also adds: grep for a CLAUDE.md heading before renaming it — other docs cite rules by heading text.
+
+## [0.23.1] - 2026-07-25
+
+### Added
+- **`mobile-debugging` — Step 0 gate: verify the bug is actually mobile-specific** — Before any device-specific investigation, reproduce in a plain desktop browser at multiple viewport widths (e.g. 412px and 1440px). "Reported on a phone" says where someone *looked*, not where the bug *exists*; layout leaks, overflow bugs, and unstyled-content flashes are frequently universal and merely more prominent on a narrow viewport. If it reproduces at desktop width too, skip the device-testing setup and debug it locally. (chef-chopsky, 2026-07: an "Android Chrome rendering bug" reproduced identically in desktop Chromium at 412px *and* 1440px — the ngrok + physical-device setup would have been pure waste.)
+
+### Changed
+- **`/playbook:close` + `session-checkpoint` — committing a gitignored checkpoint** — Both now note that `git add docs/checkpoints/` fails with "paths are ignored" in repos that gitignore the directory: use `git add -f docs/checkpoints/latest.md` when `git ls-files docs/checkpoints/` shows checkpoints are tracked despite the ignore rule; when nothing there is tracked, the checkpoint is local-only by design and the commit is skipped.
+
 ## [0.23.0] - 2026-07-25
 
 ### Added
