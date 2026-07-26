@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.5] - 2026-07-26
+
+### Fixed
+- **`/playbook:close` Phase 3 — stop the checkpoint step from destroying handoffs** — Two failure modes, both hit in a real run (chef-chopsky, 2026-07-25) and independently reproduced a second time on 2026-07-26:
+  - **New step 4 archives the existing `latest.md` before writing over it.** In a parallel-agent repo (Conductor workspaces, git worktrees) `latest.md` frequently holds *another workspace's* handoff; overwriting destroys work that isn't yours, silently and unrecoverably. Rename it to a dated archive unless it's demonstrably yours or already archived.
+  - **Step 6 re-verifies the branch and force-adds when the path is gitignored.** `docs/checkpoints/` is frequently ignored as "local resume state", in which case plain `git add` stages nothing, `git commit` reports nothing to commit, and the close-out reports success while the handoff exists only as an untracked file — which the next `git checkout` deletes with no reflog entry. `git check-ignore` must test the *file*, not the directory (a `docs/checkpoints/` pattern does not make `check-ignore` on the directory return true, even though `git add` on it refuses). Phase 1's branch check is also re-read here, since another agent can switch branches while you're waiting on tools.
+- **Phase 5 summary** now reports where the checkpoint actually landed (committed `<sha>` / left local because the path is gitignored) and any prior checkpoint archived, instead of unconditionally claiming "Saved to docs/checkpoints/latest.md".
+
+## [0.23.4] - 2026-07-26
+
+### Added
+- **Proof-of-completion comment at every PR merge** — Canonical requirement in `/playbook:monitor-pr` Step 4: every PR (especially autonomously merged ones) gets a comment posted at merge time with (1) what shipped in plain language, (2) evidence it works (test output, green full-CI run link, SQL/API verification for schema/data changes, screenshots for UI), and (3) what was consciously deferred or overridden, with a pointer to where it's tracked — "nothing deferred" is a valid entry, silence is not. Autonomous merge authority is granted in exchange for this reviewable audit trail; green CI alone is not reviewable evidence. Referenced with one-liners from `/playbook:git:create-pr`, `/playbook:work`, `/playbook:work-multiple`, `/playbook:close-project`, the `delivery-agent`, and the `autonomous-execution` skill.
+
+## [0.23.3] - 2026-07-25
+
+### Added
+- **`/playbook:debug` Step 3.1 — reproduce in the REAL execution context, not a simulation** — When the failure occurs under cron, CI, launchd, a container, or any headless/scheduled runner, reproduce it *there* (a temporary `* * * * *` cron entry writing to /tmp, a scratch CI job) — not in an interactive shell. Interactive shells and `env -i` simulations inherit session properties that env vars don't capture (macOS keychain access, GUI session state, credential helpers) and will false-pass; a fix "verified" only in a simulation is unverified. (2026-07: a Claude CLI keychain failure under cron passed every GUI-shell test for weeks; a real-cron test reproduced it in one minute.)
+
+## [0.23.2] - 2026-07-25
+
+### Added
+- **`/playbook:debug` Step 3 — probe the running system before blaming configuration** — When a hypothesis implicates external config (OAuth client, DNS record, CDN rule, IAM policy, feature flag), find the single request that would return a different answer if the thing were configured correctly, and make it. Reading the repo tells you what *should* be true; the live service tells you what *is*. Includes verifying *which instance* you're talking to, and a hard rule: never hand a human step-by-step instructions to change external state on the strength of a config-file reading. (chef-chopsky, 2026-07-25: a `redirect_uri_mismatch` was root-caused from repo config and the user was walked through a Google Cloud Console change that was already correct — the preview pointed at a different Supabase project. A ~5-second probe of the live authorize endpoint disproved it, run only after the user pushed back with a screenshot.)
+- **`/playbook:debug` Step 3 — treat never-executed paths as unimplemented** — A `catch`, retry, or fallback branch you have never watched run is untested code whatever it looks like; if a diagnosis depends on one having worked, make it fire once and read the output. (Same session: a CI fallback posted to a URL that had always 404'd, hidden behind a poll-count guard and a `::warning::` on a green job.)
+
+### Changed
+- **`/playbook:learnings` demotion checklist — try de-duplication first** — New first item: if a CLAUDE.md block restates an existing `docs/solutions/` or `docs/guides/` doc, condense it to a one-line pointer. It deletes duplication rather than knowledge, and usually frees enough budget to land the new rule in the same edit, so the trim/defer/skip decision never has to be surfaced. Also adds: grep for a CLAUDE.md heading before renaming it — other docs cite rules by heading text.
+
+## [0.23.1] - 2026-07-25
+
+### Added
+- **`mobile-debugging` — Step 0 gate: verify the bug is actually mobile-specific** — Before any device-specific investigation, reproduce in a plain desktop browser at multiple viewport widths (e.g. 412px and 1440px). "Reported on a phone" says where someone *looked*, not where the bug *exists*; layout leaks, overflow bugs, and unstyled-content flashes are frequently universal and merely more prominent on a narrow viewport. If it reproduces at desktop width too, skip the device-testing setup and debug it locally. (chef-chopsky, 2026-07: an "Android Chrome rendering bug" reproduced identically in desktop Chromium at 412px *and* 1440px — the ngrok + physical-device setup would have been pure waste.)
+
+### Changed
+- **`/playbook:close` + `session-checkpoint` — committing a gitignored checkpoint** — Both now note that `git add docs/checkpoints/` fails with "paths are ignored" in repos that gitignore the directory: use `git add -f docs/checkpoints/latest.md` when `git ls-files docs/checkpoints/` shows checkpoints are tracked despite the ignore rule; when nothing there is tracked, the checkpoint is local-only by design and the commit is skipped.
+
 ## [0.23.0] - 2026-07-25
 
 ### Added

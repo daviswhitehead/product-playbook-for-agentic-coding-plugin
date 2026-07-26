@@ -136,10 +136,17 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    # pattern does NOT make `git check-ignore -q docs/checkpoints/` return true, even
    # though `git add` on that directory refuses. Testing the dir silently picks the
    # wrong branch here.
+   #
+   # Force-add the EXPLICIT files this session wrote, never the directory: `git add -f`
+   # on `docs/checkpoints/` commits everything the repo deliberately ignored — other
+   # workspaces' checkpoints, local scratch state — under a "session checkpoint" label.
+   # That is step 4's clobbering failure in the opposite direction. If step 4 archived a
+   # prior checkpoint, add that file here too, or the file you just rescued stays
+   # untracked under an ignored path (i.e. still expendable).
    if git check-ignore -q docs/checkpoints/latest.md; then
-     git add -f docs/checkpoints/
+     git add -f -- docs/checkpoints/latest.md    # plus any archive step 4 created
    else
-     git add docs/checkpoints/
+     git add -- docs/checkpoints/latest.md       # plus any archive step 4 created
    fi
    git commit -m "chore: session checkpoint"
    ```
