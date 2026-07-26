@@ -76,7 +76,15 @@ If `/playbook:learnings` was invoked from `/playbook:close`, the close skill's P
 
 1. Run `wc -c -l CLAUDE.md` (skip if no CLAUDE.md exists in the project).
 
-   **Thresholds** (revised 2026-07-26; the old 32k/40k numbers were ~3x published best practice — a file "passed" the check while already being 2.8x Anthropic's guidance): official Anthropic docs target **under 200 lines** ("longer files consume more context and reduce adherence"); community consensus (HumanLayer, Builder.io) puts the ceiling at ~300 lines. The binding constraint is the model's instruction-following budget, not tokens — every low-value line taxes compliance with the critical rules.
+   **Thresholds** (revised 2026-07-26). **Lines are the published number; the char figures are a derived companion.**
+
+   - **Lines — cited.** Anthropic's docs: *"target under 200 lines per CLAUDE.md file. Longer files consume more context and reduce adherence."* HumanLayer treats **300 lines as a hard ceiling** (their own root CLAUDE.md is under 60). Hence 200 soft / 300 hard.
+   - **Chars — derived, not published.** 16,000 / 24,000 assume ~80 chars per line. That holds for prose-heavy files and is *far* off for terse bullet lists — this plugin's own CLAUDE.md averages ~32 chars/line, so its line count binds long before its char count. Treat the char figures as a secondary guard, not an independent standard.
+   - **Whichever trips first wins**, because the two measure different failure modes: lines ≈ instruction count (adherence), chars ≈ context cost. A file can blow one while comfortably passing the other.
+
+   The binding constraint is usually the model's instruction-following budget, not tokens: frontier models follow roughly 150–200 instructions consistently, and Claude Code's own system prompt already occupies ~50 of those slots. Every low-value line taxes compliance with the critical rules.
+
+   *Prior thresholds were 32,000 / 40,000 chars with no line check at all — so a file could pass while carrying several times the instruction count the published guidance targets.*
 
 2. **If over 24,000 chars or 300 lines**: trimming is **mandatory** before this retrospective adds any new content. Past this point, CLAUDE.md degrades agent performance. Surface to the user immediately:
 
@@ -564,7 +572,7 @@ The primary CLAUDE.md size check now runs in **Pre-Check: CLAUDE.md Size Health*
 - Condense verbose sections to a reference + link
 
 **Demotion checklist** (run before promotion):
-- [ ] **Does a CLAUDE.md block restate a `docs/solutions/` or `docs/guides/` doc that already exists? → Condense to a one-line pointer.** Try this first: it deletes duplication rather than knowledge, so nothing is lost and it usually frees enough budget to land the new rule in the same edit. (2026-07-25, chef-chopsky: CLAUDE.md sat at 39,948 of 40,000 chars. Condensing a four-bullet PostHog block that restated two existing solution docs freed ~750 chars and made adding a new CRITICAL rule a net **+22**. The trim/defer/skip decision below never had to be surfaced.)
+- [ ] **Does a CLAUDE.md block restate a `docs/solutions/` or `docs/guides/` doc that already exists? → Condense to a one-line pointer.** Try this first: it deletes duplication rather than knowledge, so nothing is lost and it usually frees enough budget to land the new rule in the same edit. (2026-07-25, chef-chopsky: CLAUDE.md sat at 39,948 chars against the 40,000 ceiling in force at the time — well over today's 24,000. Condensing a four-bullet PostHog block that restated two existing solution docs freed ~750 chars and made adding a new CRITICAL rule a net **+22**. The trim/defer/skip decision below never had to be surfaced.)
 - [ ] Are there RESOLVED known issues still in CLAUDE.md? → Archive
 - [ ] Are there niche guides in CLAUDE.md used <1x/month? → Move to `docs/guides/`
 - [ ] Is any CLAUDE.md content duplicated across sections? → Consolidate

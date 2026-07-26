@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.3] - 2026-07-26
+
+### Changed
+- **CLAUDE.md size thresholds lowered to match published guidance, and a line check added** (`/playbook:learnings` pre-check + Step 6 backstop, `learning-capture` skill) — was 32,000 / 40,000 chars with no line check; now **16,000 chars or 200 lines** (soft) and **24,000 chars or 300 lines** (hard, mandatory trim), whichever trips first.
+
+  **Lines are the cited number; the char figures are an explicitly derived companion.** Anthropic's docs state: *"target under 200 lines per CLAUDE.md file. Longer files consume more context and reduce adherence."* HumanLayer treats 300 lines as a hard ceiling (their own root CLAUDE.md is under 60). The char figures assume ~80 chars/line, which holds for prose-heavy files and is far off for terse bullet lists — this plugin's own CLAUDE.md averages ~32 chars/line, so its line count binds long before its char count. The doc now says so plainly rather than presenting both as equally sourced.
+
+  The two thresholds measure different failure modes and both are kept deliberately: lines ≈ instruction count (adherence), chars ≈ context cost. Frontier models follow roughly 150–200 instructions consistently and Claude Code's own system prompt already occupies ~50 of those slots, so instruction count is usually the binding constraint — which is why the old char-only check could pass a file already carrying several times the targeted instruction count.
+
+- **Promotions past the soft limit follow "one in, one out"** — each new CLAUDE.md rule names a demotion or deletion candidate in the same edit.
+
+**Note for existing projects**: this materially tightens the gate. A CLAUDE.md near the old 40,000-char ceiling is roughly 16,000 over the new hard limit, so the next `/playbook:learnings` run in such a repo will require trimming before it can promote anything. That forcing function is the intent, but it lands immediately.
+
 ## [0.24.2] - 2026-07-26
 
 ### Fixed
