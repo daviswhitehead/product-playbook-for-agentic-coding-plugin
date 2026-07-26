@@ -566,7 +566,10 @@ The primary CLAUDE.md size check now runs in **Pre-Check: CLAUDE.md Size Health*
 - [ ] Are there niche guides in CLAUDE.md used <1x/month? → Move to `docs/guides/`
 - [ ] Is any CLAUDE.md content duplicated across sections? → Consolidate
 - [ ] Are there stale milestone-specific references? → Delete
+- [ ] **Is every rule still TRUE?** Spot-check any rule that cites a specific file, config, or command against the current code. **A wrong rule is worse than a missing one** — it actively sends an agent to do the wrong thing, and burns context on every session doing it. (2026-07-25, chef-chopsky: CLAUDE.md instructed agents to add new specs to Playwright's `testMatch`, but the config had since become a deny-list where specs enroll automatically.) **Delete these outright** and archive to `docs/learnings/resolved-issues.md` noting what replaced them — do not demote to a guide, where the rule stays wrong but gets harder to find.
 - [ ] **Renaming a CLAUDE.md heading? Grep for it first** — `rg -c "<heading text>" docs/ projects/` — other docs cite rules by heading text, and a rename silently breaks them. Prefer broadening the body over retitling.
+
+**Trimming safety**: if the working tree already has unstaged edits to CLAUDE.md, back it up (`cp CLAUDE.md /tmp/claude-md.bak`) before running `git checkout -- CLAUDE.md`. That command restores from the index and silently discards unstaged trims — hit during the 2026-07-25 retro while negative-testing a size check, costing a full redo of four edits.
 
 **When CLAUDE.md is between 32k–40k chars — surface the trim/defer/skip decision explicitly:**
 

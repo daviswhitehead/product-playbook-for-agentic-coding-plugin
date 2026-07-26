@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-07-26
+
+### Added
+- **`autonomous-execution` — "Negative-test every guardrail you add"** — promoted from an instrumentation-only acceptance criterion to a general principle covering ANY guard: lint rules, CI jobs, hooks, schema audits, quality gates, assertion helpers. A guard must be run twice — positive, and against the broken input it exists to catch — and seen to fail with an actionable message. Also warns about guards that become *unsatisfiable* by inheriting a production filter that removes their own fixture. Mirrored as a checkbox in the `tasks` template's Completion Verification.
+
+  This rule was written down after a 2026-05-16 incident (a CI guardrail that never fired) and lived **only in a retrospective for two months** — so the next two guardrails repeated it, including one in the same session that produced this change. Documentation had already failed twice; this puts it in the workflow.
+
+### Changed
+- **`/playbook:learnings` demotion checklist — "Is every rule still TRUE?"** — trimming CLAUDE.md previously only looked for *resolved*, *niche*, *duplicated*, or *stale-milestone* content. It never asked whether a rule was still factually correct. Found 2026-07-25: CLAUDE.md told agents to add new E2E specs to Playwright's `testMatch`, but the config had become a deny-list where specs enroll automatically — an actively misleading rule costing context in every session. A wrong rule is worse than a missing one; delete rather than demote.
+- **`/playbook:learnings` — trimming safety note** — back up CLAUDE.md before `git checkout -- CLAUDE.md`; it restores from the index and silently discards unstaged trims (hit during the 2026-07-25 retro, costing a full redo).
+
+## [0.23.5] - 2026-07-26
+
+### Fixed
+- **`/playbook:close` Phase 3 — stop the checkpoint step from destroying handoffs** — Two failure modes, both hit in a real run (chef-chopsky, 2026-07-25) and independently reproduced a second time on 2026-07-26:
+  - **New step 4 archives the existing `latest.md` before writing over it.** In a parallel-agent repo (Conductor workspaces, git worktrees) `latest.md` frequently holds *another workspace's* handoff; overwriting destroys work that isn't yours, silently and unrecoverably. Rename it to a dated archive unless it's demonstrably yours or already archived.
+  - **Step 6 re-verifies the branch and force-adds when the path is gitignored.** `docs/checkpoints/` is frequently ignored as "local resume state", in which case plain `git add` stages nothing, `git commit` reports nothing to commit, and the close-out reports success while the handoff exists only as an untracked file — which the next `git checkout` deletes with no reflog entry. `git check-ignore` must test the *file*, not the directory (a `docs/checkpoints/` pattern does not make `check-ignore` on the directory return true, even though `git add` on it refuses). Phase 1's branch check is also re-read here, since another agent can switch branches while you're waiting on tools.
+- **Phase 5 summary** now reports where the checkpoint actually landed (committed `<sha>` / left local because the path is gitignored) and any prior checkpoint archived, instead of unconditionally claiming "Saved to docs/checkpoints/latest.md".
+
+## [0.23.4] - 2026-07-26
+
+### Added
+- **Proof-of-completion comment at every PR merge** — Canonical requirement in `/playbook:monitor-pr` Step 4: every PR (especially autonomously merged ones) gets a comment posted at merge time with (1) what shipped in plain language, (2) evidence it works (test output, green full-CI run link, SQL/API verification for schema/data changes, screenshots for UI), and (3) what was consciously deferred or overridden, with a pointer to where it's tracked — "nothing deferred" is a valid entry, silence is not. Autonomous merge authority is granted in exchange for this reviewable audit trail; green CI alone is not reviewable evidence. Referenced with one-liners from `/playbook:git:create-pr`, `/playbook:work`, `/playbook:work-multiple`, `/playbook:close-project`, the `delivery-agent`, and the `autonomous-execution` skill.
+
 ## [0.23.3] - 2026-07-25
 
 ### Added

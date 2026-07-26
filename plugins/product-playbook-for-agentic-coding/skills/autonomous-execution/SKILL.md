@@ -144,6 +144,25 @@ Two habits that prevent this class:
 
 If no consumer exists yet, the task is not done: write the query.
 
+### Negative-test every guardrail you add (a check that can't fail is not a check)
+
+**Applies to ANY guard, not just instrumentation**: lint rules, CI jobs, pre-commit hooks, schema/migration audits, quality gates, assertion helpers, smoke checks.
+
+Before marking a guard-adding task complete, you must have run it **twice**:
+
+1. **Positive** — against correct input. It passes.
+2. **Negative** — against the broken input it exists to catch. **It fails, with an actionable message that names the fix.**
+
+If you have not seen it fail, you have not tested it — you have only observed that it is silent, and silence is what a no-op looks like too.
+
+Also check the guard can't become **unsatisfiable**. A check that derives its query/config from production code can inherit a filter that removes the very fixture it needs, and then fails forever for a reason unrelated to what it guards. That trains people to ignore it, which is worse than having no guard.
+
+> Real incidents. (a) A metrics verifier inherited the production query's internal-account exclusion — the only attributed fixture was a test account that filter removed, so it failed on production with a message *indistinguishable from the real bug*. (b) An ESLint rule and a CI check were both authored, and only the passing direction was ever exercised; the negative case was assumed.
+>
+> This rule was written down after an earlier incident (a CI guardrail that never fired) and lived **only in a retrospective for two months**, so the next guardrail repeated it. That is why it is here, in the workflow, and not only in a doc.
+
+**Cheap pattern**: temporarily revert the fix (or point the guard at the old/broken version), run the guard, confirm red + read the message, restore. Paste both outcomes as the completion evidence.
+
 ### Acknowledge Method Substitution (don't silently downgrade verification)
 
 If a task names a **specific verification method** (e.g., "browser automation / E2E test of the full flow") and you cannot or do not perform it, you must **say so explicitly** — never substitute a weaker method (a code trace, a line-number citation, a manual read) and report it as if the named method was performed. State: *"The task asked for an E2E run; I did a code trace instead because <reason>. This is weaker — the browser test still needs to run."* For E2E specs specifically, "wired into the test runner's `testMatch`/suite + seen running in CI" is part of done — a spec file that exists but never runs is zero coverage.
@@ -257,6 +276,7 @@ Before marking project complete:
 - [ ] All tests passing
 - [ ] No regressions
 - [ ] Documentation updated
+- [ ] Any merged PR carries a proof-of-completion comment — what shipped, evidence it works, what was deferred (`/playbook:monitor-pr` Step 4). Mandatory for autonomously merged PRs: merge authority is granted in exchange for this audit trail.
 
 ## Progress Tracking
 
