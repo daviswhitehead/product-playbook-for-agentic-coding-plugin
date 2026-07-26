@@ -634,7 +634,10 @@ finding reached this retrospective.
 ```bash
 cd <plugin-repo>
 git fetch -q origin
-git log --oneline origin/main..--all -- <candidate-file>   # fixes on unmerged branches
+# Fixes sitting on unmerged branches. NOTE the ref selection: `origin/main..--all` is a
+# fatal parse error, and bare `--all` drags in agent-harness checkpoint refs (Conductor
+# writes hundreds). `--branches --remotes --not origin/main` is the form that works.
+git log --oneline --branches --remotes --not origin/main -- <candidate-file>
 gh pr list --state open --json number,title,headRefName    # open PRs touching this area
 git status --short                                          # uncommitted WIP in the checkout
 ```
