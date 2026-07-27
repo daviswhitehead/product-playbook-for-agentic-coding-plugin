@@ -213,7 +213,28 @@ Every PR — **especially autonomously merged ones** — gets a proof-of-complet
 
 Post it immediately before `gh pr merge`. If you find an already-merged PR missing one (e.g., during close-out), post it retroactively. Other workflows reference this section as "proof-of-completion comment (`/playbook:monitor-pr` Step 4)".
 
-> **Post-merge local state**: `gh pr merge --delete-branch` silently switches your local checkout to the default branch (and pulls) after deleting the PR branch. In a parallel-agent workspace this can strand your session on the wrong branch — re-checkout your working branch afterwards. If another worktree holds the PR branch, the local delete fails with a warning; that's harmless (the remote branch is still deleted), but the other checkout is left on a branch that no longer exists remotely — worth flagging for cleanup.
+> **Post-merge local state**: `gh pr merge --delete-branch` silently switches your local checkout to the default branch (and pulls) after deleting the PR branch. In a parallel-agent workspace this can strand your session on the wrong branch — re-checkout your working branch afterwards.
+>
+> **If another worktree holds the PR branch, `--delete-branch` half-fails — it deletes NEITHER branch.** You get `failed to delete local branch <b>: cannot delete branch '<b>' used by worktree at <path>`, and the operation ends with the **remote branch still alive**. The PR is merged, so the message reads as cosmetic and is easy to walk past. Verify and finish the job by hand:
+>
+> ```bash
+> gh pr merge <N> --merge --delete-branch          # may print the worktree error
+> git fetch -q origin --prune
+> git ls-remote --heads origin <branch> | wc -l    # MUST be 0; if 1, it survived
+> git push origin --delete <branch>                # finish the delete yourself
+> ```
+>
+> Check with `git ls-remote` (authoritative), not `git branch -r`, which reads a possibly-stale local cache.
+>
+> *Corrected 2026-07-26. This note previously said the local-delete failure was "harmless (the remote branch is still deleted)" — false, and the wrong version was load-bearing: it tells you not to look, so the surviving branch is never noticed. Verified both directions in one session (gh 2.88.0): 6 merges where `--delete-branch` succeeded left 0 remote branches; every merge that hit the worktree error left the remote branch alive (3 occurrences).*
+>
+> **Better, fix it at the repo level**: with `delete_branch_on_merge: true` (Settings → General → "Automatically delete head branches") GitHub deletes the head branch on every merge and this failure mode disappears — including for web-UI merges. Check with `gh repo view --json deleteBranchOnMerge`. A repo with it `false` silently accumulates merged branches; audit with:
+>
+> ```bash
+> for b in $(git ls-remote --heads origin | awk '{print $2}' | sed 's|refs/heads/||'); do
+>   gh pr list --head "$b" --state merged --limit 1 --json number --jq ".[0].number" | grep -q . && echo "stale: $b"
+> done
+> ```
 
 ### Step 5: False-Green Sanity Check
 
