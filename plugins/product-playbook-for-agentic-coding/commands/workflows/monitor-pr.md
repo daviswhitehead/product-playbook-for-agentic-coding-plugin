@@ -241,6 +241,42 @@ Post it immediately before `gh pr merge`. If you find an already-merged PR missi
 > done
 > ```
 
+#### Before deleting any branch in bulk — two checks that are not optional
+
+Sweeping "already merged" branches looks like pure hygiene. Two things make it destructive:
+
+**1. Deleting a branch closes its open PR.** Always re-derive the open-PR list *at delete
+time*, never from a list built earlier in the session — PRs appear while you work.
+
+```bash
+OPEN=$(gh pr list --state open --json headRefName --jq '.[].headRefName')
+echo "$OPEN" | grep -qx "$b" && echo "SKIP $b — has an open PR"
+```
+
+**2. "Merged" must be judged on CONTENT, not ancestry.** Squash-merges discard the branch's
+commits, so `git branch --merged`, `merge-base --is-ancestor`, and a three-dot diff all
+report a fully-merged branch as unmerged — and, worse, the reverse can hide real work.
+Compare the files:
+
+```bash
+miss=0
+for f in $(git diff origin/main...origin/$b --name-only); do
+  if git cat-file -e "origin/main:$f" 2>/dev/null; then
+    n=$(diff <(git show "origin/main:$f") <(git show "origin/$b:$f") | grep -c '^>')
+  else n=1; fi                       # file absent from main entirely
+  miss=$((miss+n))
+done
+[ "$miss" -eq 0 ] && echo "safe to delete $b" || echo "KEEP $b — $miss line(s) not in main"
+```
+
+*Both fired in one sweep (2026-07-27, 25 branches): the content check flagged two branches
+that ancestry would have called deletable, and both turned out to have PRs opened
+mid-session. It also caught a branch holding the only complete copy of a file that `main`
+had in truncated form. Ancestry alone would have destroyed all three.*
+
+Also check whether a branch's local copy is ahead of its remote before deleting the remote —
+the unique content may exist **only** in the local ref.
+
 ### Step 5: False-Green Sanity Check
 
 Before declaring victory, verify that **path-filtered heavy jobs actually ran on the same head commit** as the fast-CI passes. Per CLAUDE.md's documented learnings on path-filtered false-greens:
