@@ -1,88 +1,89 @@
 # Session Checkpoint
-**Date**: 2026-07-26 15:19 EDT
+**Date**: 2026-07-27 10:06 EDT
 **Branch**: daviswhitehead/merge-open-prs-v1 (even with origin/main)
 
 ## Current Task
-Merge all open PRs in the plugin repo, then close out. Complete — **zero open PRs**, main at
-`af99548`, version **0.24.3**, local install refreshed to match.
+Merge all open PRs, capture learnings, and clean up branches/worktrees. **Complete** —
+zero open PRs, **one** remote branch (`main`), version **0.24.7**, local install matching.
 
 ## Status
-- **Done this session**:
-  - Merged **9 PRs** (#57, #58, #60–#66) as sequential stacked bumps, 0.23.0 → 0.24.3, one patch
-    version per PR. Guard green on each; every merge carries a proof-of-completion comment.
-  - Included the three drafts (#58, #64, #65) — each was complete, just left unmarked.
-  - Rescued stranded WIP from a dormant checkout into **#66** and found the underlying bug was
-    worse than described: the archive-detection check added in 0.23.5 had **never executed**.
-  - Fixed a fatal `git log` snippet in #64 (`origin/main..--all` → `--branches --remotes --not
-    origin/main`) and separated cited from derived thresholds in #65.
-  - Refreshed the local plugin install 0.24.1 → 0.24.3 (two steps — see Out-of-Repo).
+- **Done this session** (continuation of the 2026-07-26 arc; see
+  `2026-07-26-merge-open-prs-v1.md` for the earlier half):
+  - Merged **#73** (0.24.7, evidence-based watch windows) and **closed #74** as a duplicate.
+  - **Captured the learnings** that produced #69 (0.24.4) and #70 (0.24.5) — a false claim
+    in the playbook's own `monitor-pr.md`.
+  - **Rescued orphaned content twice**: #68 (5 never-committed transcripts, one 127 KB) and
+    #72 (a transcript truncated in main, full copy only on a local branch).
+  - **Swept branches 25 → 1.** 21 remote + 7 local deleted, all verified by *content*.
+  - `delete_branch_on_merge` enabled on both repos; verified working on three merges since.
 - **In progress**: nothing.
 - **Blocked on**: nothing.
 
 ## Key Decisions
-- **Merged the drafts.** All three were content-complete; draft status was neglect, not intent.
-- **#61 merged as-is rather than waiting on its WIP.** A second session had independently
-  reproduced both bugs it fixes, so shipping beat holding. Conflict with #57 resolved by
-  narrowing `git add -f docs/checkpoints/` to the explicit file — directory-level force-add
-  commits everything the repo deliberately ignores.
-- **Left another session's uncommitted WIP untouched**, per the rule #64 added ("surface it,
-  don't commit it"). Extracted it read-only into #66 instead. Source checkout never modified.
-- **#65: kept both char and line thresholds.** They measure different failure modes — lines ≈
-  instruction count (adherence), chars ≈ context cost. Labelled lines as cited (Anthropic:
-  "target under 200 lines"; HumanLayer: 300 hard) and chars as derived (~80 chars/line
-  assumption, which is far off for terse files).
+- **Closed #74 rather than merging it.** Its only content not already in main was
+  `"version": "0.23.0"` — merging would have rolled the plugin back seven patch releases
+  and, because propagation is version-keyed, silently stalled every install until the
+  version climbed back past 0.23.0.
+- **Verified branch staleness by content, not ancestry.** Squash-merges discard commit
+  ancestry, so `git branch --merged` and `merge-base --is-ancestor` both report false
+  negatives. Content comparison caught two branches with live PRs that the earlier list
+  would have deleted.
+- **Kept the `~/GitHub` checkout, switched it to `main`.** Its `.git` is a *directory* —
+  it is the primary clone all other worktrees hang off, not a scratch worktree.
+- **Left both stashes alone** — they belong to other branches.
 
 ## Open Questions
-- **~20 stale remote branches** predate this session and were left alone. Sweep them?
-- Two old stashes exist (`daviswhitehead/git-cleanup`, `main`), both tagged to **other**
-  branches — deliberately not touched. Worth a look when their owners next surface.
+- Two old stashes (`daviswhitehead/git-cleanup`, `main`) hold lines not literally present in
+  main — but they predate PR #10, and those files have been rewritten many times since, so
+  "absent" likely means "reworded", not "lost". Worth a look by whoever owns them; **they
+  live in the shared `.git`, so archiving this worktree cannot lose them.**
+- `docs/superpowers/plans/2026-04-13-*-tasks.md` is a fully reconciled April project. Delete
+  or leave as history?
 
 ## Next Steps
-1. **Restart Claude Code** — this session still has 0.24.1 loaded; 0.24.3 applies on restart.
-2. Discard the superseded WIP in `~/GitHub/product-playbook-for-agentic-coding-plugin`
-   (`git checkout -- .`) — verified byte-identical to main, nothing to lose.
-3. Expect the next `/playbook:learnings` in a repo with a large CLAUDE.md to demand a trim:
-   0.24.3 cut the hard limit 40,000 → 24,000 chars. chef-chopsky was last at 39,985.
+1. Nothing blocking. The repo is clean: 1 branch, 0 open PRs, versions in lockstep.
+2. If archiving this workspace: everything is pushed — see "Context" for the verification.
+3. Consider whether the April tasks doc still earns its place.
 
 ## Hot Files (modified this session)
-- `plugins/.../commands/workflows/close.md`: step 4 tri-state archive detection; step 6
-  `CKPT_FILES` explicit staging + ask-before-force-add.
-- `plugins/.../commands/workflows/learnings.md`: Step A2 (check for unmerged fixes), CLAUDE.md
-  budget math, new 16k/24k + 200/300-line thresholds.
-- `plugins/.../commands/workflows/debug.md`: real-execution-context reproduction; probe the
-  live system before blaming config.
-- `plugins/.../skills/autonomous-execution/SKILL.md`: negative-test every guardrail.
-- `plugins/.../commands/workflows/monitor-pr.md`: proof-of-completion at merge.
-- `CHANGELOG.md`, both version manifests: 0.23.1 → 0.24.3.
+- `plugins/.../commands/workflows/monitor-pr.md`: the `--delete-branch` correction (0.24.4)
+  and its generalization to any local-cleanup error (0.24.5).
+- `plugins/.../resources/templates/tasks.md`: evidence-based watch windows (0.24.7).
+- `plugins/.../commands/workflows/close.md`: freshness check (0.24.6, via #71).
+- `docs/learnings/2026-07-17-merging-stacked-prs-across-worktrees.md`: dated addendum
+  correcting Learning #3, plus a strikethrough on the original wrong sentence.
+- `CHANGELOG.md` + both manifests: 0.24.3 → 0.24.7.
 
 ## Out-of-Repo Changes (runtime / system / external)
-- **Plugin install upgraded 0.24.1 → 0.24.3** at user scope. Required **two** commands — the
-  first alone is not enough, which is the easy mistake:
-  1. `claude plugin marketplace update product-playbook-marketplace` — refreshes the *catalog*
-     only. After this the cache read 0.24.3 while the install still read 0.24.1.
-  2. `claude plugin update product-playbook-for-agentic-coding@product-playbook-marketplace`
-     — updates the actual install.
-- New install path: `~/.claude/plugins/cache/product-playbook-marketplace/product-playbook-for-agentic-coding/0.24.3`
-  (sha `af99548`). Verified by grepping the on-disk files for 0.24.2/0.24.3 content, not just
-  the version string.
-- **Rollback**: prior versions remain on disk (0.22.4, 0.22.5, 0.23.0, 0.23.3, 0.23.4, **0.24.1**).
-  Revert by pointing `~/.claude/plugins/installed_plugins.json` back at the 0.24.1 path, or
-  `claude plugin install ...@0.24.1`.
-- Marketplace git checkout at `~/.claude/plugins/marketplaces/product-playbook-marketplace`
-  moved `c7e0b78` → `af99548`.
+- **`delete_branch_on_merge` set to `true`** on `daviswhitehead/product-playbook-for-agentic-coding-plugin`
+  **and** `daviswhitehead/chef-chopsky` (by the user). Verified via
+  `gh repo view --json deleteBranchOnMerge`. This is the systemic fix for the stale-branch
+  backlog. Rollback: untick "Automatically delete head branches" in Settings → General.
+- **Plugin install upgraded 0.24.3 → 0.24.7** at user scope, in four steps across the
+  session. Still requires **two** commands each time — `claude plugin marketplace update`
+  refreshes only the catalog; `claude plugin update <plugin>@<marketplace>` moves the install.
+- Install path: `~/.claude/plugins/cache/product-playbook-marketplace/product-playbook-for-agentic-coding/0.24.7`
+  (sha `5d317a0`). Prior versions remain on disk (0.22.4 → 0.24.6) for rollback.
+- **`~/GitHub/product-playbook-for-agentic-coding-plugin` switched from
+  `improve/close-checkpoint-durability` to `main`** and pulled. It was clean before and after.
+- Removed scratch worktree `/private/tmp/wt-plugin3`.
+- **21 remote + 7 local branches deleted.** GitHub keeps deleted branches restorable.
 
 ## Context the Next Session Needs
-- **Squash merges break ancestry checks.** `feat/instrumentation-acceptance-is-the-metric`
-  reports "NOT an ancestor" of main and a 97-insertion three-dot diff, yet **0 lines** are
-  missing from main — #59 was squash-merged. Answer "is it merged?" on *content*, never on
-  `merge-base --is-ancestor` alone. This is exactly what #64's Step A2 exists to catch.
-- **`gh pr merge --delete-branch` silently half-fails** when any worktree holds the branch: it
-  errors on the local delete and leaves the **remote** branch alive too. Verify with
-  `git ls-remote --heads` afterwards; I had to delete `fix/close-archive-detection` by hand.
-- **Three worktrees share this repo.** `~/GitHub/...` (dormant, dirty, superseded) and
-  `/private/tmp/wt-plugin3` both sit on merged branches. Their remote branches were left
-  undeleted on purpose so those sessions aren't stranded.
-- `/tmp/wt-close` is an unrelated pre-existing directory — **not** a worktree of this repo.
-  Don't reuse that path.
-- Repo convention tracks `.specstory/history/` transcripts (11 committed). Stage them
-  explicitly; a stray `git add -A` swept one into #57 mid-session.
+- **Slash-command skills DO reload from disk mid-session.** The `/playbook:close` invoked at
+  10:00 today carried the 0.24.6 freshness check merged ~an hour earlier, without a restart.
+  An earlier claim in this session that a restart was required was wrong. (The plugin's
+  *version-keyed* propagation still needs `claude plugin update`; that is a separate thing
+  from whether a session re-reads the installed files.)
+- **Squash merges break every ancestry-based "is it merged?" check.** Compare file contents.
+  `feat/instrumentation-acceptance-is-the-metric` reported unmerged with a 97-line diff while
+  being 100% present in main.
+- **`gh pr merge --delete-branch` half-fails on ANY local-cleanup error** — worktree holding
+  the branch *or* a dirty working tree — leaving the remote branch alive. 5 occurrences today.
+  Now moot here thanks to `delete_branch_on_merge`, but still true on repos without it.
+- **Check for open PRs before bulk-deleting branches.** Deleting a branch closes its PR. Two
+  PRs (#73, #74) opened mid-session and would have been silently closed by a sweep built from
+  a stale list.
+- `/tmp/wt-close` is an unrelated pre-existing directory, **not** a worktree of this repo.
+- Repo convention tracks `.specstory/history/`. Stage transcripts explicitly — a `git add -A`
+  swept one into #57 earlier in this arc.
