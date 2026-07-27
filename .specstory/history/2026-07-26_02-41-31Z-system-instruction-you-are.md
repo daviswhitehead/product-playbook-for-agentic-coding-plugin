@@ -11580,4 +11580,2160 @@ zero open PRs, **one** remote branch (`main`), version **0.24.7**, local install
   swept one into #57 earlier in this arc.
 
 ```
+
+```text
+File created successfully at: /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava/docs/checkpoints/latest.md (file state is current in your context — no need to Read it back)
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:07:13Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Stage checkpoint, archive, and transcripts
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+echo "=== step 6: re-verify branch ==="; git branch --show-current
+CKPT_FILES=(docs/checkpoints/latest.md docs/checkpoints/2026-07-26-merge-open-prs-v1.md)
+if git check-ignore -q docs/checkpoints/latest.md; then echo "  path gitignored -> force-add"; git add -f -- "${CKPT_FILES[@]}"
+else echo "  path tracked normally"; git add -- "${CKPT_FILES[@]}"; fi
+git add -- .specstory/history/
+git status --short
+```
+
+```text
+=== step 6: re-verify branch ===
+daviswhitehead/merge-open-prs-v1
+  path tracked normally
+M  .specstory/history/2026-07-26_02-41-31Z-system-instruction-you-are.md
+A  .specstory/history/2026-07-27_02-58-02Z-review-this-change-for.md
+A  .specstory/history/2026-07-27_03-01-29Z-review-this-change-for.md
+A  docs/checkpoints/2026-07-26-merge-open-prs-v1.md
+M  docs/checkpoints/latest.md
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:07:23Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Commit checkpoint and verify archive integrity
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+git commit -q -m "$(cat <<'EOF'
+chore: session checkpoint — merge-open-prs-v1 close-out (0.24.7)
+
+Archives the 2026-07-26 checkpoint rather than discarding it. The tri-state
+check returned ARCHIVE_REQUIRED; the freshness check confirmed the existing
+file was mine and older (same branch, 07-26 vs 07-27), so overwriting was
+permitted — archived anyway since it costs one file and this repo already
+keeps dated checkpoints.
+
+Also captures this session's SpecStory transcripts, staged explicitly.
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+EOF
+)" && git log --oneline -1
+echo "=== verify archived checkpoint is intact ==="
+diff <(git show HEAD~1:docs/checkpoints/latest.md) docs/checkpoints/2026-07-26-merge-open-prs-v1.md && echo "  IDENTICAL — prior handoff preserved"
+```
+
+```text
+2c1f0f8 chore: session checkpoint — merge-open-prs-v1 close-out (0.24.7)
+=== verify archived checkpoint is intact ===
+  IDENTICAL — prior handoff preserved
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:07:59Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Push and open close-out PR
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+git push -q origin HEAD:chore/close-out-0-24-7 && gh pr create --base main --head chore/close-out-0-24-7 --title "chore: session close-out — checkpoint + transcripts (0.24.7)" --body "Close-out for the merge-open-prs-v1 session. No plugin content, so no version bump — the guard's version check only fires on \`plugins/\` changes.
+
+## Contents
+
+- **\`docs/checkpoints/latest.md\`** — handoff for the next session.
+- **\`docs/checkpoints/2026-07-26-merge-open-prs-v1.md\`** — the prior checkpoint, archived. The 0.24.2 tri-state check returned \`ARCHIVE_REQUIRED\`; the 0.24.6 freshness check then confirmed the existing file was *mine* and *older* (same branch, 07-26 vs 07-27), which permits overwriting. Archived anyway — it costs one file, loses nothing, and this repo already keeps dated checkpoints. Verified byte-identical to what \`latest.md\` held.
+- **\`.specstory/history/\`** — this session's transcripts, staged explicitly.
+
+## Both new step-4 mechanisms exercised together
+
+This is the first close-out to run the tri-state archive check (0.24.2) and the freshness check (0.24.6) in sequence. They compose correctly: the tri-state answers *is it archived*, the freshness check answers *is it newer than me*, and only both together justify a decision about \`latest.md\`.
+
+## Noted in the handoff
+
+- **Slash-command skills reload from disk mid-session** — this close-out ran the 0.24.6 freshness check merged about an hour earlier, with no restart. An earlier claim in the session that a restart was required was wrong; version-keyed *plugin propagation* still needs \`claude plugin update\`, which is a different thing.
+- Two old stashes belong to other branches and were left alone. They live in the shared \`.git\` of the primary clone, so archiving this worktree cannot lose them.
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)" 2>&1|tail -1
+```
+
+```text
+remote: 
+remote: Create a pull request for 'chore/close-out-0-24-7' on GitHub by visiting:        
+remote:      https://github.com/daviswhitehead/product-playbook-for-agentic-coding-plugin/pull/new/chore/close-out-0-24-7        
+remote: 
+https://github.com/daviswhitehead/product-playbook-for-agentic-coding-plugin/pull/75
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:08:21Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Poll CI for close-out PR
+
+`for i in $(seq 1 30); do s=$(gh pr view 75 --json statusCheckRollup --jq '[.statusCheckRollup[] | (.conclusion // .state)] | join(",")'); echo "$i: $s"; case "$s" in *PENDING*|*IN_PROGRESS*|*QUEUED*|"") sleep 15;; *) break;; esac; done`
+
+```text
+1: 
+2: SUCCESS
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:08:41Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Merge close-out PR
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+gh pr comment 75 --body "## Proof of completion
+
+**What shipped** — Session checkpoint, the prior checkpoint preserved as a dated archive, and this session's transcripts.
+
+**Evidence it works** — Tri-state check returned \`ARCHIVE_REQUIRED\`; freshness check confirmed the existing checkpoint was same-branch and older (07-26 vs 07-27); archived copy diffed byte-identical against what \`latest.md\` held. \`git check-ignore\` on the file confirmed the path is tracked normally, so no force-add. CI guard green; no version bump because no \`plugins/\` content changed.
+
+**Deferred / overridden** — Transcripts are a mid-session snapshot; SpecStory keeps writing until the session ends, so this conversation's tail won't be in them. Two stashes belonging to other branches were left untouched." 2>&1|tail -1
+gh pr merge 75 --merge --delete-branch 2>&1|tail -2
+sleep 3; git fetch -q origin --prune; git merge --ff-only origin/main 2>&1|tail -1
+echo "PR75: $(gh pr view 75 --json state --jq .state)"; echo "open PRs: $(gh pr list --state open --json number --jq 'length')"; echo "remote branches: $(git ls-remote --heads origin|wc -l|tr -d ' ')"
+```
+
+```text
+https://github.com/daviswhitehead/product-playbook-for-agentic-coding-plugin/pull/75#issuecomment-5092382859
+Fast-forward
+PR75: MERGED
+open PRs: 0
+remote branches: 1
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:08:58Z)**_
+
+<think><details><summary>Thought Process</summary>
+Now I'm moving to step 3 and reviewing what learnings came out of this session. Since the last learnings run covered the delete-branch behavior, I'm looking at what's genuinely new here. The main finding is that squash merges can break ancestry checks when verifying by content, which nearly led me down the wrong path with branch deletion logic.
+
+The critical discovery though is that the version-bump guard has a real gap — it only checks whether the version changed, not whether it increased. A backwards version bump like what happened in #74 would slip through CI because the guard doesn't validate that the new version is actually higher than the base version.
+
+I should test this hypothesis directly to have concrete evidence, then invoke the learnings skill to capture this finding properly.
+</details></think>
+
+_**Agent (claude-opus-5 2026-07-27 14:08:58Z)**_
+
+Close-out merged. **3. Learnings** — before invoking it, testing a hypothesis from this session: PR #74 would have rolled the version *backwards*. Does the guard actually catch that?
+
+_**Agent (claude-opus-5 2026-07-27 14:08:59Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Inspect version bump guard logic
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+echo "=== how does check-version-bump.sh compare versions? ==="
+grep -n -A6 -i 'bumped\|compare\|OLD_VER\|NEW_VER' scripts/check-version-bump.sh | head -40
+```
+
+```text
+=== how does check-version-bump.sh compare versions? ===
+17:# Exit 0 = all changed plugins bumped their version (or nothing changed).
+18-# Exit 1 = a plugin changed but its version did not bump.
+19-
+20-set -uo pipefail
+21-
+22-BASE_REF="${1:-origin/main}"
+23-
+--
+75:        echo -e "${RED}FAIL: $name changed but version not bumped (still $cur_version)${NC}"
+76-        echo -e "       Run: scripts/sync-version.sh <new-version> $name"
+77-        FAILURES=$((FAILURES + 1))
+78-    else
+79:        echo -e "${GREEN}OK: $name bumped $base_version -> $cur_version${NC}"
+80-    fi
+81-done
+82-
+83-echo ""
+84-if [ "$FAILURES" -gt 0 ]; then
+85-    echo -e "${RED}Version-bump check FAILED ($FAILURES plugin(s) changed without a bump).${NC}"
+86:    echo "Auto-update is version-keyed: unbumped changes never reach users' installs."
+87-    exit 1
+88-fi
+89-echo -e "${GREEN}Version-bump check PASSED.${NC}"
+90-exit 0
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:09:03Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Read the exact comparison
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+sed -n '60,80p' scripts/check-version-bump.sh
+```
+
+```text
+    # Did anything under this plugin change vs the merge-base?
+    if git diff --quiet "$MERGE_BASE" -- "$plugin_dir"; then
+        echo -e "${GREEN}OK: $name unchanged${NC}"
+        continue
+    fi
+
+    cur_version="$(version_of WORKING "$plugin_json" || true)"
+    base_version="$(version_of "$MERGE_BASE" "$plugin_json" || echo "")"
+
+    if [ -z "$base_version" ]; then
+        echo -e "${GREEN}OK: $name is new (version $cur_version)${NC}"
+        continue
+    fi
+
+    if [ "$cur_version" = "$base_version" ]; then
+        echo -e "${RED}FAIL: $name changed but version not bumped (still $cur_version)${NC}"
+        echo -e "       Run: scripts/sync-version.sh <new-version> $name"
+        FAILURES=$((FAILURES + 1))
+    else
+        echo -e "${GREEN}OK: $name bumped $base_version -> $cur_version${NC}"
+    fi
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:09:15Z)**_
+
+<think><details><summary>Thought Process</summary>
+Looking at the version check logic, it's comparing strings with `if [ "$cur_version" = "$base_version" ]`, which means any difference passes the test—even a downgrade like 0.24.7 to 0.23.0 would incorrectly report success. I'm going to test this behavior by creating a temporary worktree, setting the version backwards, and verifying the bug.
+</details></think>
+
+_**Agent (claude-opus-5 2026-07-27 14:09:15Z)**_
+
+Reading the logic: it's a string **inequality** test (`cur != base`), so *any* change passes — including a decrease. Negative-testing that, per the 0.24.0 rule:
+
+_**Agent (claude-opus-5 2026-07-27 14:09:18Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Negative-test the guard against a backwards version
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+git worktree add -q /tmp/wt-guardtest -b tmp-guardtest origin/main 2>&1|tail -1
+cd /tmp/wt-guardtest
+# simulate exactly what PR #74 would have done: real content change + version rolled BACKWARDS
+printf '\n<!-- simulated content change -->\n' >> plugins/product-playbook-for-agentic-coding/commands/workflows/work.md
+scripts/sync-version.sh 0.23.0 >/dev/null 2>&1
+echo "=== version now: $(python3 -c "import json;print(json.load(open('plugins/product-playbook-for-agentic-coding/.claude-plugin/plugin.json'))['version'])") (main is 0.24.7) ==="
+echo "=== running the guard ==="
+scripts/check-version-bump.sh origin/main; echo "EXIT CODE: $?"
+```
+
+```text
+=== version now: 0.23.0 (main is 0.24.7) ===
+=== running the guard ===
+Checking version bumps against origin/main (merge-base 639b0260)...
+-------------------------------------------
+OK: google-tasks unchanged
+OK: openai-image-gen unchanged
+OK: product-playbook-for-agentic-coding bumped 0.24.7 -> 0.23.0
+
+Version-bump check PASSED.
+EXIT CODE: 0
+Shell cwd was reset to /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:09:27Z)**_
+
+<think><details><summary>Thought Process</summary>
+The guard is passing when it shouldn't—it's allowing a version downgrade from 0.24.7 to 0.23.0 and calling it a successful "bump." This is a critical flaw because backwards versions silently block installations until the version number climbs back above the previous high-water mark, making this worse than no version change at all. The guard was designed specifically to prevent this kind of version-keyed propagation failure, yet it's failing to catch it.
+
+I need to implement a semantic version comparison that rejects any new version that's less than or equal to the old one, using proper version sorting logic.
+</details></think>
+
+_**Agent (claude-opus-5 2026-07-27 14:09:27Z)**_
+
+Confirmed — the guard prints **"OK: bumped 0.24.7 -> 0.23.0"** and exits 0. It calls a regression a "bump" and passes it. PR #74 was a live instance; CI would have been green.
+
+_**Agent (claude-opus-5 2026-07-27 14:09:28Z)**_
+
+<tool-use data-tool-type="generic" data-tool-name="Skill"><details>
+<summary>Tool use: **Skill**</summary>
+
+**Input:**
+
+- args: `chat-session — the version-bump guard passes a BACKWARDS version bump; plus squash-merge ancestry blindness and open-PR-before-branch-delete`
+- skill: `product-playbook-for-agentic-coding:workflows:learnings`
+
+</details></tool-use>
+
+---
+
+_**User (2026-07-27 14:09:28Z)**_
+
+# Draft Learnings
+
+You are facilitating the Retrospective phase by representing multiple stakeholder perspectives, with **Engineering Manager** as the lead role coordinating the phase.
+
+**Roles in this phase**: Engineering Manager (lead), Product Manager, Senior Engineer, QA Specialist, DevOps Engineer.
+
+## Your Goal
+
+Help the user capture learnings that improve both codebase documentation AND the plugin/workflow itself.
+
+## Trigger Types & Output
+
+Ask the user a single combined question:
+
+```
+What type of learning moment is this?
+1. End of chat session (lightweight capture)
+2. Project completion (comprehensive retrospective)
+3. Overcame a blocker (targeted documentation)
+
+Output defaults to **both** codebase docs and plugin improvements.
+Say so if you only want one target.
+```
+
+### Trigger Type Reference
+
+| Type | Depth | Key Questions |
+|------|-------|---------------|
+| Chat session | Brief | What did we learn? What should be documented? Process improvements? |
+| Project completion | Thorough | What worked? What didn't? What to do differently? |
+| Blocker overcome | Targeted | What was painful? Root cause? Prevention? |
+
+### Output Targets
+
+Both targets are active by default:
+
+1. **Codebase Documentation** — Patterns, gotchas, architecture decisions, debugging solutions. Location: `[current-codebase]/docs/`
+2. **Plugin Improvements** — Skill/workflow optimizations, missing steps, wrong defaults, new commands. Location: Plugin repository (`commands/`, `skills/`)
+
+> **Portable skills go to `/lore`, not the plugin.** When a learning is really a *repeatable workflow you'd reuse across projects and harnesses* (not specific to this codebase or this plugin), don't capture it as a doc or a new playbook command — recommend the user run **`/lore`** (SpecStory Lore, if installed) to forge it into a reusable, cross-harness skill grounded in their own session history. Target #2 is for improvements to *this* plugin; `/lore` is for general-purpose skills.
+
+## Available Tools Discovery
+
+Before proceeding, consider what tools are available:
+1. **Commands**: Other `/playbook:*` commands
+2. **Agents**: Specialized agents via Task tool (if available)
+3. **MCP Tools**: External service integrations
+4. **Skills**: Domain expertise via Skill tool
+
+## Process
+
+### Pre-Check: Branch State (ALL Trigger Types)
+
+**Run this before any other pre-check.** A learnings retrospective ends with commits and a PR — both depend on the current branch being a valid target for *this* session's work. Two failure modes to detect upfront:
+
+1. **Branch is merged.** If the original PR was squash-merged, the local branch still exists but commits to it won't reach the target. Detect: `gh pr list --head $(git branch --show-current) --state merged --limit 1`. If a merged PR comes back, ask the user before committing:
+   > "Current branch `<name>` was merged via PR #<n>. Commits will be local-only. Branch off `<target>` first?"
+
+2. **Branch was switched by another agent (parallel-agent workspaces — Conductor, git worktrees).** If multiple agents share a working directory, your session's branch may have been switched while you were sleeping/awaiting tools. Detect: compare `git branch --show-current` against the branch your session has been working on (last push target, PR head being monitored). If it's unfamiliar, stash any unrelated uncommitted changes (`git stash push -m "other-agent-WIP" <paths>`) and create a fresh branch off the target before continuing. Restore the stash after.
+
+3. **Work hiding in a stash.** A branch can have every commit pushed yet still have uncommitted work in a `git stash` that's lost when the worktree/branch is archived. Before treating the branch as "everything captured," run `git stash list` and check for entries tagged to it (`On <branch>:` / `WIP on <branch>:`). For each: compare against `HEAD` (diff `HEAD <stash>` per file, not `<base>..<stash>` — the base may be rebased away); if superseded, drop it; if unique/uncertain, salvage to a pushed branch before dropping. Leave other branches' stashes alone.
+
+If `/playbook:learnings` was invoked from `/playbook:close`, the close skill's Phase 1 already runs an equivalent check (including the stash check) — you can skip this. For standalone invocations or after long wait gaps, run it.
+
+### Pre-Check: CLAUDE.md Size Health (ALL Trigger Types)
+
+**Run this check at the very start**, alongside the prior learnings search. CLAUDE.md is loaded into every agent session, so size growth has compounding cost.
+
+1. Run `wc -c -l CLAUDE.md` (skip if no CLAUDE.md exists in the project).
+
+   **Thresholds** (revised 2026-07-26). **Lines are the published number; the char figures are a derived companion.**
+
+   - **Lines — cited.** Anthropic's docs: *"target under 200 lines per CLAUDE.md file. Longer files consume more context and reduce adherence."* HumanLayer treats **300 lines as a hard ceiling** (their own root CLAUDE.md is under 60). Hence 200 soft / 300 hard.
+   - **Chars — derived, not published.** 16,000 / 24,000 assume ~80 chars per line. That holds for prose-heavy files and is *far* off for terse bullet lists — this plugin's own CLAUDE.md averages ~32 chars/line, so its line count binds long before its char count. Treat the char figures as a secondary guard, not an independent standard.
+   - **Whichever trips first wins**, because the two measure different failure modes: lines ≈ instruction count (adherence), chars ≈ context cost. A file can blow one while comfortably passing the other.
+
+   The binding constraint is usually the model's instruction-following budget, not tokens: frontier models follow roughly 150–200 instructions consistently, and Claude Code's own system prompt already occupies ~50 of those slots. Every low-value line taxes compliance with the critical rules.
+
+   *Prior thresholds were 32,000 / 40,000 chars with no line check at all — so a file could pass while carrying several times the instruction count the published guidance targets.*
+
+2. **If over 24,000 chars or 300 lines**: trimming is **mandatory** before this retrospective adds any new content. Past this point, CLAUDE.md degrades agent performance. Surface to the user immediately:
+
+   ```
+   CLAUDE.md is at <N> chars / <L> lines — over the hard limit (24,000 chars / 300 lines).
+   Trimming is required before this retrospective can promote new content.
+
+   Common demotion candidates:
+   - RESOLVED known issues → docs/learnings/resolved-issues.md
+   - Niche/domain-specific guides → docs/guides/[topic].md (keep 1-line ref)
+   - Stale file trees / "(NEW)" markers from past milestones
+   - Duplicated content across sections
+
+   Trim first, then continue the retrospective? Or surface specific candidates?
+   ```
+
+   **Trim to a budget, not to the limit.** The content this retrospective promotes *also*
+   counts against the ceiling, so the target is `24,000 − (planned addition) − headroom`,
+   not `24,000`. Estimate the addition first (a substantive new rule runs 600–900 chars), then
+   trim to that number. Landing 15 chars under the limit is a failed trim — the next
+   session's first edit breaks the limit again.
+
+   **Re-measure after every edit** (`wc -c CLAUDE.md`), and expect condensing rewrites to
+   *increase* size. Rewriting a section to be "tighter" while folding in new content commonly
+   nets positive; a real trim means deleting or demoting, not rephrasing. If two consecutive
+   edits haven't moved the number meaningfully, stop nibbling at prose and demote a whole
+   section to `docs/guides/` with a one-line reference — that is the only reliably large win.
+
+3. **If between 16,000 and 24,000 chars (or 200–300 lines)**: flag as approaching threshold but don't block. Note it in the prior-learnings summary so the user can choose to trim opportunistically during Step 6 (Promotion). Over the soft limit, promotions should follow **one in, one out**: each new CLAUDE.md rule names a demotion/deletion candidate in the same edit.
+
+**Why pre-flight, not just pre-promotion**: catching size violations before any other work means the user can decide to trim *first* and have a clean baseline. Discovering it mid-promotion (which is where the historical check lived) forces a context-switch when the retrospective should be wrapping up. The Step 6 health check remains as a backstop in case content is added during facilitation.
+
+### Pre-Check: Prior Learnings Search (ALL Trigger Types)
+
+**Before starting any retrospective**, search for prior learnings to enable cross-session pattern detection:
+
+1. **Search for existing learnings docs**: `docs/learnings/*.md`, `docs/solutions/*.md`
+2. **Read YAML frontmatter** of each to understand categories, tags, and severity
+3. **Search for prior improvement ideas**: Look for `## Action Items` or `## Future Work` sections in prior learnings docs — these contain ideas that were documented but may never have been implemented
+4. **Build a "recurring patterns" list**: If the current project's themes (e.g., "CI churn", "testing gaps", "context loss") match tags or content from prior learnings, flag them:
+
+```
+Prior learnings search found N existing docs.
+
+Recurring patterns detected:
+- "[pattern]" — appeared in [N] prior learnings ([dates/titles])
+  → Prior proposed fix: [what was proposed before]
+  → Was it implemented? [yes/no/partially]
+  → If "yes": did it actually MERGE? [verify — see below]
+
+These recurring patterns should be prioritized HIGHEST in this
+retrospective — they represent problems that documentation alone
+hasn't solved and likely need systemic fixes (automation, tooling,
+workflow changes), not more documentation.
+```
+
+5. **If prior improvement ideas were never implemented**, surface them:
+
+```
+Unimplemented improvement ideas from prior retrospectives:
+- [Idea] (from [date] learnings) — still relevant? [y/n]
+```
+
+**"Implemented" means MERGED, not written.** When checking whether a prior fix landed, verify it reached the default branch — `git merge-base --is-ancestor <sha> origin/<default>` or `gh pr view` on its PR — not merely that a commit or file exists. The staging-migration-drift fix (chef-chopsky, 2026-04-10 `a675b6ca`) was fully implemented on a workspace branch that never merged; six manual repair incidents followed while every retrospective would have scored it "implemented." A fix on an unmerged branch is an unimplemented fix.
+
+**Why this matters**: Without this search, the same problems get documented repeatedly across retrospectives without escalation. A pattern that appears in 3 retrospectives needs a systemic fix, not a 4th documentation entry.
+
+### When a pattern recurs: append-and-strengthen, don't duplicate
+
+A pattern is **recurring** if the pre-check above finds it in 1+ prior learning docs AND it appeared again in the current session. The correct response is rarely "write a new doc." Instead, **append a dated addendum to the existing doc** with this structure:
+
+```markdown
+---
+
+## YYYY-MM-DD second-incident addendum — recurrence count and the systemic fix
+
+The pattern recurred during the **[current work]** session ([PR link]).
+[Count] separate incidents in one session:
+
+1. [Incident 1 description]
+2. [Incident 2 description]
+...
+
+The recovery-style prevention rules from the original doc all worked, but
+they were applied **per incident, [N] times** instead of preventing the
+incidents.
+
+### The systemic upgrade
+
+> [The new, stronger rule that sidesteps the problem instead of recovering from it.]
+
+**Trigger signal**: [Concrete signals that should fire the new rule, not the old one]
+
+**Pattern**:
+[Code block / command sequence demonstrating the upgrade]
+
+### Updated rule of thumb
+
+| Signal | Old response | New response |
+|---|---|---|
+| [Signal] | [Old recovery] | [New prevention] |
+
+### Why the original prevention rules are insufficient
+
+[One-paragraph explanation of why "recover gracefully" is inferior to
+"don't get into the state at all." This is the load-bearing claim that
+justifies the upgrade.]
+```
+
+The append-and-strengthen pattern preserves the prior incident's evidence (so the recurrence count is visible in one place), names the systemic upgrade explicitly (so future searches surface the *new* rule, not the old one), and forces an honest answer to "why didn't the prior fix work?" — which is exactly the question a 4th documentation entry would dodge.
+
+---
+
+### Pre-Check: Validation Status (Project Completion Only)
+
+**Before capturing learnings for a completed project**, run two pre-checks:
+
+#### Pre-Check A: Gap Analysis
+
+**Run a planned-vs-implemented gap analysis before the retrospective.** This gives the retrospective concrete data instead of relying on memory.
+
+1. **Locate planning docs**: Find the PRD, tech plan, tasks doc, and any v2/revised plans.
+2. **Query authoritative sources, do NOT infer**:
+   - **PR state**: Use `gh pr view <number> --json state,isDraft,createdAt,mergedAt,mergeCommit,additions,deletions,changedFiles,commits` (or `gh pr list --search "head:<branch>"` if no number is known). Do not infer "no PR exists" from the absence of a feature branch — draft PRs and squash-merged branches both look like nothing locally.
+   - **Commits**: `git log --oneline <base>..<head>` against the actual base branch the PR targeted (read it from `gh pr view`, do not assume `main`).
+   - **File scope**: `git diff --stat <base>..<head>` for the real change footprint.
+   - For squash-merged PRs, use `gh pr view --json mergeCommit` to find the squash commit on the base branch.
+3. **Compare planned vs actual**: For each planned component, check if it was implemented, modified, deferred, or dropped.
+4. **Foundation/strategy consistency check** (do NOT skip — this catches the highest-value strategy findings): planned-vs-implemented only compares a project against its *own* plan. Also compare the execution against the **upstream strategy/foundation docs** it should descend from (e.g., `docs/foundations/*`, a strategy doc, an OKR). For each foundational commitment, ask: *did execution still honor it, or did it silently diverge?* A channel ranked "Tier 1, start here" that never appears in the project, or a constraint ("no paid until PMF") that was quietly relaxed, is **drift by omission** — a real strategic decision made without anyone deciding it. Flag each divergence.
+   - **Before calling it "drift", check recency and authority.** Two conflicting docs usually means one is stale, not that there's an open question. Check dates and which doc is canonical. If the execution doc is newer and authoritative, the finding is "the foundation doc is stale — add a dated override note" (per the decision-overrides framework), not "we have an unresolved contradiction." Propose the reconciliation direction rather than dumping the conflict on the user.
+5. **Write the analysis to a file**: Use the template at `resources/templates/planned-vs-implemented.md`. Save as `projects/[project-name]/planned-vs-implemented.md` — this becomes input to the retrospective questions.
+
+**Note**: If the project was already closed via `/playbook:close-project`, this artifact already exists at `projects/done/[project-name]/planned-vs-implemented.md`. Read it instead of regenerating — close-project produces it as the default close artifact.
+
+**Why this matters**: Without a gap analysis, retrospective questions like "what didn't work?" get vague answers. With a gap analysis, you can ask specific questions like "the tech plan called for GitHub Actions but you used local cron — what drove that decision?"
+
+**Why the `gh pr view` step is required**: The agent-activity-ux retro (2026-04-24) initially asserted "No PR exists after 17 days" — wrong, the PR had been a draft from day 2 and was merged on the same day as the retro. The error came from inferring PR state from local git only. `gh pr view` is the cheap, authoritative cure.
+
+#### Pre-Check B: Validation Tasks
+
+1. **Locate the tasks document** for the project (typically `projects/[project-name]/tasks.md`)
+2. **Search for validation/QA tasks** — look for tasks related to the project's actual validation needs. Common examples include: test coverage, integration testing, CI pipeline verification, performance profiling, security review, manual smoke testing. Don't assume UI-specific checks (Lighthouse, accessibility audit, visual review) apply to every project — match validation to what the project actually built.
+3. **Check their status**:
+   - If validation tasks exist and are **incomplete**, warn the user:
+     ```
+     "I found incomplete validation tasks in the tasks document:
+     - [List incomplete validation tasks]
+
+     Validation is often skipped because it's less exciting than building.
+     Would you like to:
+     1. Complete validation tasks first, then capture learnings
+     2. Proceed with learnings and document deferred validation as an action item"
+     ```
+   - If validation tasks exist and are **complete**, proceed normally
+   - If **no validation tasks exist**, note this as a gap in the learnings
+   - If validation tasks exist but **tests were planned in the tasks doc and not created**, flag them:
+     ```
+     "Planned but unimplemented tests found:
+     - [List tests from tasks doc that do not exist as files]
+
+     Would you like to:
+     1. Create the missing tests now, then continue learnings
+     2. Document as a gap and continue"
+     ```
+
+These pre-checks prevent two common patterns: (1) projects skip validation and move directly to learnings/closure, and (2) retrospectives produce vague insights because no one checked what actually shipped vs what was planned.
+
+### Step 1: Identify Trigger Type and Output
+
+Ask the user:
+```
+What type of learning moment is this?
+1. End of chat session (lightweight capture)
+2. Project completion (comprehensive retrospective)
+3. Overcame a blocker (targeted documentation)
+
+Output defaults to **both** codebase docs and plugin improvements.
+Say so if you only want one target.
+```
+
+**If the user selects option 2 (project completion)**, also check whether a project directory exists:
+
+1. **Check for a project dir** in `projects/in-progress/` or `projects/done/` matching this work. If **none exists** (often the case for ad-hoc incident response), prompt the user:
+
+   ```
+   No project directory was found for this work. This typically happens with
+   ad-hoc incident response or short reactive fixes that grew larger than
+   expected.
+
+   Would you like to:
+   A. Create `projects/done/[name]/` retroactively with a README capturing the
+      context, fix, and link to the learnings doc (recommended for multi-hour work).
+   B. Skip — keep the learnings doc only (fine for short fixes or hygiene work).
+   ```
+
+   If the user picks A, create the dir at the end (Step 9) so it links to the
+   completed learnings doc and any commits/PRs.
+
+2. Then check for session history files:
+
+3. Search for SpecStory session files: `.specstory/history/*.md`
+4. If session files exist within the project's date range, **default to deep retrospective**:
+
+```
+Session history files found (N files from [date range]).
+
+For project completions, I recommend a **deep retrospective** — it analyzes
+session files for patterns the standard retro misses: repetition, wasted
+effort, and user frustration signals. (In past projects, deep analysis found
+8+ patterns that standard retrospectives missed.)
+
+A. **Deep retrospective** (recommended) — ~30-45 minutes
+B. **Standard retrospective** — ~15 minutes
+```
+
+3. If no session files are found, fall back to standard retrospective automatically.
+
+Set `deep_retrospective = true` if the user selects A (or accepts the default) and proceed to Step 3.5 after Step 3.
+
+### Step 2: Locate or Create the Template
+
+1. Check if a Learnings document already exists
+2. If not, use template from `resources/templates/learnings.md`
+3. Create in `docs/learnings/[learning-name].md`
+
+### Step 3: Facilitate Based on Trigger Type
+
+#### For Chat Session Learnings
+Quick questions:
+- What was the most valuable insight from this session?
+- What documentation gap did we discover?
+- Any tool or workflow improvement ideas?
+
+**Session Handoff** (for multi-session projects):
+If work will continue in a future session, also capture:
+- Current state: What's done, what's in progress?
+- Recent decisions: Any choices made this session with reasoning?
+- Stale docs: Did any earlier document's conclusions get invalidated?
+- Entry point: What should the next session read first?
+
+#### For Project Completion Learnings
+
+**If a gap analysis was produced in Pre-Check A**, use it to generate specific, targeted questions instead of generic ones. The gap analysis transforms vague retrospective prompts into concrete questions grounded in what actually happened.
+
+**Gap-analysis-informed questions** (preferred):
+```
+Based on the planned-vs-implemented analysis:
+
+1. **Architecture drift**: [Specific drift from gap analysis] — what drove this change?
+   Was it a good decision in hindsight, or should the plan have been updated earlier?
+
+2. **Deferred items**: [Specific deferred items] — should these be implemented,
+   formally dropped, or carried to the next project?
+
+3. **Unplanned additions**: [Items built but not in plan] — were these necessary?
+   Should future plans account for this type of emergent work?
+
+4. **Process friction**: Which phase caused the most rework?
+   (Discovery → Planning → Implementation → Testing → Deployment)
+
+5. **Multi-session coordination**: What information was hardest to maintain
+   across sessions? What would have helped?
+```
+
+**Generic fallback** (use only if no gap analysis exists):
+- **Project Summary**: What was built and outcomes
+- **What Went Well**: Successes and effective practices
+- **What Could Be Improved**: Challenges and pain points
+- **Process Improvements**: Suggested changes
+- **Template Refinements**: Updates needed
+- **Next Steps**: Action items
+
+#### For Blocker Overcome Learnings
+Targeted capture:
+- **Context**: What were you trying to do?
+- **Initial Hypothesis**: What did you think was wrong?
+- **Actual Root Cause**: What was actually wrong?
+- **Solution**: How was it fixed?
+- **Prevention**: How to avoid this in the future?
+
+### Step 3.5: Deep Session History Analysis (If Selected)
+
+**Only run this step if the user opted for deep retrospective in Step 1.**
+
+**Parallelism**: Launch the deep analysis agent **in the background** while conducting the standard retrospective (Step 3) with the user. This runs both in parallel and cuts total time significantly.
+
+#### 3.5.1: Locate Data Sources
+
+**Session files** — Search for SpecStory session history files:
+```
+.specstory/history/*.md
+```
+
+Filter to files within the project's date range. If no session files are found, fall back to standard retrospective.
+
+**Git history** — Analyze commit patterns alongside session files:
+```bash
+# Commit volume and categories
+git log --oneline [base-branch]...HEAD
+
+# File churn (which files changed most)
+git diff --stat [base-branch]...HEAD
+
+# Commit message patterns (look for fix/test churn)
+git log --oneline [base-branch]...HEAD | grep -iE "^[a-f0-9]+ (fix|test|revert)" | wc -l
+```
+
+Git history often reveals patterns invisible in session files — e.g., "46% of commits were test fixes" or "same file modified in 10+ separate commits."
+
+#### 3.5.1b: Scale Strategy for Large Session Sets
+
+When session data is large (>20 sessions or >10MB total):
+- **Prioritize by file size**: Larger sessions = more interaction = more signal
+- **Chunk by date range**: Split into weekly ranges and assign parallel agents
+- **Sample if necessary**: For 50+ sessions, analyze the 20 largest plus a random sample of 10 smaller ones
+- **Always include**: First session (setup patterns), last 5 sessions (final-mile patterns), and any sessions >1MB
+
+#### 3.5.2: Analyze Sessions
+
+Use the Task tool to spawn a research agent (run in background) that reads through the session files and git history. **Use the prompt template at `resources/templates/deep-retrospective-agent-prompt.md`** — fill in the placeholders rather than improvising the prompt each time. If a gap analysis exists from Pre-Check A, include it as additional context for the agent.
+
+Agents should return **structured, tagged findings**.
+
+**For each finding, assign a target tag:**
+
+| Tag | Meaning | Routes To |
+|-----|---------|-----------|
+| `codebase` | Fix via project documentation or code | CLAUDE.md, README, docs/, code |
+| `plugin` | Fix via skill/workflow/command change | Plugin repo files |
+| `both` | Needs changes in both places | Both promotion tracks |
+
+**Tagging guidance:**
+- "Agent didn't invoke a skill" → `plugin`
+- "Agent jumped to implementation during planning" → `plugin`
+- "Agent used wrong branch name despite docs" → `codebase`
+- "Agent didn't commit before git operations" → `both`
+
+**Agents analyze for these 5 categories:**
+
+**Repetition Patterns** (signals of misalignment or missing docs):
+- Same instruction given by user multiple times in different forms
+- Same file read 3+ times in a session
+- Same error encountered and "fixed" more than twice
+- Agent proposing a solution, reverting it, proposing it again
+- Agent making the same type of mistake across sessions
+
+**Wasted Effort** (work that didn't contribute to outcome):
+- Code written and then deleted in the same session
+- Multiple failed approaches before finding the right one
+- Long debugging cycles for simple root causes
+- Planning documents generated but never referenced during implementation
+
+**User Frustration Signals**:
+- Short corrective responses after long agent outputs ("no", "just do X")
+- User repeating instructions with increasing specificity
+- User overriding agent decisions ("don't do that, do this instead")
+- User taking over tasks the agent was supposed to handle (e.g., manually testing CSS values)
+
+**Knowledge Gaps**:
+- Information the agent searched for that was already in CLAUDE.md or MEMORY.md
+- Platform quirks the agent hit that were documented but not consulted
+- Commands or workflows the agent got wrong despite documentation
+
+**Skill/Workflow Gaps** (patterns that map to plugin improvements):
+- Agent didn't invoke a skill that was available and relevant
+- Agent used a skill but the skill's instructions were insufficient (missing step, wrong default)
+- User had to redirect the agent's approach — the skill should have guided it correctly
+- Agent repeated a cross-session pattern that a skill should encode
+- User overrode an agent default — the skill's default should change
+- Agent confabulated facts that a "verify before asserting" instruction would have prevented
+
+#### 3.5.3: Present Findings
+
+Agents return findings in this structured format:
+
+```
+## Finding: [title]
+- **Category**: repetition | wasted_effort | frustration | knowledge_gap | skill_gap
+- **Target**: codebase | plugin | both
+- **Evidence**: [specific quote or example from session]
+- **Impact**: [estimated waste — tokens, time, user redirections]
+- **Proposed fix**: [concrete action]
+- **Target file** (if plugin): [skill/command path, e.g., commands/workflows/debug-ci.md]
+```
+
+Produce a summary grouped by target:
+
+```
+## Deep Retrospective Findings
+
+**Sessions analyzed**: N (from [date] to [date])
+
+### Codebase Findings (N)
+[Findings tagged `codebase` or `both`, grouped by category]
+
+### Plugin Findings (N)
+[Findings tagged `plugin` or `both`, grouped by category]
+
+### Cross-Cutting Findings (N)
+[Findings tagged `both`, showing proposed changes for each target]
+```
+
+#### 3.5.4: Merge Standard + Deep Findings
+
+After both the standard retrospective (Step 3) and deep analysis complete, **merge the findings into a single unified document** rather than presenting them as two separate sections.
+
+1. **Create a comparison table** showing what each method found:
+
+```markdown
+| Finding | Standard Retro | Deep Analysis | Notes |
+|---------|:---:|:---:|-------|
+| [Finding A] | ✓ | ✓ | Both methods caught this |
+| [Finding B] | ✓ | - | Only surfaced in discussion |
+| [Finding C] | - | ✓ | Hidden pattern in session data |
+| [Finding D] | - | ✓ | Agent blind spot |
+```
+
+2. **Highlight the delta**: Findings that ONLY appeared in the deep analysis represent the agent's blind spots — patterns invisible during normal conversation. These are the highest-value learnings because they reveal what the retrospective would have missed without session analysis.
+
+3. **Deduplicate**: Where both methods found the same pattern, combine into the stronger version (usually the deep analysis has more evidence).
+
+4. **The comparison table itself is a learning**: It shows whether deep retrospectives are worth the extra time for this type of project. Include it in the final document.
+
+---
+
+### Step 4: Use YAML Frontmatter for Searchability
+
+Ensure learnings include frontmatter:
+```yaml
+---
+title: "Brief descriptive title"
+date: YYYY-MM-DD
+trigger: [chat-session|project-completion|blocker-overcome]
+analysis-depth: [standard|deep]
+category: [performance|database|integration|workflow|debugging|design|generation|infrastructure]
+tags: [relevant, searchable, keywords]
+severity: [critical|high|medium|low]
+module: "affected_module_name"
+sessions-analyzed: [N]  # only for deep retrospectives
+---
+```
+
+This enables fast filtering when searching for relevant learnings later.
+
+### Step 5: Complete the Document
+
+Based on trigger type, fill appropriate sections:
+
+**All Types**:
+- Title and metadata (YAML frontmatter)
+- Context/summary
+- Key insight or learning
+- Actionable improvements
+
+**Project Completion** (additionally):
+- Full project summary
+- What went well / could improve
+- Process and template refinements
+
+**Blocker Overcome** (additionally):
+- Root cause analysis
+- Prevention strategy
+
+
+### Completeness Gate
+
+Before proceeding to promotion, verify:
+- [ ] Scanned for code patterns worth documenting
+- [ ] Scanned for workflow improvements
+- [ ] Scanned for template fixes or enhancements
+- [ ] Scanned for recurring issues that need prevention
+
+If any items are unchecked, go back and address them before continuing.
+
+### Step 6: Promote Learnings to Point-of-Use
+
+A learning left in a doc is a learning that will be re-learned the hard way. Promote findings via two parallel tracks.
+
+#### Pre-Promotion: CLAUDE.md Health Check (Backstop)
+
+The primary CLAUDE.md size check now runs in **Pre-Check: CLAUDE.md Size Health** at the start of the workflow. This step is a backstop in case content was added during Step 3 facilitation (e.g., new gotchas discovered mid-retrospective). Re-run `wc -c -l CLAUDE.md`; if it's grown past 24k chars / 300 lines since pre-flight, apply the same demotion guidance:
+- Archive RESOLVED known issues → `docs/learnings/resolved-issues.md`
+- Move niche/domain-specific guides → `docs/guides/[topic].md` (keep 1-line reference)
+- Remove content that duplicates the Quick Reference section
+- Condense verbose sections to a reference + link
+
+**Demotion checklist** (run before promotion):
+- [ ] **Does a CLAUDE.md block restate a `docs/solutions/` or `docs/guides/` doc that already exists? → Condense to a one-line pointer.** Try this first: it deletes duplication rather than knowledge, so nothing is lost and it usually frees enough budget to land the new rule in the same edit. (2026-07-25, chef-chopsky: CLAUDE.md sat at 39,948 chars against the 40,000 ceiling in force at the time — well over today's 24,000. Condensing a four-bullet PostHog block that restated two existing solution docs freed ~750 chars and made adding a new CRITICAL rule a net **+22**. The trim/defer/skip decision below never had to be surfaced.)
+- [ ] Are there RESOLVED known issues still in CLAUDE.md? → Archive
+- [ ] Are there niche guides in CLAUDE.md used <1x/month? → Move to `docs/guides/`
+- [ ] Is any CLAUDE.md content duplicated across sections? → Consolidate
+- [ ] Are there stale milestone-specific references? → Delete
+- [ ] **Is every rule still TRUE?** Spot-check any rule that cites a specific file, config, or command against the current code. **A wrong rule is worse than a missing one** — it actively sends an agent to do the wrong thing, and burns context on every session doing it. (2026-07-25, chef-chopsky: CLAUDE.md instructed agents to add new specs to Playwright's `testMatch`, but the config had since become a deny-list where specs enroll automatically.) **Delete these outright** and archive to `docs/learnings/resolved-issues.md` noting what replaced them — do not demote to a guide, where the rule stays wrong but gets harder to find.
+- [ ] **Renaming a CLAUDE.md heading? Grep for it first** — `rg -c "<heading text>" docs/ projects/` — other docs cite rules by heading text, and a rename silently breaks them. Prefer broadening the body over retitling.
+
+**Trimming safety**: if the working tree already has unstaged edits to CLAUDE.md, back it up (`cp CLAUDE.md /tmp/claude-md.bak`) before running `git checkout -- CLAUDE.md`. That command restores from the index and silently discards unstaged trims — hit during the 2026-07-25 retro while negative-testing a size check, costing a full redo of four edits.
+
+**When CLAUDE.md is between 16k–24k chars (or 200–300 lines) — surface the trim/defer/skip decision explicitly:**
+
+Don't silently choose between trimming and skipping the CLAUDE.md addition. Surface the three options to the user with a recommendation:
+
+```
+CLAUDE.md is currently at <N> chars / <L> lines (over the 16k-char/200-line soft limit, under the 24k-char/300-line hard limit).
+
+I have three options for this finding:
+1. **Trim first** — apply the demotion checklist above, then add the new content (estimated ~10 min of doc surgery)
+2. **Defer to docs/guides/** — write the finding as `docs/guides/[topic].md`; rely on grep-discovery instead of CLAUDE.md (zero CLAUDE.md cost, but the agent has to find it on its own)
+3. **Skip** — the finding isn't important enough to warrant either option
+
+My recommendation: [option] because [rationale tying to finding severity + CLAUDE.md current state].
+```
+
+The recipes retrospective (2026-03-16) and the memory-phase-2 2c.5–2c.8 close-out (2026-05-18) both hit this case. Silent choice in either direction loses information — surfacing it lets the user weigh CLAUDE.md hygiene against discoverability for the specific finding.
+
+---
+
+#### Track 1: Codebase Promotion
+
+For each finding tagged `codebase` or `both`, route using this decision tree:
+
+1. **Broadly applicable gotcha or rule?** → CLAUDE.md (Known Issues or Architecture section)
+2. **Specific to one subsystem** (workflows, agent, frontend)? → Subsystem README or `docs/guides/`
+3. **Should be enforced in code?** → Lint rule, pre-commit hook, or script check
+4. **One-time fix?** → Just do it (no documentation needed)
+
+**Present a single batch summary:**
+
+```
+Codebase promotion plan:
+- CLAUDE.md: [N findings] — [brief list]
+- workflows/README.md: [N findings] — [brief list]
+- Code fixes: [N findings] — [brief list]
+- No action needed: [N findings]
+
+Approve all? [y/n, or specify changes]
+```
+
+Implement all approved edits after a single approval. Do not ask per-item.
+
+---
+
+#### Track 2: Plugin Promotion
+
+For each finding tagged `plugin` or `both`:
+
+**Step A — Discover the plugin repo:**
+1. Check CLAUDE.md or MEMORY.md for the plugin repo path
+2. If not found, search: `find ~ -maxdepth 4 -name "product-playbook-for-agentic-coding" -type d 2>/dev/null`
+3. Cache the discovered path in MEMORY.md for future sessions
+
+**Step A2 — Check whether the fix already exists but never merged (do this BEFORE writing one):**
+
+The "'implemented' means MERGED, not written" rule from the prior-learnings pre-check applies to
+the *plugin* too, and it is easy to miss because the plugin repo is not the one you're working in.
+A fix sitting in an open PR still produces the bug in every session — which is precisely why the
+finding reached this retrospective.
+
+```bash
+cd <plugin-repo>
+git fetch -q origin
+# Fixes sitting on unmerged branches. NOTE the ref selection: `origin/main..--all` is a
+# fatal parse error, and bare `--all` drags in agent-harness checkpoint refs (Conductor
+# writes hundreds). `--branches --remotes --not origin/main` is the form that works.
+git log --oneline --branches --remotes --not origin/main -- <candidate-file>
+gh pr list --state open --json number,title,headRefName    # open PRs touching this area
+git status --short                                          # uncommitted WIP in the checkout
+```
+
+Route on what you find:
+- **Open PR already fixes it** → do NOT write a duplicate. Comment on that PR with this
+  session's independent reproduction (a second real occurrence is the strongest possible
+  argument for merging it) and report the PR to the user as the action item.
+- **Fixed on an unmerged/unpushed branch with no PR** → open the PR; that is the missing step.
+- **Uncommitted WIP in the plugin checkout** → surface it, don't commit it — it is likely
+  another session's in-flight work. Note it as at-risk.
+- **Nothing exists** → proceed to Step B.
+
+**If the plugin checkout is dirty, use a worktree rather than switching branches** —
+`git worktree add -b <branch> /tmp/<name> origin/main` — so your edits can't entangle with or
+clobber the in-flight work. Verify with `git -C <plugin-repo> status --short` afterward.
+
+**Step B — Map findings to skills/commands:**
+
+Read the plugin directory structure (`commands/workflows/`, `skills/`). For each finding, identify which file should change:
+
+| Finding Pattern | Target File |
+|----------------|-------------|
+| Agent didn't triage before investigating | `commands/workflows/debug-ci.md` or `debug.md` |
+| Agent jumped to implementation during research | `commands/workflows/research-synthesis.md` |
+| Agent didn't commit before git operations | `commands/workflows/work.md` |
+| Skill default didn't match user preference | The specific skill file |
+| Missing workflow entirely | Propose new command file |
+
+**Step C — Classify change type:**
+
+| Type | Description | Example |
+|------|-------------|---------|
+| New step | Add a step to an existing workflow | "Step 0: Triage" in debug-ci |
+| Default change | Change a workflow's default behavior | Deep retro as default |
+| New principle | Add a rule/principle to a workflow | "Commit checkpoint" in work.md |
+| New workflow | Entirely new command needed | New `/playbook:run-review` |
+
+**Step D — Present a single batch summary:**
+
+```
+Plugin promotion plan:
+- [file]: [change type] — [brief description]
+- [file]: [change type] — [brief description]
+- New command: [name] — [brief description]
+
+Approve all? [y/n, or specify changes]
+```
+
+Implement all approved edits after a single approval. Do not ask per-item.
+
+### Step 7: Check Planning Doc Accuracy
+
+**Planning documents that drift from reality waste tokens in every future session.** Before finalizing, check:
+
+- [ ] **Are planning docs still accurate?** If the project evolved beyond the original tech plan or tasks doc, mark stale docs as superseded with a deprecation notice pointing to the current source of truth.
+- [ ] **Are there standalone critique/review docs that were never referenced?** Synthesize key warnings into the tasks doc as inline notes, then consider archiving the standalone files to reduce directory noise.
+- [ ] **Does an architecture README exist?** If agents spent significant time re-discovering the codebase structure, create or update a README in the relevant directory. This is the single highest-ROI action for multi-session projects.
+
+#### Step 7b: Loose Artifacts Sweep
+
+Multi-week generative projects accumulate untracked artifacts: design exploration screenshots, draft HTML comparison files, side-by-side prototypes, intermediate analysis docs. The agent-activity-ux retro (2026-04-24) found 9 such files dangling in `projects/in-progress/` — useful work that was never tied back to the project's history.
+
+**Run this sweep before declaring the retrospective complete:**
+
+```bash
+# 1. List untracked or untracked-but-modified files in the project directory
+git status --porcelain projects/[status]/[project-name]/
+
+# 2. List untracked files anywhere that look related (loose screenshots, HTMLs)
+git ls-files --others --exclude-standard | grep -iE "[project-keyword]" || true
+```
+
+For each file the sweep returns, decide:
+- **Commit it** alongside the retro if it informed a decision or shows an alternative considered (variant exploration, before/after screenshots, side-by-side comparisons). Move into `projects/[status]/[project-name]/` if it lives elsewhere.
+- **Delete it** if it was an intermediate scratch artifact with no ongoing value.
+- **Move it** into `docs/learnings/assets/` if it has cross-project value (a generic pattern, a reusable diagram).
+
+Do NOT leave files dangling. Either it's worth keeping (so commit it where future-you will find it) or it isn't (so remove it). The mid-state — in the working tree, untracked, undocumented — is the worst outcome.
+
+This sweep is mandatory for **deep** project-completion retros. For incident retros and lighter triggers, skim and skip if nothing turns up.
+
+### Step 8: Validate Completeness
+
+Review the document:
+- [ ] Trigger type captured
+- [ ] YAML frontmatter complete for searchability
+- [ ] Key learning clearly documented
+- [ ] Actionable improvements identified
+- [ ] Saved to correct location
+- [ ] **Codebase track**: Key learnings promoted (CLAUDE.md, README, docs/, code)
+- [ ] **Plugin track**: Skill/workflow improvements identified, mapped, and implemented
+- [ ] Plugin repo path cached in MEMORY.md (if discovered this session)
+- [ ] Planning docs checked for accuracy (Step 7)
+- [ ] Other guidance files updated (if applicable)
+
+### Step 9: Execute Improvements (The Climax — Don't Just Document, Do)
+
+> **Why this step exists**: The biggest gap in retrospectives is stopping at documentation. Learnings that aren't acted on will be re-learned. **This step is the most important part of the entire workflow** — everything before it is analysis; this is where value is created.
+
+#### 9.1: Present the Full Action Plan
+
+Gather ALL actionable improvements from Steps 3 through 8 (standard findings, deep findings, gap analysis, promotions, planning doc fixes) and present them as a **single prioritized action plan**, split by target:
+
+```
+"Here's everything we identified, organized by where it goes:
+
+## Codebase Improvements (N items)
+1. [Priority: High] [Action] — [brief description]
+2. [Priority: Medium] [Action] — [brief description]
+...
+
+## Plugin/Workflow Improvements (N items)
+1. [Action] — [brief description]
+2. [Action] — [brief description]
+...
+
+## Template Feed-Forward (N items)
+1. [Action] — [resources/templates/*.md file + change]
+...
+
+## Deferred (N items)
+1. [Action] — [reason for deferral]
+...
+
+Which should we proceed with? (I recommend executing all High priority items.)"
+```
+
+**Key**: Present codebase and plugin items separately — but **default to executing both**. Do not defer plugin improvements to "next time" or "when you next improve the playbook." The whole point of the learnings phase is to close the loop in this session.
+
+**Default execution strategy**: Execute codebase improvements immediately, then locate the plugin repo and make plugin edits in the same session. Only defer if the user explicitly asks to skip plugin work. If you find yourself writing "these are documented in the learnings doc for when you next improve the playbook" — stop. That means you're deferring instead of executing.
+
+**Template feed-forward is not optional**: Before declaring the action plan complete, walk through the Step 9.5 table (Feed-Forward to Next Project Templates) and surface any template-update items in the same batch summary above. The plan presentation is where the templates get committed-to; Step 9.5 itself is execution. If the action plan doesn't list any template updates and the findings are systemic, double-check — most systemic findings have at least one template that should change.
+
+#### 9.1b: Systemic Analysis — Think Bigger (Project Completion Only)
+
+> **Why this step exists**: The natural tendency is to propose incremental fixes (add a CLAUDE.md rule, update a doc). But if the same class of problem keeps appearing, the fix isn't another rule — it's a systemic change (automation, tooling, workflow redesign). This step forces that elevation.
+
+**After presenting the initial action plan, before the user approves:**
+
+1. **Group findings into root problems**: Look across all findings — do multiple symptoms point to the same underlying cause? Name the root problems explicitly (e.g., "The Trust Gap", "CI Feedback Loop Tax").
+
+2. **Check against prior learnings**: If recurring patterns were found in the Pre-Check, escalate them:
+   ```
+   "[Pattern] has appeared in [N] prior retrospectives. Previous fixes were
+   [documentation/rules]. Since it recurred, a systemic solution is needed —
+   not another documentation entry."
+   ```
+
+3. **Propose systemic solutions**: For each root problem, brainstorm solutions at multiple levels:
+   - **Code/automation**: Can this be enforced by a hook, script, or lint rule?
+   - **Tooling**: Can a new skill, command, or framework prevent this?
+   - **Process**: Does the workflow need a new step or gate?
+   - **Architecture**: Does the system design need to change?
+
+4. **Present a prioritized list** with rationale (impact × feasibility × leverage) alongside the incremental fixes. Let the user decide which level to invest in.
+
+```
+"Before you approve the action items — I've also identified [N] root
+problems that these symptoms point to:
+
+[Root problem analysis + systemic solutions]
+
+Would you like to:
+1. Execute the incremental fixes only
+2. Execute incremental fixes + implement systemic solutions
+3. Review the systemic proposals first"
+```
+
+#### 9.2: Execute Codebase Improvements
+
+For each approved codebase action:
+1. Make the change (archive files, fix docs, update configs)
+2. Verify the change (run relevant checks)
+3. Report what was done
+
+#### 9.3: Create Plugin PR (If Applicable)
+
+If the user selected "Both" or "Plugin/workflow" as the output target and improvements to the playbook/plugin were identified:
+
+1. **Locate the plugin repo**: Check `.claude/plugins/` for the plugin directory
+2. **Create a feature branch**: `git checkout -b improve/[project-name]-retrospective-learnings`
+3. **Make changes**: Modify the relevant plugin files (commands, templates, skills)
+4. **Cross-repo URL resolution check** (see below) — if the plugin PR's description references codebase docs as evidence, those docs must be on the default branch BEFORE the plugin PR opens
+5. **Create the PR**: Use `gh pr create` with a clear description of what was learned and why each change improves the workflow
+6. **Report the PR URL** to the user
+
+**Common plugin files to improve:**
+- `commands/workflows/*.md` — Workflow steps and guidance
+- `resources/templates/*.md` — Task and document templates
+- `skills/*.md` — Skill definitions and patterns
+
+**Cross-repo URL resolution (load-bearing)**:
+
+When the plugin PR description cites a codebase learnings doc as evidence (typical for systemic-fix PRs grounded in a real incident), the doc URL like `https://github.com/<org>/<repo>/blob/<default-branch>/docs/learnings/<file>.md` will 404 if the doc only lives on a feature branch.
+
+**Before opening the plugin PR**, check:
+
+1. Are the cited codebase docs already on the project's default branch (`production` / `main`)? If yes — open the plugin PR as planned.
+2. If the docs only exist on a feature branch that hasn't merged yet, open a **thin docs-only PR** against the codebase repo FIRST. It typically runs only lint+typecheck+unit-tests (path-filtered jobs skip), so the CI cost is low (~12 min) and the URLs become durable.
+3. Only then open the plugin PR. The two PRs can review and merge in parallel.
+
+**Why this matters**: Reviewers of the plugin PR need to validate the premise (the real incident the change is grounded in). Dead links break that validation. The 2026-05-18 memory-phase-2 2c.5–2c.8 close-out hit this exactly — a plugin PR referenced a learning doc that only existed on a feature branch; a thin docs-only PR was opened so the URLs resolved.
+
+**Heuristic for when this applies**: if the plugin PR body contains a `https://github.com/.../blob/<default-branch>/docs/learnings/` URL, double-check that path resolves before submitting.
+
+#### 9.4: Document Solutions with /compound (If Applicable)
+
+For any high-severity finding that has a clear problem → investigation → solution pattern, suggest running `/compound` (or the compound engineering compound skill) to create a reusable solution document in `docs/solutions/`.
+
+**When to suggest /compound:**
+- A significant bug or drift was discovered AND fixed during the retrospective
+- The root cause is non-obvious and likely to recur in other projects
+- The investigation steps would save future developers time
+
+```
+"The [problem] we identified and fixed has a clear solution pattern.
+Would you like to run /compound to document it as a reusable solution
+in docs/solutions/? This makes it searchable for future projects."
+```
+
+#### 9.5: Feed-Forward to Next Project Templates
+
+**Learnings are most valuable when they prevent the same patterns in the next project, not just document them after the current one.**
+
+For each systemic finding (especially from deep analysis), check if it should inform the starting templates for future projects:
+
+| Finding Type | Template to Update |
+|-------------|-------------------|
+| Missing planning for emergent work | `resources/templates/tech-plan.md` — add "Emergent Work Budget" section |
+| Architecture drift not caught early | `resources/templates/tasks.md` — add mid-project architecture check task |
+| Multi-session context loss | `resources/templates/tasks.md` — add session handoff checkpoint tasks |
+| Validation skipped at end | `resources/templates/tasks.md` — add validation tasks as default |
+| Planning docs went stale | `resources/templates/tech-plan.md` — add "Accuracy Review" milestone |
+
+**How to apply**: Don't just note "we should do X next time" — actually edit the template so the next project starts with the improved structure. Add template changes to the plugin PR (Step 9.3).
+
+### Step 10: Improve This Workflow (Meta-Retrospective) — MANDATORY
+
+> **This step is MANDATORY and must ALWAYS be the final step. Never skip it. Never forget it.** The learnings workflow itself is a product. Every time you run it, you discover gaps between what the skill prescribes and what actually works. This step closes the loop — the retrospective retrospectes on itself.
+
+> **Why mandatory**: In the recipes project retrospective (2026-03-16), the agent skipped this step entirely. The user had to prompt twice — first to "think bigger" about solutions, then to reflect on the learnings phase itself. Both prompts produced the most impactful improvements of the session. Skipping this step means leaving the highest-value learnings on the table.
+
+**Part A: Agent self-reflection (do this BEFORE asking the user)**
+
+Compare what the skill prescribed vs what actually happened:
+1. Which steps did you skip, rush, or do out of order?
+2. Where did the user have to redirect you? (These are the most important signals.)
+3. What did you do that the skill didn't tell you to do? (These might be improvements to add.)
+4. Did you search prior learnings? Did you propose systemic solutions or just incremental fixes?
+5. Did you batch approvals or fragment them?
+
+Present your self-assessment honestly:
+```
+"Here's my honest assessment of how this learnings session went:
+
+**Steps I followed well**: [list]
+**Steps I skipped or rushed**: [list]
+**Places you had to redirect me**: [list with what I should have done]
+**Proposed improvements to the learnings workflow**: [list]
+
+Do you have additional observations about the process?"
+```
+
+**Part B: User input**
+
+Ask the user:
+```
+"Did anything about the learnings process itself feel like it could
+be improved? For example:
+
+- Steps that were missing or out of order
+- Questions that weren't asked but should have been
+- Parts that felt redundant or too slow
+- Things we did that the skill didn't guide us to do"
+```
+
+**Part C: Implement improvements**
+
+For ALL identified improvements (from both agent self-reflection and user input):
+1. Propose specific edits to `learnings.md`
+2. Add the changes to the plugin PR created in Step 9.3 (or create one if none exists)
+3. Do not ask "should we do this?" — improvements to the learnings workflow are always worth implementing
+
+**Examples of improvements discovered this way:**
+- Git history analysis was missing as a data source (found during subscriptions-v1 retro)
+- Step 9 (Execute Improvements) didn't exist — the skill stopped at documentation
+- /compound integration wasn't suggested for significant solved problems
+- No guidance for large session sets (>20 sessions)
+- Prior learnings search was missing — recurring patterns never got escalated (found during recipes retro)
+- Systemic analysis ("think bigger") step was missing — agent defaulted to incremental fixes (found during recipes retro)
+- Meta-retrospective was skippable — agent skipped it, losing the highest-value improvements (found during recipes retro)
+
+---
+
+## Key Principles
+
+- **Be Honest**: Encourage honest reflection on what worked and didn't
+- **Focus on Actionability**: Improvements should be specific and actionable
+- **Enable Discovery**: Use YAML frontmatter for future searchability
+- **Plugin Improvements Are First-Class**: Plugin/workflow improvements are proactively surfaced, not an afterthought. The deep analysis explicitly looks for skill gaps, and promotion runs a dedicated plugin track.
+- **Right-Sized**: Match depth to trigger type (lightweight vs comprehensive)
+- **Execute, Don't Just Document**: Learnings without follow-through will be re-learned
+
+## Next Steps
+
+Once the Learnings Document is complete and improvements are executed:
+1. Review and validate the learnings
+2. Verify all executed improvements (Step 9)
+3. If plugin PR was created, share the PR URL with the user
+4. If `/compound` was run, verify the solution doc was created
+5. Apply learnings to future work
+
+---
+
+*Learnings compound over time. Capture them AND act on them to improve both this project's documentation and the overall workflow.*
+
+
+ARGUMENTS: chat-session — the version-bump guard passes a BACKWARDS version bump; plus squash-merge ancestry blindness and open-PR-before-branch-delete
+
+---
+
+_**Agent (claude-opus-5 2026-07-27 14:09:59Z)**_
+
+<think><details><summary>Thought Process</summary>
+Checking the branch state and CLAUDE.md size—it's at 242 lines, which means I'm within the soft limit but need to apply the "one in, one out" rule if I add anything. I've got prior learnings documented on merging stacked PRs and the MCP wrapper, and I'm evaluating whether this is a recurring pattern related to the version-guard gap.
+
+The key findings are that the version-bump guard has a critical flaw—it's passing backwards version bumps when it should reject them semantically—and squash merges are breaking ancestry checks because they lose the commit history. I also need to add guidance about checking open PRs before deleting branches. The version-bump fix in check-version-bump.sh is the priority since this repo is both the plugin and the codebase, so they're the same target. Let me run the check for existing unmerged fixes first, then implement the guard fix.
+
+Now I'm implementing the version-bump guard to properly reject non-increasing versions with negative tests in both directions, adding branch deletion safety guidance to monitor-pr.md about verifying no open PRs and checking content rather than ancestry, and deciding whether CLAUDE.md needs a rule about monotonic versioning—but since the guard now enforces it mechanically, I'll skip the documentation rule and rely on the code enforcement instead. Let me also clean up the guardtest worktree.
+</details></think>
+
+_**Agent (claude-opus-5 2026-07-27 14:09:59Z)**_
+
+**Pre-checks** (branch state already covered by the close-out that just ran):
+
+_**Agent (claude-opus-5 2026-07-27 14:10:09Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Learnings pre-checks and Step A2
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+git worktree remove /tmp/wt-guardtest --force 2>&1|tail -1; git branch -D tmp-guardtest 2>&1|tail -1
+echo "=== CLAUDE.md size (0.24.3 thresholds) ==="; wc -l -c CLAUDE.md | awk '{print "  "$1" lines / "$2" chars  -> over 200-line soft limit, under 300 hard"}'
+echo "=== prior learnings ==="; ls docs/learnings/ | sed 's/^/  /'
+echo "=== Step A2: does a fix for the guard already exist unmerged? ==="
+git log --oneline --branches --remotes --not origin/main -- scripts/check-version-bump.sh; echo "  (empty = none)"
+gh pr list --state open --json number --jq 'if length==0 then "  no open PRs" else .[].number end'
+```
+
+```text
+Exit code 1
+Deleted branch tmp-guardtest (was 639b026).
+=== CLAUDE.md size (0.24.3 thresholds) ===
+  242 lines / 7644 chars  -> over 200-line soft limit, under 300 hard
+=== prior learnings ===
+  2026-07-17-merging-stacked-prs-across-worktrees.md
+  google-tasks-mcp-gog-wrapper.md
+=== Step A2: does a fix for the guard already exist unmerged? ===
+  (empty = none)
+Post "https://api.github.com/graphql": net/http: TLS handshake timeout
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:10:40Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Retry open PR check
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+sleep 3; gh pr list --state open --json number --jq 'if length==0 then "  no open PRs" else .[].number end' 2>&1 | tail -2
+```
+
+```text
+  no open PRs
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:10:49Z)**_
+
+<think><details><summary>Thought Process</summary>
+I need to fix the check-version-bump.sh script so it properly rejects versions that don't increase. Let me examine the version_of function and understand how the script currently works so I can implement the right solution.
+</details></think>
+
+_**Agent (claude-opus-5 2026-07-27 14:10:49Z)**_
+
+Nothing exists — implementing. Reading the guard fully before changing it:
+
+_**Agent (claude-opus-5 2026-07-27 14:10:49Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Read the guard script
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+sed -n '1,60p' scripts/check-version-bump.sh
+```
+
+```text
+#!/bin/bash
+#
+# check-version-bump.sh — Fail if a plugin's files changed without a version bump.
+#
+# WHY THIS EXISTS:
+#   Claude Code marketplace auto-update is *version-keyed*: a plugin only re-installs
+#   on users' machines when its version number changes. So a content change shipped
+#   at an unchanged version silently never propagates — installs stay stale forever.
+#   This check makes that mistake impossible to merge: if any tracked file under a
+#   plugin directory differs from the base branch, that plugin's plugin.json version
+#   MUST also differ.
+#
+# USAGE:
+#   scripts/check-version-bump.sh [base-ref]
+#     base-ref   git ref to diff against (default: origin/main)
+#
+# Exit 0 = all changed plugins bumped their version (or nothing changed).
+# Exit 1 = a plugin changed but its version did not bump.
+
+set -uo pipefail
+
+BASE_REF="${1:-origin/main}"
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$REPO_ROOT"
+
+RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; NC='\033[0m'
+FAILURES=0
+
+# Resolve the base ref; if it isn't present (shallow CI clone), try to fetch it.
+if ! git rev-parse --verify --quiet "$BASE_REF" >/dev/null; then
+    git fetch --quiet origin "${BASE_REF#origin/}" 2>/dev/null || true
+fi
+if ! git rev-parse --verify --quiet "$BASE_REF" >/dev/null; then
+    echo -e "${YELLOW}WARNING: base ref '$BASE_REF' not found — skipping version-bump check.${NC}"
+    exit 0
+fi
+
+MERGE_BASE="$(git merge-base "$BASE_REF" HEAD 2>/dev/null || echo "$BASE_REF")"
+
+version_of() {  # version_of <git-ref-or-WORKING> <path>
+    local ref="$1" path="$2" content
+    if [ "$ref" = "WORKING" ]; then
+        [ -f "$path" ] || return 1
+        content="$(cat "$path")"
+    else
+        content="$(git show "$ref:$path" 2>/dev/null)" || return 1
+    fi
+    printf '%s' "$content" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("version",""))' 2>/dev/null
+}
+
+echo "Checking version bumps against $BASE_REF (merge-base ${MERGE_BASE:0:8})..."
+echo "-------------------------------------------"
+
+shopt -s nullglob
+for plugin_json in plugins/*/.claude-plugin/plugin.json; do
+    plugin_dir="$(dirname "$(dirname "$plugin_json")")"   # plugins/<name>
+    name="$(basename "$plugin_dir")"
+
+    # Did anything under this plugin change vs the merge-base?
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:10:59Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Branch for the guard fix
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+git checkout -q -b fix/guard-rejects-version-regression && git branch --show-current
+```
+
+```text
+fix/guard-rejects-version-regression
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:11:11Z)**_
+
+<tool-use data-tool-type="write" data-tool-name="Edit"><details>
+<summary>Tool use: **Edit**</summary>
+
+```text
+<tool_use_error>File has not been read yet. Read it first before writing to it.</tool_use_error>
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:11:17Z)**_
+
+<tool-use data-tool-type="read" data-tool-name="Read"><details>
+<summary>Tool use: **Read**</summary>
+ `./scripts/check-version-bump.sh`
+
+```text
+14	#   scripts/check-version-bump.sh [base-ref]
+15	#     base-ref   git ref to diff against (default: origin/main)
+16	#
+17	# Exit 0 = all changed plugins bumped their version (or nothing changed).
+18	# Exit 1 = a plugin changed but its version did not bump.
+19	
+20	set -uo pipefail
+21
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:11:40Z)**_
+
+<tool-use data-tool-type="write" data-tool-name="Edit"><details>
+<summary>Tool use: **Edit**</summary>
+
+```text
+The file /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava/scripts/check-version-bump.sh has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:11:58Z)**_
+
+<tool-use data-tool-type="read" data-tool-name="Read"><details>
+<summary>Tool use: **Read**</summary>
+ `./scripts/check-version-bump.sh`
+
+```text
+44	
+45	MERGE_BASE="$(git merge-base "$BASE_REF" HEAD 2>/dev/null || echo "$BASE_REF")"
+46	
+47	version_of() {  # version_of <git-ref-or-WORKING> <path>
+48	    local ref="$1" path="$2" content
+49	    if [ "$ref" = "WORKING" ]; then
+50	        [ -f "$path" ] || return 1
+51	        content="$(cat "$path")"
+52	    else
+53	        content="$(git show "$ref:$path" 2>/dev/null)" || return 1
+54	    fi
+55	    printf '%s' "$content" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("version",""))' 2>/dev/null
+56	}
+57
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:12:08Z)**_
+
+<tool-use data-tool-type="write" data-tool-name="Edit"><details>
+<summary>Tool use: **Edit**</summary>
+
+```text
+The file /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava/scripts/check-version-bump.sh has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:12:29Z)**_
+
+<tool-use data-tool-type="read" data-tool-name="Read"><details>
+<summary>Tool use: **Read**</summary>
+ `./scripts/check-version-bump.sh`
+
+```text
+85	
+86	    cur_version="$(version_of WORKING "$plugin_json" || true)"
+87	    base_version="$(version_of "$MERGE_BASE" "$plugin_json" || echo "")"
+88	
+89	    if [ -z "$base_version" ]; then
+90	        echo -e "${GREEN}OK: $name is new (version $cur_version)${NC}"
+91	        continue
+92	    fi
+93	
+94	    if [ "$cur_version" = "$base_version" ]; then
+95	        echo -e "${RED}FAIL: $name changed but version not bumped (still $cur_version)${NC}"
+96	        echo -e "       Run: scripts/sync-version.sh <new-version> $name"
+97	        FAILURES=$((FAILURES + 1))
+98	    else
+99	        echo -e "${GREEN}OK: $name bumped $base_version -> $cur_version${NC}"
+100	    fi
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:13:53Z)**_
+
+<tool-use data-tool-type="write" data-tool-name="Edit"><details>
+<summary>Tool use: **Edit**</summary>
+
+```text
+The file /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava/scripts/check-version-bump.sh has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:13:57Z)**_
+
+<tool-use data-tool-type="read" data-tool-name="Read"><details>
+<summary>Tool use: **Read**</summary>
+ `./scripts/check-version-bump.sh`
+
+```text
+104	    else
+105	        echo -e "${GREEN}OK: $name bumped $base_version -> $cur_version${NC}"
+106	    fi
+107	done
+108	
+109	echo ""
+110	if [ "$FAILURES" -gt 0 ]; then
+111	    echo -e "${RED}Version-bump check FAILED ($FAILURES plugin(s) changed without a bump).${NC}"
+112	    echo "Auto-update is version-keyed: unbumped changes never reach users' installs."
+113	    exit 1
+114	fi
+115	echo -e "${GREEN}Version-bump check PASSED.${NC}"
+116	exit 0
+117
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:14:02Z)**_
+
+<tool-use data-tool-type="write" data-tool-name="Edit"><details>
+<summary>Tool use: **Edit**</summary>
+
+```text
+The file /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava/scripts/check-version-bump.sh has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:14:06Z)**_
+
+Now negative-testing the fix in **all four directions** — the rule 0.24.0 added:
+
+_**Agent (claude-opus-5 2026-07-27 14:14:11Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Unit-test the version comparison
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+echo "=== unit-test version_gt directly ==="
+source /dev/stdin <<'SH'
+version_gt() {
+    python3 - "$1" "$2" <<'PY'
+import re, sys
+def parse(v):
+    m = re.match(r'^(\d+)\.(\d+)\.(\d+)', (v or '').strip())
+    return tuple(int(x) for x in m.groups()) if m else None
+a, b = parse(sys.argv[1]), parse(sys.argv[2])
+sys.exit(0 if (a is not None and b is not None and a > b) else 1)
+PY
+}
+SH
+for pair in "0.24.8 0.24.7:greater" "0.23.0 0.24.7:NOT-greater" "0.24.7 0.24.7:NOT-greater" "0.10.0 0.9.0:greater(string-sort would fail)" "1.0.0 0.99.99:greater" "abc 0.24.7:NOT-greater(malformed)" " 0.24.7:NOT-greater(empty)"; do
+  v="${pair%%:*}"; label="${pair##*:}"; set -- $v
+  if version_gt "${1:-}" "${2:-}"; then r="greater"; else r="NOT-greater"; fi
+  printf "  %-22s -> %-12s (expected %s)\n" "${1:-∅} vs ${2:-∅}" "$r" "$label"
+done
+```
+
+```text
+=== unit-test version_gt directly ===
+  0.24.8 0.24.7 vs ∅     -> NOT-greater  (expected greater)
+  0.23.0 0.24.7 vs ∅     -> NOT-greater  (expected NOT-greater)
+  0.24.7 0.24.7 vs ∅     -> NOT-greater  (expected NOT-greater)
+  0.10.0 0.9.0 vs ∅      -> NOT-greater  (expected greater(string-sort would fail))
+  1.0.0 0.99.99 vs ∅     -> NOT-greater  (expected greater)
+  abc 0.24.7 vs ∅        -> NOT-greater  (expected NOT-greater(malformed))
+   0.24.7 vs ∅           -> NOT-greater  (expected NOT-greater(empty))
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:14:15Z)**_
+
+<think><details><summary>Thought Process</summary>
+The test harness itself is the problem — the colon-delimited pairs aren't splitting correctly with `set -- $v`, leaving the second field empty. I need to rewrite the test setup to properly construct the test cases.
+</details></think>
+
+_**Agent (claude-opus-5 2026-07-27 14:14:15Z)**_
+
+My test harness is broken (`$2` is empty in every case), not the function. Fixing the harness:
+
+_**Agent (claude-opus-5 2026-07-27 14:14:19Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Correctly unit-test version_gt
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+version_gt() {
+    python3 - "$1" "$2" <<'PY'
+import re, sys
+def parse(v):
+    m = re.match(r'^(\d+)\.(\d+)\.(\d+)', (v or '').strip())
+    return tuple(int(x) for x in m.groups()) if m else None
+a, b = parse(sys.argv[1]), parse(sys.argv[2])
+sys.exit(0 if (a is not None and b is not None and a > b) else 1)
+PY
+}
+t() { if version_gt "$1" "$2"; then r=greater; else r=NOT-greater; fi; printf "  %-18s -> %-12s expected %s\n" "'$1' vs '$2'" "$r" "$3"; }
+t 0.24.8 0.24.7 greater
+t 0.23.0 0.24.7 NOT-greater
+t 0.24.7 0.24.7 NOT-greater
+t 0.10.0 0.9.0  greater
+t 1.0.0  0.99.99 greater
+t abc    0.24.7 NOT-greater
+t ""     0.24.7 NOT-greater
+t 0.24.7 ""     NOT-greater
+```
+
+```text
+  '0.24.8' vs '0.24.7' -> greater      expected greater
+  '0.23.0' vs '0.24.7' -> NOT-greater  expected NOT-greater
+  '0.24.7' vs '0.24.7' -> NOT-greater  expected NOT-greater
+  '0.10.0' vs '0.9.0' -> greater      expected greater
+  '1.0.0' vs '0.99.99' -> greater      expected greater
+  'abc' vs '0.24.7'  -> NOT-greater  expected NOT-greater
+  '' vs '0.24.7'     -> NOT-greater  expected NOT-greater
+  '0.24.7' vs ''     -> NOT-greater  expected NOT-greater
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:14:26Z)**_
+
+All 8 cases correct, including `0.10.0 > 0.9.0` which a string sort gets wrong. Now the end-to-end guard test:
+
+_**Agent (claude-opus-5 2026-07-27 14:14:37Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+End-to-end guard test in all directions
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+git add -- scripts/check-version-bump.sh && git commit -q -m "wip: guard rejects version regression" && git worktree add -q /tmp/wt-gt2 tmp-gt2 2>/dev/null || git worktree add -q /tmp/wt-gt2 -b tmp-gt2 HEAD
+cd /tmp/wt-gt2
+run() { printf '\n<!-- test -->\n' >> plugins/product-playbook-for-agentic-coding/commands/workflows/work.md; scripts/sync-version.sh "$1" >/dev/null 2>&1; scripts/check-version-bump.sh origin/main >/tmp/o 2>&1; ec=$?; echo "  version $1 -> exit $ec : $(grep -E 'OK:|FAIL:' /tmp/o | grep product-playbook | sed 's/\x1b\[[0-9;]*m//g')"; git checkout -q -- . ; }
+echo "=== end-to-end: content changed + version set to ... ==="
+run 0.23.0
+run 0.24.7
+run 0.24.8
+echo "=== control: no content change, no bump ==="
+scripts/check-version-bump.sh origin/main 2>&1 | grep -E 'product-playbook|PASSED|FAILED' | sed 's/\x1b\[[0-9;]*m//g' | sed 's/^/  /'
+```
+
+```text
+=== end-to-end: content changed + version set to ... ===
+  version 0.23.0 -> exit 1 : FAIL: product-playbook-for-agentic-coding version went BACKWARDS (0.24.7 -> 0.23.0)
+  version 0.24.7 -> exit 1 : FAIL: product-playbook-for-agentic-coding changed but version not bumped (still 0.24.7)
+  version 0.24.8 -> exit 0 : OK: product-playbook-for-agentic-coding bumped 0.24.7 -> 0.24.8
+=== control: no content change, no bump ===
+  OK: product-playbook-for-agentic-coding unchanged
+  Version-bump check PASSED.
+Shell cwd was reset to /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:15:11Z)**_
+
+<think><details><summary>Thought Process</summary>
+I'm seeing that the backwards case now fails as expected, while the other directions are passing. Next I need to document these findings about squash merges breaking ancestry in the monitor-pr.md file, add notes to the learnings doc, update the version, and get this ready for a PR.
+
+Since I'm modifying monitor-pr.md which is under plugins/, that'll trigger a version bump requirement to 0.24.8. Let me clean up the test worktree and add the branch-cleanup safety section to the docs.
+</details></think>
+
+_**Agent (claude-opus-5 2026-07-27 14:15:11Z)**_
+
+All four directions correct — backwards now **fails** where it previously passed. Adding the other two findings:
+
+_**Agent (claude-opus-5 2026-07-27 14:15:11Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Locate the branch-audit section
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+git worktree remove /tmp/wt-gt2 --force 2>&1|tail -1; git branch -D tmp-gt2 2>&1|tail -1
+grep -n 'audit with:' -A6 plugins/product-playbook-for-agentic-coding/commands/workflows/monitor-pr.md | tail -10
+```
+
+```text
+Deleted branch tmp-gt2 (was a42cdb1).
+236:> **Better, fix it at the repo level**: with `delete_branch_on_merge: true` (Settings → General → "Automatically delete head branches") GitHub deletes the head branch on every merge and this failure mode disappears — including for web-UI merges. Check with `gh repo view --json deleteBranchOnMerge`. A repo with it `false` silently accumulates merged branches; audit with:
+237->
+238-> ```bash
+239-> for b in $(git ls-remote --heads origin | awk '{print $2}' | sed 's|refs/heads/||'); do
+240->   gh pr list --head "$b" --state merged --limit 1 --json number --jq ".[0].number" | grep -q . && echo "stale: $b"
+241-> done
+242-> ```
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:15:19Z)**_
+
+<tool-use data-tool-type="read" data-tool-name="Read"><details>
+<summary>Tool use: **Read**</summary>
+ `./plugins/product-playbook-for-agentic-coding/commands/workflows/monitor-pr.md`
+
+```text
+236	> **Better, fix it at the repo level**: with `delete_branch_on_merge: true` (Settings → General → "Automatically delete head branches") GitHub deletes the head branch on every merge and this failure mode disappears — including for web-UI merges. Check with `gh repo view --json deleteBranchOnMerge`. A repo with it `false` silently accumulates merged branches; audit with:
+237	>
+238	> ```bash
+239	> for b in $(git ls-remote --heads origin | awk '{print $2}' | sed 's|refs/heads/||'); do
+240	>   gh pr list --head "$b" --state merged --limit 1 --json number --jq ".[0].number" | grep -q . && echo "stale: $b"
+241	> done
+242	> ```
+243	
+244	### Step 5: False-Green Sanity Check
+245
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:15:35Z)**_
+
+<tool-use data-tool-type="write" data-tool-name="Edit"><details>
+<summary>Tool use: **Edit**</summary>
+
+```text
+The file /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava/plugins/product-playbook-for-agentic-coding/commands/workflows/monitor-pr.md has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:15:40Z)**_
+
+Now the learnings doc — appending to the existing worktree/merge doc rather than duplicating:
+
+_**Agent (claude-opus-5 2026-07-27 14:15:41Z)**_
+
+<tool-use data-tool-type="read" data-tool-name="Read"><details>
+<summary>Tool use: **Read**</summary>
+ `./docs/learnings/2026-07-17-merging-stacked-prs-across-worktrees.md`
+
+```text
+116	|---|---|
+117	| `--delete-branch` half-fails when a worktree holds the branch | Verify + `git push origin --delete` (documented in Step 4) |
+118	| Merges that never used `--delete-branch` at all | `delete_branch_on_merge: true` — covers both |
+119	
+120	### Updated rule of thumb
+121	
+122	| Signal | Old response | New response |
+123	|---|---|---|
+124	| `failed to delete local branch …used by worktree` | Ignore — "remote is still deleted" | `git ls-remote --heads origin <b>`; delete it yourself if present |
+125	| Repo accumulating merged branches | (not covered) | Check `gh repo view --json deleteBranchOnMerge`; enable it |
+126	
+127	### Addendum action items
+128	
+129	- [x] `/playbook:monitor-pr` Step 4: claim corrected, verification snippet + repo-level fix added (0.24.4)
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:15:45Z)**_
+
+<tool-use data-tool-type="read" data-tool-name="Read"><details>
+<summary>Tool use: **Read**</summary>
+ `./docs/learnings/2026-07-17-merging-stacked-prs-across-worktrees.md`
+
+```text
+127	### Addendum action items
+128	
+129	- [x] `/playbook:monitor-pr` Step 4: claim corrected, verification snippet + repo-level fix added (0.24.4)
+130	- [ ] **Enable `delete_branch_on_merge` on this repo** — repo setting, needs owner action
+131	- [ ] Sweep the 24 stale remote branches (two are held by live worktrees — leave those)
+132
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:16:28Z)**_
+
+<tool-use data-tool-type="write" data-tool-name="Edit"><details>
+<summary>Tool use: **Edit**</summary>
+
+```text
+The file /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava/docs/learnings/2026-07-17-merging-stacked-prs-across-worktrees.md has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:16:37Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Bump to 0.24.8
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+scripts/sync-version.sh 0.24.8 2>&1|head -1
+```
+
+```text
+Synced 'product-playbook-for-agentic-coding': 0.24.7 -> 0.24.8
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:16:42Z)**_
+
+<tool-use data-tool-type="read" data-tool-name="Read"><details>
+<summary>Tool use: **Read**</summary>
+ `./CHANGELOG.md`
+
+```text
+1	# Changelog
+2	
+3	All notable changes to this project will be documented in this file.
+4	
+5	The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+6	and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+7	
+8	## [Unreleased]
+9	
+10	## [0.24.7] - 2026-07-27
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:16:58Z)**_
+
+<tool-use data-tool-type="write" data-tool-name="Edit"><details>
+<summary>Tool use: **Edit**</summary>
+
+```text
+The file /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava/CHANGELOG.md has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:17:31Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Validate and commit the learnings fixes
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+scripts/validate-plugin.sh 2>&1|tail -2 && scripts/check-version-bump.sh origin/main 2>&1|tail -3
+git add -- scripts/ plugins/ docs/learnings/ CHANGELOG.md .claude-plugin/ && git status --short
+git commit -q -m "$(cat <<'EOF'
+fix(guard): reject version regressions; branch-sweep safety checks
+
+check-version-bump.sh compared versions with a string inequality, so any
+change passed — including a decrease. It printed "OK: bumped 0.24.7 ->
+0.23.0" and exited 0.
+
+Open PR #74 carried exactly that (duplicate of merged #59, plus version
+0.23.0). CI was the only gate and CI would have been green.
+
+Backwards is worse than unbumped: installs on the higher version stop
+updating until the number climbs back past it.
+
+Now semver-aware, fails closed on malformed input, distinct BACKWARDS
+message. Negative-tested: 8 unit cases + 4 end-to-end runs.
+
+Also adds bulk-delete safety to monitor-pr: re-derive open PRs at delete
+time, and judge merged-ness on content rather than ancestry (squash-merge
+breaks ancestry in both directions).
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+EOF
+)" && git log --oneline -1
+```
+
+```text
+Validation PASSED
+OK: product-playbook-for-agentic-coding bumped 0.24.7 -> 0.24.8
+
+Version-bump check PASSED.
+M  .claude-plugin/marketplace.json
+ M .specstory/history/2026-07-26_02-41-31Z-system-instruction-you-are.md
+M  CHANGELOG.md
+M  docs/learnings/2026-07-17-merging-stacked-prs-across-worktrees.md
+M  plugins/product-playbook-for-agentic-coding/.claude-plugin/plugin.json
+M  plugins/product-playbook-for-agentic-coding/commands/workflows/monitor-pr.md
+?? .specstory/history/2026-07-27_14-14-39Z-review-this-change-for.md
+e0bfa07 fix(guard): reject version regressions; branch-sweep safety checks
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:19:05Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Push and open the guard fix PR
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+git push -q -u origin fix/guard-rejects-version-regression && gh pr create --base main --head fix/guard-rejects-version-regression --title "fix(guard): version-bump check passed a version REGRESSION" --body "## The bug
+
+\`scripts/check-version-bump.sh\` exists to protect version-keyed propagation. It compared versions with a string inequality:
+
+\`\`\`bash
+if [ \"\$cur_version\" = \"\$base_version\" ]; then   # FAIL
+else                                            # OK: bumped \$base -> \$cur
+\`\`\`
+
+So **any** change passed — including a decrease:
+
+\`\`\`
+OK: product-playbook-for-agentic-coding bumped 0.24.7 -> 0.23.0
+Version-bump check PASSED.     EXIT CODE: 0
+\`\`\`
+
+It printed the word \"bumped\" for a seven-release regression and exited green.
+
+## This was live, not hypothetical
+
+**PR #74** — a duplicate of the already-merged #59 — carried exactly this shape: every content file byte-identical to \`main\`, plus \`\"version\": \"0.23.0\"\`. It was open today. CI was the only gate, and CI would have passed it. It got caught by a judgement call (\"this looks like a duplicate\"), not by the guard built to catch it.
+
+**Backwards is worse than unbumped.** An unbumped change fails to propagate. A backwards version makes every install already on the higher version stop updating until the number climbs back past that high-water mark — a stall that outlives the offending PR and is invisible from the repo.
+
+## Negative-tested in both directions
+
+Per the \"negative-test every guardrail\" rule added in 0.24.0 — applied here to a guard that predates it.
+
+**Unit (8 cases):**
+
+| a vs b | result | note |
+|---|---|---|
+| 0.24.8 vs 0.24.7 | greater | |
+| 0.23.0 vs 0.24.7 | NOT-greater | the bug |
+| 0.24.7 vs 0.24.7 | NOT-greater | |
+| 0.10.0 vs 0.9.0 | greater | **string sort gets this wrong** |
+| 1.0.0 vs 0.99.99 | greater | |
+| abc / empty / missing | NOT-greater | fails closed |
+
+**End-to-end (content changed + version set to…):**
+
+| version | exit | message |
+|---|---|---|
+| 0.23.0 | **1** | \`FAIL: version went BACKWARDS (0.24.7 -> 0.23.0)\` |
+| 0.24.7 | 1 | \`FAIL: changed but version not bumped\` |
+| 0.24.8 | 0 | \`OK: bumped 0.24.7 -> 0.24.8\` |
+| (no change) | 0 | \`OK: unchanged\` |
+
+## Also: branch-sweep safety in \`/playbook:monitor-pr\`
+
+Two checks that are not optional before bulk-deleting branches:
+
+1. **Deleting a branch closes its open PR** — re-derive the open-PR list *at delete time*, never from a list built earlier in the session.
+2. **Judge \"merged\" on content, not ancestry** — squash-merge discards the branch's commits, so \`git branch --merged\` and \`merge-base --is-ancestor\` misreport in both directions.
+
+Both fired in one 25-branch sweep today: the content check flagged two branches ancestry called deletable, and both had PRs opened mid-session (#73, #74). A third held the only complete copy of a file \`main\` had truncated — and only in its **local** ref.
+
+## Open follow-up
+
+- [ ] Audit the repo's other guards the same way. Has \`validate-plugin.sh\` ever been run against input it should *reject*?
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)" 2>&1|tail -1
+```
+
+```text
+remote: 
+remote: Create a pull request for 'fix/guard-rejects-version-regression' on GitHub by visiting:        
+remote:      https://github.com/daviswhitehead/product-playbook-for-agentic-coding-plugin/pull/new/fix/guard-rejects-version-regression        
+remote: 
+https://github.com/daviswhitehead/product-playbook-for-agentic-coding-plugin/pull/76
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:19:47Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Poll CI for guard fix PR
+
+`for i in $(seq 1 30); do s=$(gh pr view 76 --json statusCheckRollup --jq '[.statusCheckRollup[] | (.conclusion // .state)] | join(",")'); echo "$i: $s"; case "$s" in *PENDING*|*IN_PROGRESS*|*QUEUED*|"") sleep 15;; *) break;; esac; done`
+
+```text
+1: SUCCESS
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:21:00Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Merge the guard fix PR
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+gh pr comment 76 --body "## Proof of completion
+
+**What shipped** — \`check-version-bump.sh\` now rejects non-increasing versions with a semver-aware comparison that fails closed on malformed input. \`/playbook:monitor-pr\` gains two mandatory pre-delete checks (open-PR at delete time; content-not-ancestry). Third dated addendum on the 2026-07-17 learnings doc.
+
+**Evidence it works** — Negative-tested both directions: 8 unit cases (incl. \`0.10.0 > 0.9.0\`, which a string sort fails) and 4 end-to-end runs — backwards → exit 1, unchanged → exit 1, forward → exit 0, no-change → exit 0. The pre-fix behavior was reproduced first (\`OK: bumped 0.24.7 -> 0.23.0\`, exit 0) so the fix is measured against a demonstrated failure, not an assumed one. \`validate-plugin.sh\` 0 errors / 0 warnings; guard green on this PR at 0.24.8.
+
+**Deferred / overridden**
+1. **Other guards not audited.** \`validate-plugin.sh\` has almost certainly never been run against input it should reject. Tracked as an open item in the learnings doc — the same class of bug could be sitting there.
+2. Comparison handles \`MAJOR.MINOR.PATCH\` only; a prerelease/build suffix (\`1.0.0-rc1\`) parses on the numeric prefix and ignores the suffix. Fine for this repo's scheme, would need extending if that changes.
+3. This guard runs in CI on PRs to \`main\`; it does not protect direct pushes to \`main\`, which are currently unprotected." 2>&1|tail -1
+gh pr merge 76 --merge --delete-branch 2>&1|tail -2
+sleep 3; git fetch -q origin --prune; git checkout -q daviswhitehead/merge-open-prs-v1 2>/dev/null; git merge --ff-only origin/main 2>&1|tail -1
+echo "PR76: $(gh pr view 76 --json state --jq .state)"; echo "open PRs: $(gh pr list --state open --json number --jq 'length')"
+```
+
+```text
+https://github.com/daviswhitehead/product-playbook-for-agentic-coding-plugin/pull/76#issuecomment-5092513343
+Post "https://api.github.com/graphql": net/http: TLS handshake timeout
+Already up to date.
+PR76: OPEN
+open PRs: 1
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:21:12Z)**_
+
+<think><details><summary>Thought Process</summary>
+I see the issue now—when I ran that git checkout command, it switched me away from the fix branch back to main, which reverted all my changes. The version bump script is back to using string comparison instead of the numeric check, the changelog still shows 0.24.7, and the monitor-pr documentation is at its original state. My commit got lost in that switch.
+
+But the good news is the commit e0bf a07 is actually on the remote branch `fix/guard-rejects-version-regression` that was already pushed, and PR #76 is open with green CI—the merge just failed due to a TLS timeout. I need to retry the merge to get it through.
+</details></think>
+
+_**Agent (claude-opus-5 2026-07-27 14:21:12Z)**_
+
+The merge hit a TLS timeout and my branch switch reverted the working tree — the commit is safe on the pushed branch. Verifying and retrying:
+
+_**Agent (claude-opus-5 2026-07-27 14:21:26Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Verify the work survived the timeout
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+echo "=== where is the work? ==="
+git log --oneline -1 origin/fix/guard-rejects-version-regression
+echo "  version_gt present on that branch: $(git show origin/fix/guard-rejects-version-regression:scripts/check-version-bump.sh | grep -c 'version_gt')"
+echo "=== PR state ==="; gh pr view 76 --json state,mergeable,statusCheckRollup --jq '"\(.state) \(.mergeable) checks=\([.statusCheckRollup[]|(.conclusion//.state)]|join(","))"'
+```
+
+```text
+=== where is the work? ===
+e0bfa07 fix(guard): reject version regressions; branch-sweep safety checks
+  version_gt present on that branch: 3
+=== PR state ===
+OPEN MERGEABLE checks=SUCCESS
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:22:52Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Retry merge and verify on main
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+gh pr merge 76 --merge --delete-branch 2>&1|tail -2; sleep 4; git fetch -q origin --prune
+echo "PR76: $(gh pr view 76 --json state --jq .state)"
+git merge --ff-only origin/main 2>&1|tail -1
+echo "=== fix is on main? ==="
+grep -c 'version_gt' scripts/check-version-bump.sh | xargs echo "  version_gt occurrences:"
+echo "  version: $(python3 -c "import json;print(json.load(open('plugins/product-playbook-for-agentic-coding/.claude-plugin/plugin.json'))['version'])")"
+echo "open PRs: $(gh pr list --state open --json number --jq 'length')"; echo "remote branches: $(git ls-remote --heads origin|wc -l|tr -d ' ')"
+```
+
+```text
+PR76: MERGED
+ 6 files changed, 164 insertions(+), 8 deletions(-)
+=== fix is on main? ===
+  version_gt occurrences: 3
+  version: 0.24.8
+open PRs: 0
+remote branches: 1
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:23:13Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Final regression test against main
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+echo "=== final regression test AGAINST MAIN's copy of the guard ==="
+git worktree add -q /tmp/wt-final -b tmp-final origin/main 2>&1|tail -1
+cd /tmp/wt-final
+printf '\n<!-- t -->\n' >> plugins/product-playbook-for-agentic-coding/commands/workflows/work.md
+scripts/sync-version.sh 0.23.0 >/dev/null 2>&1
+scripts/check-version-bump.sh origin/main 2>&1 | sed 's/\x1b\[[0-9;]*m//g' | grep -E 'FAIL|PASS|BACKWARDS'; echo "EXIT: ${PIPESTATUS[0]}"
+```
+
+```text
+=== final regression test AGAINST MAIN's copy of the guard ===
+FAIL: product-playbook-for-agentic-coding version went BACKWARDS (0.24.8 -> 0.23.0)
+Version-bump check FAILED (1 plugin(s) without a forward version bump).
+EXIT:
+Shell cwd was reset to /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-07-27 14:23:24Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+Cleanup, refresh, and archive-readiness check
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/bratislava
+git worktree remove /tmp/wt-final --force 2>&1|tail -1; git branch -D tmp-final 2>&1|tail -1
+claude plugin marketplace update product-playbook-marketplace >/dev/null 2>&1 && claude plugin update product-playbook-for-agentic-coding@product-playbook-marketplace 2>&1|tail -1
+echo "=== ARCHIVE-READINESS CHECK ==="
+echo "-- working tree (excluding live specstory writes) --"; git status --porcelain | grep -v '\.specstory' ; echo "   (empty above = no non-transcript changes)"
+echo "-- specstory --"; git status --porcelain | grep '\.specstory' | sed 's/^/   /'
+echo "-- branch vs origin/main --"; git rev-list --left-right --count origin/main...HEAD | awk '{print "   behind: "$1"  ahead: "$2}'
+echo "-- unpushed commits anywhere --"; git log --oneline --branches --not --remotes | head -5; echo "   (empty = all pushed)"
+echo "-- stashes --"; git stash list | sed 's/^/   /'
+echo "-- open PRs --"; gh pr list --state open --json number --jq 'length'
+```
 </details></tool-use>
