@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.5] - 2026-07-26
+
+### Fixed
+- **`/playbook:monitor-pr` Step 4 — the `--delete-branch` half-fail isn't worktree-specific** — 0.24.4 (one version earlier, same session) described the trigger as "another worktree holds the PR branch". Too narrow: **any** failure in gh's post-merge local cleanup produces the same half-fail, leaving the remote branch alive. A second trigger was hit immediately — a **dirty working tree**, which blocks the switch to the default branch (`Please commit your changes or stash them before you switch branches. Aborting`).
+
+  Found while merging PR #69, the very PR that corrected this note: its own merge hit the new trigger. Running total is 4 occurrences, of which 3 were the worktree case and 1 the dirty-tree case.
+
+  Step 4 now lists both triggers with their distinct error messages and instructs treating *any* non-empty error from `gh pr merge --delete-branch` as "the remote branch probably survived — verify", rather than pattern-matching one message.
+
 ## [0.24.4] - 2026-07-26
 
 ### Fixed
