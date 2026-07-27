@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.6] - 2026-07-27
+
+### Added
+- **`/playbook:close` step 4 — freshness check before claiming `latest.md`** — Step 4 previously only asked *whose* the existing checkpoint was; it never asked *when* it was written. In a multi-session workspace `latest.md` can hold a **newer** session's handoff than the one being closed, and overwriting the freshest handoff with an older-scoped one is backwards. Now compares the existing checkpoint's `**Date**:` against the closing session and, when the existing one is newer, writes the closing session's checkpoint as a dated archive and leaves `latest.md` alone. `latest.md` should be the most recent handoff for the workspace, not the most recently *written* one. (chef-chopsky, 2026-07-25: closing a 7/08–7/20 arc found a 7/25 checkpoint from a successor thread.)
+
+  The `ALREADY_ARCHIVED` branch of the 0.24.2 tri-state check now points at the freshness check explicitly — "archived somewhere" does not imply "older than you", so a newer handoff could otherwise be archived *and* overwritten.
+
 ## [0.24.5] - 2026-07-26
 
 ### Fixed
