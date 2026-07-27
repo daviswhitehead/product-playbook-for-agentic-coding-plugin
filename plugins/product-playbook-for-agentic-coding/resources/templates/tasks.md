@@ -106,10 +106,14 @@
 - [ ] Confirm every metric returns a non-null real number (not "no data," not `null`, not "unable to measure")
 - [ ] If any metric is unmeasurable: STOP. Fix the instrumentation, re-run the dry-run, and only then proceed to the gate review.
 
+**Watch window** (for time-based gates — "watch metric X for N hours/days"):
+- State the window as the **evidence it is waiting for**, not just a duration: `[N hours] OR [the evidence: e.g. "one full token-refresh cycle past the last pre-change session + ≥K post-change logins with 0 error events"] — whichever arrives first`
+- A fixed duration inherited from a plan is really a *sample-size* gate. At low traffic the information value saturates long before the clock (a 48h auth watch saturated in ~12h at 2-users/week scale, single-domain cutover 2026-07-27); at high traffic the clock may expire before enough samples arrive. Early closure requires the evidence stated up front + the gate owner's sign-off, recorded in the decision line.
+
 **Acceptance Criteria**:
 - [ ] All metrics dry-run successfully (non-null values)
 - [ ] All metrics meet their thresholds (or explicit conditional-GO with named follow-up)
-- [ ] Decision recorded with date, owner, and follow-up tasks
+- [ ] Decision recorded with date, owner, and follow-up tasks (incl. early/late closure rationale if the watch window deviated from the stated duration)
 
 **Status**: [ ] Not Started | [ ] In Progress | [ ] Complete
 
