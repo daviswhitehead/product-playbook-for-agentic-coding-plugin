@@ -93,7 +93,9 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    ```
 
    - `NO_EXISTING_CHECKPOINT` → nothing to archive; go straight to step 5.
-   - `ALREADY_ARCHIVED` → safe to overwrite in step 5.
+   - `ALREADY_ARCHIVED` → safe to overwrite in step 5 — **but run the freshness check below
+     first.** "Archived somewhere" does not mean "older than you": a newer session's handoff
+     can be both already archived and the one that should stay in `latest.md`.
    - `ARCHIVE_REQUIRED` → rename it first, do NOT overwrite:
 
    ```bash
