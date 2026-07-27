@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.7] - 2026-07-27
+
+### Added
+- **`tasks` template — time-based gates state the evidence they're waiting for, not just a duration** — A gate written as "watch metric X for N hours" is really a *sample-size* gate wearing a clock. At low traffic the information value saturates long before the duration expires; at high traffic the clock can expire before enough samples arrive. Either way the number inherited from the plan stops tracking what the gate is actually for.
+
+  Watch windows are now written as `[N hours] OR [the evidence] — whichever arrives first`, with the evidence named up front (e.g. "one full token-refresh cycle past the last pre-change session + ≥K post-change logins with 0 error events"). Early closure requires that stated evidence plus the gate owner's sign-off, and the decision line now records the rationale whenever the window deviates from its stated duration — in either direction. (Single-domain cutover, 2026-07-27: a 48h auth watch saturated in ~12h at 2-users/week scale.)
+
 ## [0.24.6] - 2026-07-27
 
 ### Added
