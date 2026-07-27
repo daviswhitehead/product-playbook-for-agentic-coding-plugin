@@ -127,5 +127,82 @@ come from merges that simply never passed `--delete-branch`, compounded by
 ### Addendum action items
 
 - [x] `/playbook:monitor-pr` Step 4: claim corrected, verification snippet + repo-level fix added (0.24.4)
-- [ ] **Enable `delete_branch_on_merge` on this repo** — repo setting, needs owner action
-- [ ] Sweep the 24 stale remote branches (two are held by live worktrees — leave those)
+- [x] **Enable `delete_branch_on_merge`** — done 2026-07-27 on this repo *and* chef-chopsky; verified via `gh repo view --json deleteBranchOnMerge` and by three subsequent merges cleaning up their own branches
+- [x] Sweep the stale remote branches — 21 remote + 7 local deleted 2026-07-27; 25 branches → 1
+
+---
+
+## 2026-07-27 third-incident addendum — the guard that green-lit a version *regression*
+
+The branch sweep this addendum's action items called for turned up two findings that
+belong here, one of them more serious than anything above.
+
+### 1. The version-bump guard passed a BACKWARDS bump
+
+`scripts/check-version-bump.sh` exists to protect version-keyed propagation. It compared
+versions with a string inequality:
+
+```bash
+if [ "$cur_version" = "$base_version" ]; then   FAIL
+else                                            OK: bumped $base -> $cur
+```
+
+So **any** change passed — including a decrease. Reproduced end-to-end:
+
+```
+OK: product-playbook-for-agentic-coding bumped 0.24.7 -> 0.23.0
+Version-bump check PASSED.     EXIT CODE: 0
+```
+
+It printed the word "bumped" for a seven-release regression and exited green.
+
+**This was not hypothetical.** PR #74 — a duplicate of the already-merged #59 — carried
+exactly this: content identical to `main`, plus `"version": "0.23.0"`. It was open, and CI
+was the only thing standing between it and `main`. It was caught by a human-style judgement
+call ("this looks like a duplicate"), not by the guard built to catch it.
+
+**Why backwards is worse than unchanged.** An unbumped change fails to propagate. A
+*backwards* version makes every install already on the higher version stop updating until
+the number climbs back past that high-water mark — a stall that outlasts the offending PR
+and is invisible from the repo.
+
+**Fix**: semver-aware `version_gt`, failing closed on malformed/empty input, with a distinct
+`version went BACKWARDS` failure message. Negative-tested in both directions — 8 unit cases
+(including `0.10.0 > 0.9.0`, which a string sort gets wrong) and 4 end-to-end runs:
+backwards → exit 1, unchanged → exit 1, forward → exit 0, no-change → exit 0.
+
+### 2. Branch sweeps need a content check and an open-PR check
+
+Ancestry-based "is it merged?" is unreliable under squash-merge, which this repo uses.
+`feat/instrumentation-acceptance-is-the-metric` reported unmerged with a 97-line diff while
+being 100% present in `main`. Judging on ancestry alone would have been wrong in both
+directions during one 25-branch sweep:
+
+- Two branches the content check flagged as "has unique content" turned out to have PRs
+  **opened mid-session** (#73, #74). Deleting a branch closes its PR — a list built an hour
+  earlier would have silently killed both.
+- One branch held the **only complete copy** of a session transcript that `main` had in
+  truncated form, and only in its *local* ref — the remote copy was already truncated.
+
+### Updated rule of thumb (cumulative)
+
+| Signal | Response |
+|---|---|
+| Guard says "OK: bumped A -> B" | Confirm B > A. "Changed" ≠ "increased". |
+| About to bulk-delete branches | Re-derive open PRs at delete time; compare file contents, not ancestry |
+| Branch looks unmerged | Check content — squash-merge discards ancestry |
+| Local branch ahead of its remote | The unique content may exist only locally |
+
+### Why the earlier prevention rules were insufficient
+
+Every rule above this line is about *branch* hygiene, and they worked. The regression slipped
+through a different layer: a guard whose own comparison was wrong. Documentation cannot catch
+that — only running the guard against the input it exists to reject can. This is the
+"negative-test every guardrail" rule (0.24.0) applied to a guard that predates it.
+
+### Third-addendum action items
+
+- [x] `scripts/check-version-bump.sh`: reject non-increasing versions, semver-aware, fail closed
+- [x] `/playbook:monitor-pr`: bulk-delete safety — open-PR check + content-not-ancestry check
+- [ ] Audit the repo's other guards the same way — has `validate-plugin.sh` ever been run
+      against input it should reject?

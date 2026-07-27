@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.8] - 2026-07-27
+
+### Fixed
+- **`scripts/check-version-bump.sh` green-lit a version *regression*** — The guard that exists to protect version-keyed propagation compared versions with a string inequality (`cur != base`), so **any** change passed, including a decrease. It printed `OK: product-playbook-for-agentic-coding bumped 0.24.7 -> 0.23.0` and exited 0 — calling a seven-release regression a "bump".
+
+  Not hypothetical: open PR #74 (a duplicate of the already-merged #59) carried content identical to `main` plus `"version": "0.23.0"`. CI was the only thing between it and `main`, and CI would have been green. It was caught by judgement, not by the guard built for it.
+
+  A backwards version is worse than an unbumped one: installs already on the higher version stop updating until the number climbs back past that high-water mark, a stall that outlasts the offending PR and is invisible from the repo.
+
+  Now uses a semver-aware comparison that fails closed on malformed or empty input, with a distinct `version went BACKWARDS` message naming the consequence. **Negative-tested in both directions**: 8 unit cases (including `0.10.0 > 0.9.0`, which a string sort gets wrong) and 4 end-to-end runs — backwards → exit 1, unchanged → exit 1, forward → exit 0, no-change → exit 0.
+
+### Added
+- **`/playbook:monitor-pr` — two mandatory checks before bulk-deleting branches** — (1) Deleting a branch closes its open PR, so re-derive the open-PR list *at delete time*, never from a list built earlier in the session. (2) Judge "merged" on **content, not ancestry** — squash-merge discards the branch's commits, so `git branch --merged` and `merge-base --is-ancestor` misreport in both directions.
+
+  Both fired in one 25-branch sweep (2026-07-27): the content check flagged two branches ancestry called deletable, and both had PRs opened mid-session; a third held the only complete copy of a file `main` had truncated — and only in its *local* ref. Also notes to check whether a local branch is ahead of its remote before deleting the remote.
+
 ## [0.24.7] - 2026-07-27
 
 ### Added
