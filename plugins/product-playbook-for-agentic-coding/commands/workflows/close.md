@@ -123,6 +123,16 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    workspace and topic. Only skip archiving if the existing checkpoint is demonstrably yours
    (its branch matches the one this session has been working on).
 
+   **Freshness check before claiming `latest.md` (even when it's yours):** compare the
+   existing checkpoint's `**Date**:` against the session being closed. In a multi-session
+   workspace, `latest.md` may hold a NEWER session's handoff than the one you are closing
+   (hit on chef-chopsky, 2026-07-25: close-out of a 7/08-7/20 arc found a 7/25 checkpoint
+   from a successor thread). Overwriting the freshest handoff with an older-scoped one is
+   backwards - in that case write YOUR checkpoint as the dated archive file
+   (`docs/checkpoints/<date>-<topic>.md`) and leave `latest.md` untouched. `latest.md`
+   should always be the most recent handoff for the workspace, not the most recently
+   *written* one.
+
 5. Write to `docs/checkpoints/latest.md` using the session-checkpoint format:
 
 ```markdown
