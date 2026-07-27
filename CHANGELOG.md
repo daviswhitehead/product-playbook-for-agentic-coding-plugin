@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.4] - 2026-07-26
+
+### Fixed
+- **`/playbook:monitor-pr` Step 4 stated a false fact about `gh pr merge --delete-branch`** — The note claimed that when another worktree holds the PR branch, the local-delete failure is "harmless (the remote branch is still deleted)". It is not: the operation deletes **neither** branch, ending with the remote branch alive. Because the PR *is* merged, the error reads as cosmetic and gets walked past.
+
+  The wrong version was load-bearing — it explicitly told you the check was unnecessary, so the surviving branch was never noticed. A missing rule would have left normal curiosity intact. This is the "Is every rule still TRUE?" check added in 0.24.0 landing on the playbook's own documentation.
+
+  **Verified in both directions in one session** (gh 2.88.0): 6 merges where `--delete-branch` succeeded left 0 remote branches; all 3 merges that hit the worktree error left the remote branch alive, each needing a manual `git push origin --delete`. Confirmed with `git ls-remote --heads` after `git fetch --prune`, not the local `git branch -r` cache.
+
+  Step 4 now carries the corrected behavior, a verification snippet, and the repo-level fix that makes the failure mode moot: `delete_branch_on_merge: true` ("Automatically delete head branches") deletes the head branch on every merge, including web-UI merges. An audit of this repo — which has the setting `false` — found 24 stale remote branches from merged PRs going back to 2026-04, though most stem from merges that never passed `--delete-branch` at all rather than from the gh bug itself.
+
+### Changed
+- **`docs/learnings/2026-07-17-merging-stacked-prs-across-worktrees.md`** — dated second-incident addendum correcting Learning #3 (the origin of the false claim), with the evidence table, both root causes separated, and the systemic repo-level fix.
+
 ## [0.24.3] - 2026-07-26
 
 ### Changed
