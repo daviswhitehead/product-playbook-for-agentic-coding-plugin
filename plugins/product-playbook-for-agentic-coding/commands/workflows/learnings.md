@@ -196,6 +196,21 @@ justifies the upgrade.]
 
 The append-and-strengthen pattern preserves the prior incident's evidence (so the recurrence count is visible in one place), names the systemic upgrade explicitly (so future searches surface the *new* rule, not the old one), and forces an honest answer to "why didn't the prior fix work?" — which is exactly the question a 4th documentation entry would dodge.
 
+#### If the prior doc pre-registered an escalation, audit it before executing it
+
+A well-written recurrence doc often ends with *"next escalation if an Nth occurs: \<planned fix\>."* That is valuable — but it was written from the previous occurrences' evidence, so it encodes an assumption about the **mechanism**. Before adopting it, check whether this occurrence is actually the shape that fix addresses:
+
+> **A recurrence in the same *family* is not necessarily the same *mechanism*.** Same symptom, different cause ⇒ the pre-registered fix will miss it, and executing it produces a plausible-looking non-fix.
+
+Ask explicitly: *would the pre-registered escalation have caught this one?*
+
+- **Yes** → execute it. The trigger fired as designed; that is the doc working.
+- **No** → say so *in the addendum*, name the sub-species that escapes it, and design the fix for the mechanism actually seen. Then re-register a sharpened escalation.
+
+Answering "no" out loud is the high-value move: it's the difference between a fix aimed at the real cause and one aimed at the last three incidents. Note the family/mechanism split explicitly in the addendum so the next reader inherits the distinction rather than re-deriving it.
+
+*(Found chef-chopsky, 2026-07-29. A doc on "a metric reading 0 means not-wired" had pre-registered "build a module↔entrypoint inventory" for the 4th occurrence. The 4th arrived — but the un-invoked thing was a **CI job**, i.e. the verifier itself, not a product module. No module inventory would have covered it. The honest answer reframed the rule as "a guard that does not run is indistinguishable from a guard that passes" and produced a different, correct guard.)*
+
 ---
 
 ### Pre-Check: Validation Status (Project Completion Only)

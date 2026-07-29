@@ -247,6 +247,33 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    is a fine choice to make on purpose — just not one to arrive at by a silent no-op, and
    not one to silently overrule either.
 
+   **First, check whether the ignore rule is already dead.** Before asking the user to
+   choose, count how many files under the path are *already tracked*:
+
+   ```bash
+   git ls-files docs/checkpoints/ | wc -l          # tracked despite the ignore rule
+   git ls-files --others docs/checkpoints/ | wc -l # untracked
+   ```
+
+   If tracked files exist, the repo has been **force-adding past its own ignore rule**, one
+   checkpoint at a time — the rule is not expressing a real preference, it is just generating
+   silent `git add` no-ops. Say so and offer the durable fix instead of the per-session dance:
+
+   > "`docs/checkpoints/` is gitignored, but N checkpoints are already tracked — the rule has
+   > been force-added past every time. Want me to remove the ignore rule so this stops
+   > recurring, rather than force-adding again?"
+
+   Removing the rule is a two-line change, makes every future `git add` behave, and eliminates
+   the failure mode where a handoff sits untracked under an ignored path one `git checkout`
+   away from deletion. Before removing it, confirm nothing unexpected becomes trackable
+   (`git ls-files --others <path>` should list only the checkpoint you just wrote).
+
+   *(Found chef-chopsky, 2026-07-29: the ignore rule had been in place for months while all 11
+   existing checkpoints were tracked. Every close-out re-litigated the same force-add question;
+   the founder's actual preference — "checkpoints should always get merged to remote" — had
+   never been written down anywhere, because the skill only ever offered "force-add this once"
+   or "leave it local.")*
+
 ## Phase 4: Learn Flow
 
 1. If `--quick` or `--skip-learnings` was passed: skip this phase.
