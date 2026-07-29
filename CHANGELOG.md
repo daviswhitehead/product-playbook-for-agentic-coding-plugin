@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.9] - 2026-07-29
+
+### Fixed
+- **`gh pr create` examples now pass `--draft` everywhere** — `/playbook:git:create-pr` has always documented draft-by-default, with an explicitly labelled non-draft exception. But three other places showed the bare form: `improve-playbook.md` (a copy-pasteable code block), `learnings.md` ("Use `gh pr create`"), and `work.md`'s flow diagram. An agent following any of those got a non-draft PR while believing it was following the playbook.
+
+  This matters more than a style nit because of what a non-draft PR *silently skips*. In a tiered-CI repo, `ready_for_review` is a **one-shot** trigger — a PR born non-draft never fires it, so integration/E2E/eval jobs stay SKIPPED and the PR reads green having tested almost nothing. (chef-chopsky PR #294 sat six weeks that way, green, with agent evals SKIPPED the whole time.) The failure is invisible at exactly the moment you're most inclined to trust it.
+
+  The labelled exception in `create-pr.md` is intentionally left alone. (Found 2026-07-29 while auditing whether a new `PreToolUse` guard that denies non-draft `gh pr create` would break existing playbook tooling.)
+
 ## [0.24.8] - 2026-07-27
 
 ### Fixed
