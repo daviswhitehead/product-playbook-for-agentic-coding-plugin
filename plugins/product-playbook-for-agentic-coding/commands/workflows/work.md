@@ -610,7 +610,7 @@ Local Review — Walk through the feature yourself (browser, endpoints, etc.)
   ↓
 CI Maximizing — Push and ensure all CI checks pass. Use `/playbook:debug-ci` if failures occur.
   ↓
-Create PR — Use `/playbook:git:create-pr` or `gh pr create`
+Create PR — Use `/playbook:git:create-pr` or `gh pr create --draft`
   ↓
 Merge — Post the proof-of-completion comment on the PR first (what shipped, evidence, deferrals — `/playbook:monitor-pr` Step 4)
   ↓

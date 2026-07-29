@@ -303,8 +303,11 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 
 ```bash
 git push -u origin feature/session-pattern-improvements
-gh pr create --title "..." --body "..."
+gh pr create --draft --title "..." --body "..."
 ```
+
+Draft by default, matching `/playbook:git:create-pr`. Promote with `gh pr ready <n>`
+when the full suite should run.
 
 **6.3 Report Success**
 
