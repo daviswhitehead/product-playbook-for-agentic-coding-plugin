@@ -176,6 +176,15 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    ```bash
    git branch --show-current   # still the branch Phase 1 validated?
 
+   # The index must be EMPTY before you stage. Anything already staged here is not
+   # yours — in a shared workspace it is another agent's in-flight work — and
+   # `git commit` will sweep it into a commit labelled "session checkpoint".
+   if [ -n "$(git diff --cached --name-only)" ]; then
+     echo "REFUSING: index is dirty; these staged paths are not this session's:"
+     git diff --cached --stat
+     # Do NOT commit. Leave the index exactly as found and surface it to the user.
+   fi
+
    # Stage ONLY the files this session wrote. Never `git add` the directory.
    CKPT_FILES=(docs/checkpoints/latest.md)
    # If step 4 archived a prior checkpoint, it MUST go in this list too — otherwise the
@@ -186,13 +195,25 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    # pattern does NOT make `git check-ignore -q docs/checkpoints/` return true, even
    # though `git add` on that directory refuses. Testing the dir silently picks the
    # wrong branch here.
-   if git check-ignore -q docs/checkpoints/latest.md; then
-     # The repo ignores this path on purpose. ASK before overriding that, then:
+   #
+   # Test EVERY file you are about to stage, not one representative file. `git
+   # check-ignore` reports nothing for an *already-tracked* path, so a tracked
+   # `latest.md` answers "not ignored" while a brand-new sibling in the same ignored
+   # directory is ignored — and `git add` aborts the whole invocation on it.
+   needs_force=""
+   for f in "${CKPT_FILES[@]}"; do
+     git check-ignore -q -- "$f" && needs_force=1
+   done
+
+   if [ -n "$needs_force" ]; then
+     # Ignored path. Check whether siblings are tracked first (see below) — if they
+     # are, `-f` restores the repo's convention. Otherwise ASK. Then:
      git add -f -- "${CKPT_FILES[@]}"
    else
      git add -- "${CKPT_FILES[@]}"
    fi
    git commit -m "chore: session checkpoint"
+   git show --stat HEAD   # verify it contains every CKPT_FILE and nothing else
    ```
 
    **Do not decide `-f` vs plain `add` from a tracked-ness check you ran earlier in this
@@ -239,6 +260,24 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
      that contains the archive and not the handoff. Always `git check-ignore` the file
      immediately before staging, and verify the commit contains **both** files
      (`git show --stat HEAD`) rather than trusting the exit code.
+   - **`git check-ignore` reports nothing for an already-tracked path**, so testing one
+     representative file answers for that file only. A tracked `latest.md` returns
+     "not ignored" — correctly — while the *new* dated sibling you are also staging is
+     ignored, and `git add` aborts on it. Testing `latest.md` and concluding "plain
+     `add` is fine" is the same false negative as testing the directory, one level in.
+     Loop over every path in `CKPT_FILES`. (chef-chopsky, 2026-07-29: a session that
+     wrote only a dated file and deliberately left `latest.md` alone tested `latest.md`
+     anyway — a file it was not staging — and got a green light for a `git add` that
+     staged nothing.)
+   - **Whatever is already staged when you arrive may belong to another agent.** The
+     bullet above assumes the pre-staged content is your own step-4 rename; in a shared
+     workspace (Conductor, worktrees) it can be an unrelated agent's in-flight work.
+     `git commit` without `-a` still commits it, under your message. Same run as above:
+     the checkpoint `git add` no-opped on the ignored path and the commit captured a
+     *different agent's* staged file deletion instead — a "session checkpoint" commit
+     whose entire content was someone else's 121-line deletion. Assert `git diff
+     --cached --name-only` is empty **before** staging; if it is not, do not commit, and
+     leave the index exactly as found (`git reset --soft HEAD~1` if you already did).
 
    When the path is gitignored, force-adding overrides a deliberate repo decision, so
    **ask** rather than defaulting. If the user wants checkpoints to stay local, skip the
