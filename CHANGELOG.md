@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-07-29
+
+### Added
+- **`SessionStart` hook — orientation without needing to be invoked** — The `session-start-status` skill exists because agents burn 10–30K tokens per session re-discovering the same context. But a skill only runs when someone remembers to invoke it, which makes "orient at session start" a suggestion rather than a behavior. `hooks/hooks.json` now runs `scripts/session-orientation.sh` unconditionally, gathering the deterministic half — branch and tracking state, uncommitted count, active `projects/in-progress/` dirs, latest checkpoint, last 3 commits, and any stashes tagged to this branch — with zero tool round-trips.
+
+  It surfaces stashes because that is how work actually gets lost: every commit is pushed, the branch reads clean, and the stash goes with the archived worktree.
+
+  Constraints, since this runs for every user in every session: fast (cheap git plumbing only), bounded (hard caps; 5 lines in practice), silent when irrelevant (no git repo, or no `projects/` and no `docs/checkpoints/` → prints nothing), and it always exits 0 so it can never fail a session. Opt out with `PLAYBOOK_NO_ORIENTATION=1`. The skill now defers to it and covers only the judgment half.
+
+- **`scripts/verify-close-project.sh` — the assertion that was missing** — `/playbook:close-project` Step 7 asked *"Project lives under `projects/done/[name]/`?"*. That was **true** during the failure it should have caught: `forgot-password` and `illustration-batch` were copied rather than moved, so they existed in **both** `in-progress/` and `done/` for ~3.7 months with every checklist item passing.
+
+  The missing assertion was never "did it land" but **"is the source gone"**. Step 7 is now a script that asserts it, plus no living references to the old path, the close-out artifact, and (best-effort, via `gh`) that merged PRs carry a proof-of-completion comment. A prose checkbox cannot catch this class, because the agent answering it is the same one that just performed the move.
+
+- **Hook validation in `validate-plugin.sh`** — hooks are the one component that runs in every session without being invoked, so a malformed one degrades every session silently. The validator now checks `hooks.json` parses, and that every `${CLAUDE_PLUGIN_ROOT}` script exists and is executable. Verified to fail on all three (missing script, non-executable, bad JSON), not just to pass when healthy.
+
+- **`scripts/test-close-project-checks.sh`** — 14 cases across both scripts, asserting both directions. The load-bearing case reproduces the exact 3.7-month bug shape and requires the checker to fail on it.
+
 ## [0.24.9] - 2026-07-29
 
 ### Fixed

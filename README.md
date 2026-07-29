@@ -183,6 +183,19 @@ by many plugins in Anthropic's official marketplace.
 | `user-journey-testing` | Patterns for user journey testing and validation |
 | `chat-insights` | Patterns for analyzing chat sessions to extract product insights |
 
+## Hooks & Checks
+
+Some things shouldn't depend on an agent remembering to do them. These run in the harness, or as scripts a command must execute.
+
+| Component | Kind | What it does |
+|---|---|---|
+| `hooks/hooks.json` → `scripts/session-orientation.sh` | `SessionStart` hook | Gathers branch/tracking state, uncommitted count, active `projects/in-progress/` dirs, latest checkpoint, last 3 commits, and stashes tagged to this branch — with no tool round-trips. Silent outside a git repo or in a repo without the playbook layout. Opt out with `PLAYBOOK_NO_ORIENTATION=1`. |
+| `scripts/verify-close-project.sh <name>` | Executable check | Asserts a close-out actually completed — above all that the **source directory is gone**, not merely that `done/` exists. |
+
+Run `scripts/test-close-project-checks.sh` after changing either (14 cases, both directions).
+
+**Why these are scripts rather than instructions**: `/playbook:close-project`'s checklist asked *"Project lives under `projects/done/`?"* — which was **true** while `forgot-password` and `illustration-batch` sat duplicated in both `in-progress/` and `done/` for ~3.7 months. The agent answering a checklist is the same one that just performed the move. A real guardrail has to be deterministic.
+
 ## Key Features
 
 ### Tool Discovery

@@ -190,6 +190,49 @@ fi
 
 echo ""
 
+# 5b. Validate hooks
+# A hook is the one component that runs every session without being invoked, so
+# a malformed one degrades every session silently for every user. Validate it.
+echo "Validating hooks..."
+echo "-------------------------------------------"
+
+HOOKS_FILE="$PLUGIN_DIR/hooks/hooks.json"
+if [ -f "$HOOKS_FILE" ]; then
+    if python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$HOOKS_FILE" 2>/dev/null; then
+        success "hooks.json is valid JSON"
+
+        # Every referenced script must exist and be executable, or the hook
+        # fails silently at session start.
+        while IFS=$'\t' read -r event relpath; do
+            [ -z "$event" ] && continue
+            if [ -z "$relpath" ]; then
+                warning "$event hook does not use \${CLAUDE_PLUGIN_ROOT} — may not resolve once installed"
+            elif [ ! -f "$PLUGIN_DIR$relpath" ]; then
+                error "$event hook references a missing script: $relpath"
+            elif [ ! -x "$PLUGIN_DIR$relpath" ]; then
+                error "$event hook script is not executable: $relpath"
+            else
+                success "$event hook -> $relpath (exists, executable)"
+            fi
+        done < <(python3 - "$HOOKS_FILE" <<'PYEOF'
+import json, re, sys
+d = json.load(open(sys.argv[1]))
+for event, entries in d.get("hooks", {}).items():
+    for entry in entries:
+        for h in entry.get("hooks", []):
+            m = re.search(r'\$\{CLAUDE_PLUGIN_ROOT\}"?(/[^\s"]+)', h.get("command", ""))
+            print(f"{event}\t{m.group(1) if m else ''}")
+PYEOF
+        )
+    else
+        error "hooks.json is not valid JSON"
+    fi
+else
+    warning "No hooks/hooks.json (optional)"
+fi
+
+echo ""
+
 # 6. Validate templates
 echo "Validating templates..."
 echo "-------------------------------------------"
