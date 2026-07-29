@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.25.2] - 2026-07-29
+
+### Added
+- **`/playbook:learnings` — guidance for autonomous invocation** — Every facilitation gate in the workflow assumes a human is present: Step 1 asks the trigger type, Steps 6 and 9.1 ask for batch approval, Step 10 Part B asks the user for process observations. Invoked autonomously (a cron, a delegated subagent, or a user saying "run it autonomously"), those gates have no one to answer them.
+
+  The failure mode is **silent degradation, not an error**: the agent skips the question, picks a default nobody chose, and still reports success — the same "documented but never decided" pattern the workflow exists to prevent. Step 10 Part B is the worst case, since it's pure user input and historically produces the highest-value improvements.
+
+  New section prescribes: answer each gate in writing with reasoning rather than skipping it; default to executing anything reversible and refusing anything that isn't; ship as draft PRs so the PR *becomes* the deferred approval gate; mine the session's earlier user redirections in place of Part B's questions; and state plainly in the summary which gates were auto-answered. An autonomous run that reads identically to a facilitated one is hiding the decisions it made on someone's behalf. (Found 2026-07-29, chef-chopsky, running this workflow autonomously.)
+
 ## [0.25.1] - 2026-07-29
 
 ### Fixed
