@@ -79,9 +79,9 @@ For each:
 
 `git mv projects/[in-progress|to-do]/[name] projects/done/[name]`
 
-Verify nothing else in the codebase points at the old path:
-- `grep -r "projects/in-progress/[name]" .` (or `to-do`) → expect zero hits in living docs
-- Any cross-references in CLAUDE.md, README, or other learnings docs need their paths updated
+**Move, never copy.** `git mv` does this correctly; copy-then-commit does not, and afterwards the difference is invisible unless you look for it. `forgot-password` and `illustration-batch` were copied, so they lived in **both** `in-progress/` and `done/` for ~3.7 months — while every Step 7 checklist item still read as passing, because "project lives under `done/`?" was *true*.
+
+Any cross-references in CLAUDE.md, README, or learnings docs need their paths updated. Step 7 asserts all of this — don't hand-verify it.
 
 ### Step 6: Trigger the Retrospective
 
@@ -91,13 +91,28 @@ Confirm with the user whether to run the retrospective inline:
 
 ### Step 7: Final Sanity Check
 
-Before declaring close-project done:
-- [ ] `planned-vs-implemented.md` exists in the project directory
+**Run the check — do not answer these from memory:**
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}"/scripts/verify-close-project.sh <project-name>
+```
+
+It asserts, and exits non-zero on any failure:
+
+| Assertion | Why it's mechanical, not a checkbox |
+|---|---|
+| `projects/done/<name>/` exists | The project landed |
+| **`projects/{in-progress,to-do}/<name>/` are GONE** | The assertion whose absence cost 3.7 months. A copy leaves both, and every prose checkbox still passes |
+| No living references to the old path | Excludes `done/` — historical references there are fine |
+| `planned-vs-implemented.md` present | The close-out artifact exists |
+| Merged PRs carry a proof-of-completion comment | Best-effort; skipped cleanly without `gh` or auth |
+
+Paste its output into the close-out summary. The agent answering a checklist is the same one that just did the move, which is exactly why this is a script.
+
+Then confirm by hand the things a script can't judge:
 - [ ] No tasks left in "Not Started" or "In Progress" status (every task has a final disposition)
 - [ ] No status drift between summary table and task detail sections
 - [ ] No orphan project artifacts at repo root
-- [ ] Project lives under `projects/done/[name]/`
-- [ ] Every merged PR for this project carries a proof-of-completion comment (`/playbook:monitor-pr` Step 4) — post retroactively if missing
 - [ ] Retrospective triggered or explicitly deferred with a tracking task
 
 ## Handoff to Retrospective

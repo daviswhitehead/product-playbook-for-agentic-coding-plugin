@@ -23,6 +23,14 @@ This skill collapses that work into a single fixed pass that costs predictable t
 - Session-checkpoint skill already wrote `docs/checkpoints/latest.md` — that file is higher signal
 - One-shot question that doesn't depend on project state ("what's the syntax for X?")
 
+## Relationship to the SessionStart hook
+
+`hooks/hooks.json` runs `scripts/session-orientation.sh` at every session start. It gathers the **cheap, deterministic** half of the inputs below — branch and tracking state, uncommitted count, active `projects/in-progress/` dirs, latest checkpoint path, last 3 commits, and any stashes tagged to this branch — with no tool round-trips and without depending on anyone remembering to invoke anything.
+
+When that orientation block is already in context, **skip inputs 2, 3, and 5 below** — you have them. What remains is the part a shell script can't do: reading `tasks.md` for the in-flight task, reading the specstory tail for what the user was last asking about, and the judgment calls (blockers, suggested next step).
+
+If the block is absent — hook disabled via `PLAYBOOK_NO_ORIENTATION=1`, repo has no `projects/` or `docs/checkpoints/`, or the plugin isn't installed — run the full pass below.
+
 ## Process
 
 ### Inputs to Read (in order, in parallel where possible)
