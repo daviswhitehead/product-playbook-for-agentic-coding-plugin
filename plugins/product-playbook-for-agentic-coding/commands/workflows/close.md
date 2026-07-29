@@ -195,8 +195,27 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    git commit -m "chore: session checkpoint"
    ```
 
-   Three failure modes this closes, the first two hit in a real run (chef-chopsky,
-   2026-07-25):
+   **Do not decide `-f` vs plain `add` from a tracked-ness check you ran earlier in this
+   phase — step 4 invalidates it.** `latest.md` is normally *tracked*, so an early
+   `git ls-files --error-unmatch docs/checkpoints/latest.md` says "tracked, plain `add`
+   works" and that is true at the time. Then step 4's `git mv` renames it, and the
+   `latest.md` you write afterwards is a **new, untracked** file at an ignored path.
+   The correct branch flips mid-phase. Always run `git check-ignore` on the file
+   immediately before staging, as the snippet above does.
+
+   That is not hypothetical: chef-chopsky, 2026-07-29 — the early check reported
+   `TRACKED`, the plain `git add` then aborted on the ignored path (`git add` fails the
+   *whole* invocation, so the already-staged rename committed alone), and the commit
+   landed containing only the archive. The close-out would have reported success with
+   the actual handoff untracked and one `git checkout` from deletion. Note also that a
+   repo whose `docs/checkpoints/` is ignored but whose checkpoints are *tracked* is the
+   normal case, not a contradiction — `.gitignore` never applies to already-tracked
+   files, so force-adding there **restores** the repo's convention rather than
+   overriding it. Check whether siblings are tracked (`git ls-tree <default-branch>
+   docs/checkpoints/`) before treating `-f` as an override that needs permission.
+
+   Four failure modes this closes, the first two hit in a real run (chef-chopsky,
+   2026-07-25) and the fourth on 2026-07-29:
 
    - **`docs/checkpoints/` is frequently gitignored** ("local resume state"). A plain
      `git add` then silently stages *nothing*, `git commit` reports nothing to commit, and
@@ -213,6 +232,13 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
      buries them in a commit labelled "session checkpoint". That is the same
      other-agent-clobbering failure step 4 exists to prevent, in the opposite direction.
      Force-add the explicit file list, never the directory.
+   - **Step 4's archive silently flips `latest.md` from tracked to untracked**, so any
+     tracked-ness check from earlier in the phase is stale by the time you stage. And
+     because `git add` aborts the *entire* invocation when one path is ignored, the
+     already-staged rename commits by itself — producing a "session checkpoint" commit
+     that contains the archive and not the handoff. Always `git check-ignore` the file
+     immediately before staging, and verify the commit contains **both** files
+     (`git show --stat HEAD`) rather than trusting the exit code.
 
    When the path is gitignored, force-adding overrides a deliberate repo decision, so
    **ask** rather than defaulting. If the user wants checkpoints to stay local, skip the

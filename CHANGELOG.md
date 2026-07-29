@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.25.2] - 2026-07-29
+
+### Added
+- **`/playbook:learnings` — guidance for autonomous invocation** — Every facilitation gate in the workflow assumes a human is present: Step 1 asks the trigger type, Steps 6 and 9.1 ask for batch approval, Step 10 Part B asks the user for process observations. Invoked autonomously (a cron, a delegated subagent, or a user saying "run it autonomously"), those gates have no one to answer them.
+
+  The failure mode is **silent degradation, not an error**: the agent skips the question, picks a default nobody chose, and still reports success — the same "documented but never decided" pattern the workflow exists to prevent. Step 10 Part B is the worst case, since it's pure user input and historically produces the highest-value improvements.
+
+  New section prescribes: answer each gate in writing with reasoning rather than skipping it; default to executing anything reversible and refusing anything that isn't; ship as draft PRs so the PR *becomes* the deferred approval gate; mine the session's earlier user redirections in place of Part B's questions; and state plainly in the summary which gates were auto-answered. An autonomous run that reads identically to a facilitated one is hiding the decisions it made on someone's behalf. (Found 2026-07-29, chef-chopsky, running this workflow autonomously.)
+
+## [0.25.1] - 2026-07-29
+
+### Fixed
+- **`/playbook:close` Phase 3 — step 4's archive silently untracks `latest.md`, flipping the staging decision** — `docs/checkpoints/latest.md` is normally *tracked*, so an early `git ls-files --error-unmatch` correctly reports "tracked, a plain `git add` works." Then step 4's `git mv` renames it, and the `latest.md` written afterwards is a **new, untracked** file at an ignored path. The correct branch flips mid-phase, and the earlier check is stale exactly when it's consulted.
+
+  Because `git add` aborts the *whole* invocation when any path is ignored, the already-staged rename then commits **alone** — yielding a "session checkpoint" commit containing the archive and not the handoff, with a clean exit code. The close-out reports success while the actual handoff sits untracked, one `git checkout` from deletion. (chef-chopsky, 2026-07-29.)
+
+  Phase 3 step 6 now says to run `git check-ignore` on the file immediately before staging, and to verify the commit contains **both** files via `git show --stat HEAD` rather than trusting the exit code. Also clarifies that a repo with an ignored `docs/checkpoints/` but tracked checkpoints is the normal case — `.gitignore` never applies to already-tracked files — so force-adding there *restores* the repo's convention rather than overriding it, and doesn't warrant the "ask first" treatment.
+
 ## [0.25.0] - 2026-07-29
 
 ### Added

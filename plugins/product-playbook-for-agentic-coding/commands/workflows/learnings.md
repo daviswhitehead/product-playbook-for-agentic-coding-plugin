@@ -941,6 +941,42 @@ For ALL identified improvements (from both agent self-reflection and user input)
 - Prior learnings search was missing — recurring patterns never got escalated (found during recipes retro)
 - Systemic analysis ("think bigger") step was missing — agent defaulted to incremental fixes (found during recipes retro)
 - Meta-retrospective was skippable — agent skipped it, losing the highest-value improvements (found during recipes retro)
+- Autonomous invocation turned every approval gate into a silent no-op (found 2026-07-29, chef-chopsky) — see below
+
+---
+
+## Running This Workflow Autonomously
+
+Every facilitation gate in this document assumes a human is present: Step 1 asks the
+trigger type, Steps 6/9.1 ask for batch approval, Step 10 Part B asks the user for
+process observations. When invoked autonomously ("run `/playbook:learnings`
+autonomously", a cron, or a delegated subagent), those gates have no one to answer them.
+
+**The failure mode is silent degradation, not an error.** The agent skips the question,
+picks a default nobody chose, and the retrospective still reports success — which is
+the same "documented but never decided" pattern this workflow exists to prevent. Worse,
+Step 10 Part B is where the highest-value improvements historically come from, and it is
+pure user input.
+
+When there is no human to ask:
+
+1. **Answer the gate yourself, in writing, with the reasoning.** Don't skip it — state
+   the choice and why. "Trigger: chat-session (passed as an argument). Output: both
+   targets, the default." A recorded decision is reviewable; a skipped one is invisible.
+2. **Default to executing, not deferring.** Approval gates exist to prevent unwanted
+   work, not to be the only path to any work. With no one to approve, the correct
+   reading of "Approve all?" is yes for anything reversible (docs, learnings, a draft
+   PR) and no for anything that isn't (merging, force-pushing, deleting).
+3. **Ship changes as draft PRs, never direct commits to the default branch.** The PR
+   *is* the deferred approval gate — it preserves the human decision point without
+   blocking the work.
+4. **Step 10 Part B becomes Part A-extended.** With no user to ask, the agent must
+   self-critique harder: where did the user redirect you *earlier in the session*? Those
+   redirections are the same signal Part B fishes for, and they already happened. Mine
+   the session, don't skip the step.
+5. **Say plainly in the final summary which gates were auto-answered**, so the human can
+   revisit any of them. An autonomous run that reads identically to a facilitated one is
+   hiding the decisions it made on someone's behalf.
 
 ---
 
