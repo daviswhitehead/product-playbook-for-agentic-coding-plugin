@@ -833,7 +833,7 @@ If the user selected "Both" or "Plugin/workflow" as the output target and improv
 2. **Create a feature branch**: `git checkout -b improve/[project-name]-retrospective-learnings`
 3. **Make changes**: Modify the relevant plugin files (commands, templates, skills)
 4. **Cross-repo URL resolution check** (see below) — if the plugin PR's description references codebase docs as evidence, those docs must be on the default branch BEFORE the plugin PR opens
-5. **Create the PR**: Use `gh pr create` with a clear description of what was learned and why each change improves the workflow
+5. **Create the PR**: Use `gh pr create --draft` (or `/playbook:git:create-pr`) with a clear description of what was learned and why each change improves the workflow
 6. **Report the PR URL** to the user
 
 **Common plugin files to improve:**
