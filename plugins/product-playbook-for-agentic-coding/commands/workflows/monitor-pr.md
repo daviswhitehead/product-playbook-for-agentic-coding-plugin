@@ -63,9 +63,18 @@ Rules that fall out of this hierarchy:
 ### Step 1: Snapshot Current State
 
 ```bash
-gh pr view <N> --json statusCheckRollup,state,isDraft,mergeable,headRefOid
+gh pr view <N> --json statusCheckRollup,state,isDraft,mergeable,mergeStateStatus,headRefOid
 gh run list --branch <BRANCH> --limit 5 --json databaseId,name,status,conclusion,createdAt,event
 ```
+
+**GATE — check `mergeStateStatus` BEFORE interpreting any check results.** If it is
+`DIRTY` (`mergeable: CONFLICTING`), the PR has no merge ref and GitHub creates **ZERO**
+`pull_request` workflow runs — while platform apps (Vercel/Supabase/Railway) still attach
+green checks to the head commit. The check list looks healthy; nothing actually ran.
+Corroborate with an empty `gh run list --branch <BRANCH>`. Fix: merge the base branch in,
+resolve conflicts, push — Actions will fire on that push. Do NOT read a conflicted PR's
+green platform checks as "CI passed." (Hit on chef-chopsky #484, 2026-08-03: two pushes,
+zero Actions runs, four green platform checks.)
 
 Classify each check into one of:
 
