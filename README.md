@@ -97,14 +97,22 @@ by many plugins in Anthropic's official marketplace.
 | `/playbook:tasks` | Break down work into specific, actionable tasks |
 | `/playbook:work` | Execute the next task from the tasks document |
 | `/playbook:work-multiple` | Work autonomously on multiple tasks without interruption |
+| `/playbook:emergent` | Capture emergent in-flight scope as a micro-PRD before implementing |
 | `/playbook:learnings` | Capture learnings to improve docs and plugin |
 | `/playbook:close` | Session close-out — uncommitted work check, task cleanup, handoff context, learnings |
+| `/playbook:close-project` | Project close-out — planned-vs-implemented diff, move to `done/`, retrospective |
 
 ### Debugging & CI Commands
 | Command | Description |
 |---------|-------------|
 | `/playbook:debug` | Systematic debugging workflow |
 | `/playbook:debug-ci` | Debug CI/CD failures using GitHub CLI |
+
+### Pull Request Commands
+| Command | Description |
+|---------|-------------|
+| `/playbook:monitor-pr` | Drive one PR's CI to green autonomously with local-first fixes, then merge |
+| `/playbook:merge-prs` | Triage every open PR, approve one merge plan, then merge the queue autonomously |
 
 ### Design Commands
 | Command | Description |
@@ -154,6 +162,7 @@ by many plugins in Anthropic's official marketplace.
 | Command | Description |
 |---------|-------------|
 | `/playbook:help` | List all commands and find the right one for your task |
+| `/playbook:hello` | Verify the plugin installed correctly |
 
 ## Agents
 
