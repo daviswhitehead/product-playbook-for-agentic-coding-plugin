@@ -15,7 +15,7 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
 1. **Branch state check (do first)**: The current branch may not be a valid commit target for your close-out. Two common failure modes:
 
    **(a) Branch is merged.** If the current branch's PR is already merged, new commits on this branch will NOT reach the target.
-   - `gh pr list --head $(git branch --show-current) --state merged --limit 1` (or check `git log <target>..HEAD` against a known squash-merge commit on the target).
+   - `gh pr list --head $(git branch --show-current) --state merged --limit 1` (or check `git log <target>..HEAD` against a known squash-merge commit on the target — but see step 6: on a stale branch that range is measured from the merge base and over-reports).
    - If merged, warn the user and offer to branch off the target before committing:
      > "Current branch `<name>` is already merged into `<target>` (likely via squash). Any commits made here will be local-only. Want me to branch off `<target>` so the close-out commits reach production?"
 
@@ -38,6 +38,49 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    - **If unique or uncertain** → preserve it durably BEFORE dropping — you likely didn't create it. Salvage to a branch and push: `git branch <archive-name> stash@{N} && git push -u origin <archive-name>`. Then it's captured off the stash list and off this worktree; the user can review/discard later.
    - **Leave stashes tagged to OTHER branches alone** — they're separate work streams; dropping them can destroy another effort's WIP.
    - This closes a real gap: the working-tree check above catches uncommitted changes but not stashes. A user asking "is everything in the PR / safe to archive?" needs both checked.
+
+6. **Merged-ness check — required before answering "is it safe to archive?"** Clean tree
+   + everything pushed still does not mean the branch is disposable, and the two obvious
+   commands both over-report, for *different* reasons:
+
+   - `git log <target>..HEAD` is measured from the **merge base**. On a branch N commits
+     behind, work that already shipped via another branch still lists as unmerged.
+   - `git cherry <target> HEAD` matches by **patch-id**, so it does catch byte-identical
+     duplicates (they print as `-`). But patch-id is defeated by **squash-merges** and by
+     any edit made to the work after it left your branch — a rebase, a conflict
+     resolution, a one-line path fix. Those print `+`, indistinguishable from genuinely
+     new work. If the repo squash-merges PRs (most do), assume `+` is unreliable.
+
+   ```bash
+   git fetch origin <target>
+   git rev-list --left-right --count origin/<target>...HEAD   # behind / ahead
+   git diff --stat origin/<target> HEAD                       # TWO-dot: vs the tip
+   ```
+
+   The two-dot diff is the honest answer to "what does this branch still have that the
+   target doesn't?" (It also lists the target's newer files as removals — that is the
+   branch being stale, not a proposed deletion. Ignore that side.) Cross-check anything
+   that still looks unique:
+
+   ```bash
+   gh pr list --state merged --search "<commit subject>"   # did it land from another branch?
+   ```
+
+   Grounding case (chef-chopsky, 2026-07-29): a never-pushed branch showed six commits as
+   `+` under `git cherry`, including a parallel agent's security fix, and the close-out told
+   the user archiving would destroy them. Every one had already merged — squash-merged from
+   that agent's *own* branch, which is exactly the case patch-id cannot see. Real
+   contribution: one checkpoint file. **A tiny diff is the tell** — a file differing by a
+   single line (there, a doc path `projects/in-progress/…` → `projects/done/…`) almost
+   always means the target holds a *newer* version of your own work, not that you hold
+   something new.
+
+   Two consequences worth acting on:
+   - **Merge the target in before opening the PR.** It collapses the already-merged content
+     so the PR shows its true contribution instead of a stale re-proposal.
+   - **A stale branch carries superseded duplicates.** Merging it can re-create a directory
+     that `close-project` already moved to `done/`. Diff your copies against the target's
+     `done/` versions and delete rather than merge when they match.
 
 ## Phase 2: Task Cleanup
 
