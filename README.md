@@ -200,8 +200,21 @@ Some things shouldn't depend on an agent remembering to do them. These run in th
 |---|---|---|
 | `hooks/hooks.json` → `scripts/session-orientation.sh` | `SessionStart` hook | Gathers branch/tracking state, uncommitted count, active `projects/in-progress/` dirs, latest checkpoint, last 3 commits, and stashes tagged to this branch — with no tool round-trips. Silent outside a git repo or in a repo without the playbook layout. Opt out with `PLAYBOOK_NO_ORIENTATION=1`. |
 | `scripts/verify-close-project.sh <name>` | Executable check | Asserts a close-out actually completed — above all that the **source directory is gone**, not merely that `done/` exists. |
+| `scripts/check-version-bump.sh` | CI guard (PR + push) | On a PR: the changed plugin must declare a changeset. On `main`: fails while changesets sit unreleased, and fails if plugin content changed without the version increasing. |
+| `scripts/release.sh` | Release step | Consumes `.changes/*`, computes each plugin's new version, updates both manifests + `CHANGELOG.md`, deletes the changesets. `--dry-run` to preview. |
 
-Run `scripts/test-close-project-checks.sh` after changing either (14 cases, both directions).
+Run `scripts/test-close-project-checks.sh` after changing either close-project piece (14
+cases, both directions), and `scripts/test-version-checks.sh` after touching the version
+scripts (20 cases across both).
+
+**Why changesets**: the version is a single monotonic counter on `main`, but PRs are
+parallel. Requiring each PR to bump it made N open PRs mutually exclusive — they all wanted
+the same next number — forcing serialized merges and pairwise conflicts on the version
+lines. Worse, the guard compared against the *merge base*, so it checked "did this branch
+bump since it forked", not "will main's version increase"; the only thing preventing a
+stale PR from dragging the version backwards was that very conflict. A changeset is a new
+file per PR, so it cannot conflict, and the number is computed once on `main`. See
+`.changes/README.md`.
 
 **Why these are scripts rather than instructions**: `/playbook:close-project`'s checklist asked *"Project lives under `projects/done/`?"* — which was **true** while `forgot-password` and `illustration-batch` sat duplicated in both `in-progress/` and `done/` for ~3.7 months. The agent answering a checklist is the same one that just performed the move. A real guardrail has to be deterministic.
 
