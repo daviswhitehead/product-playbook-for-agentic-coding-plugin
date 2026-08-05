@@ -66,20 +66,32 @@ This plugin also uses a marketplace-embedded structure (plugin source is a relat
 inside the marketplace repo), so a machine may need a marketplace refresh to pull a new
 version, and the "Update now" button on the *plugin* won't work directly.
 
-**To pull the latest version onto a machine:**
+**To pull the latest version onto a machine** — two steps, because the marketplace clone
+and the plugin install are refreshed separately:
 
-1. **Refresh the marketplace** (pulls latest from GitHub):
-   ```
-   /plugin → Marketplaces tab → select "product-playbook-marketplace" → Update now
-   ```
+```bash
+claude plugin marketplace update product-playbook-marketplace
+claude plugin update product-playbook-for-agentic-coding@product-playbook-marketplace
+```
 
-2. **Reinstall the plugin** if it didn't refresh to the new version automatically:
-   ```
-   /plugin → Installed tab → select the plugin → Uninstall
-   /plugin → Marketplaces tab → select marketplace → Install
-   ```
+**Use `update`, not `install`.** On an already-installed plugin, `claude plugin install`
+short-circuits with *"already installed"* and does **not** upgrade — it can leave the new
+version's files sitting in `~/.claude/plugins/cache/<marketplace>/<plugin>/<version>/`
+while the install still points at the old one. `update` is the subcommand that moves the
+pointer. Never hand-edit `installed_plugins.json`.
 
-You can confirm the live version under `/plugin → Installed`.
+The update applies on **restart** — a session already running keeps the version it loaded.
+Confirm with `claude plugin list`, or under `/plugin → Installed`.
+
+<details>
+<summary>Equivalent via the <code>/plugin</code> UI</summary>
+
+1. **Refresh the marketplace**: `/plugin` → Marketplaces tab → select
+   "product-playbook-marketplace" → Update now
+2. **Reinstall the plugin** if it didn't refresh automatically: `/plugin` → Installed tab →
+   select the plugin → Uninstall, then Marketplaces tab → select marketplace → Install
+
+</details>
 
 **Note:** The "Local plugins cannot be updated remotely" message appears because the
 plugin uses a relative path source within the marketplace. This is the same pattern used
