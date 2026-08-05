@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.2] - 2026-08-04
+
+### Fixed
+- **`/playbook:close` — a clean tree does not mean the branch is disposable** — Phase 1 gains a
+  merged-ness check, because the two obvious commands both over-report for *different* reasons:
+  `git log <target>..HEAD` measures from the merge base (stale branches list already-shipped
+  work as unmerged), and `git cherry` matches by patch-id, which squash-merges and any
+  post-departure edit defeat. The honest answer is the two-dot `git diff --stat origin/<target> HEAD`.
+  Grounding case: a branch showed six commits as "unmerged" including a parallel agent's
+  security fix, and the close-out warned that archiving would destroy them — every one had
+  already squash-merged. Real contribution: one checkpoint file.
+- **`/playbook:close` — refuse to commit a dirty index** — Phase 3 asserts
+  `git diff --cached --name-only` is empty before staging. In a shared workspace whatever is
+  already staged may be another agent's in-flight work, and `git commit` sweeps it in under a
+  "session checkpoint" message. Observed: a checkpoint commit whose entire content was a
+  different agent's 121-line deletion.
+- **`/playbook:close` — `git check-ignore` must be tested per-file, not on a representative** —
+  It reports nothing for an already-tracked path, so a tracked `latest.md` answers "not ignored"
+  while a brand-new sibling in the same ignored directory is ignored, and `git add` aborts on the
+  whole invocation. Now loops over every path in `CKPT_FILES`.
+- **`/playbook:close` — notice when an ignore rule is already dead** — Before asking the user to
+  force-add past a gitignore rule for the Nth time, count how many files under the path are
+  already tracked. If any are, the repo has been force-adding past its own rule one checkpoint at
+  a time and the rule expresses no real preference. Offer to remove it instead of re-litigating
+  every session.
+- **`/playbook:learnings` — audit a pre-registered escalation before executing it** — A recurrence
+  doc's planned "next escalation" encodes an assumption about the *mechanism*, drawn from the
+  prior occurrences. A recurrence in the same family is not necessarily the same mechanism, and
+  executing the pre-registered fix against a different one produces a plausible-looking non-fix.
+  Ask explicitly whether it would have caught this occurrence; answering "no" out loud is the
+  high-value move.
+
 ## [0.26.1] - 2026-08-04
 
 ### Fixed
