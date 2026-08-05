@@ -14,6 +14,10 @@ Display all available commands and help the user find the right one for their ta
 
 ### Which Command Should I Use?
 
+**Starting a whole product, or don't know what to build yet?**
+→ `/playbook:foundations` - Mission, Vision, Personas, Engagement frameworks
+→ `/playbook:research-synthesis` - Turn research into ranked strategic opportunities
+
 **Starting a new feature or project?**
 → `/playbook:product-requirements` - Define WHAT to build and WHY
 
@@ -27,9 +31,20 @@ Display all available commands and help the user find the right one for their ta
 → `/playbook:work` - Execute the next task
 → `/playbook:work-multiple` - Execute multiple tasks autonomously
 
+**Scope changed mid-project?**
+→ `/playbook:emergent` - Capture a mid-flight bug or new requirement as a micro-PRD
+
 **Something broken?**
 → `/playbook:debug` - Systematic debugging workflow
 → `/playbook:debug-ci` - CI/CD specific failures
+
+**PR open, or a backlog of them?**
+→ `/playbook:monitor-pr` - Shepherd one PR's CI to green, then merge
+→ `/playbook:merge-prs` - Triage every open PR, approve one plan, merge the queue
+
+**Wrapping up?**
+→ `/playbook:close` - Session close-out: uncommitted work, handoff context, learnings
+→ `/playbook:close-project` - Project close-out: planned-vs-implemented diff, move to done/
 
 **Designing UI for a feature?**
 → `/playbook:design-system` - Extract your design system into DESIGN.md
@@ -69,6 +84,12 @@ Display all available commands and help the user find the right one for their ta
 
 ## All Commands by Category
 
+### Strategy Foundations
+| Command | When to Use |
+|---------|-------------|
+| `/playbook:foundations` | New product or strategy work - Mission, Vision, Personas, Engagement |
+| `/playbook:research-synthesis` | After research - synthesize quant + qual + taste into opportunities |
+
 ### Core Workflow (4-Phase)
 | Command | When to Use |
 |---------|-------------|
@@ -77,13 +98,26 @@ Display all available commands and help the user find the right one for their ta
 | `/playbook:tasks` | After tech plan - create specific, actionable tasks |
 | `/playbook:work` | Execute one task from the tasks document |
 | `/playbook:work-multiple` | Execute multiple tasks autonomously |
+| `/playbook:emergent` | Mid-project bug or new requirement - capture as a micro-PRD first |
 | `/playbook:learnings` | After completing work - capture insights for future |
+
+### Close-Out
+| Command | When to Use |
+|---------|-------------|
+| `/playbook:close` | End of a session - uncommitted work check, handoff context, learnings |
+| `/playbook:close-project` | Project finished - planned-vs-implemented diff, move to done/, retrospective |
 
 ### Debugging & CI
 | Command | When to Use |
 |---------|-------------|
 | `/playbook:debug` | Something isn't working - systematic debugging |
 | `/playbook:debug-ci` | CI/CD pipeline failures - GitHub Actions, tests |
+
+### Pull Requests
+| Command | When to Use |
+|---------|-------------|
+| `/playbook:monitor-pr` | One PR open - drive CI to green with local-first fixes, then merge |
+| `/playbook:merge-prs` | Backlog of open PRs - triage all, approve one plan, merge the queue |
 
 ### Design Pipeline
 | Command | When to Use |
@@ -128,6 +162,12 @@ Display all available commands and help the user find the right one for their ta
 | `/playbook:rubric` | Validate code quality against predefined rubrics |
 | `/playbook:rubric-doc` | Generate documents based on spec files with citations |
 
+### Meta
+| Command | When to Use |
+|---------|-------------|
+| `/playbook:help` | This command - find the right command for your task |
+| `/playbook:hello` | Verify the plugin installed correctly |
+
 ---
 
 ## Typical Workflows
@@ -140,7 +180,16 @@ Display all available commands and help the user find the right one for their ta
 4. /playbook:work                  → Execute tasks (repeat)
 5. /playbook:git-commit            → Commit changes
 6. /playbook:git-pr                → Create PR
-7. /playbook:learnings             → Capture what you learned
+7. /playbook:monitor-pr            → Drive CI to green, then merge
+8. /playbook:learnings             → Capture what you learned
+9. /playbook:close                 → Close out the session
+```
+
+### Clearing a PR Backlog
+```
+1. /playbook:merge-prs             → Triage every open PR, present one merge plan
+2. (approve the plan once)         → Queue merges autonomously from here
+3. /playbook:learnings             → Capture anything new about the merge mechanics
 ```
 
 ### UI Feature Development (with Design Pipeline)

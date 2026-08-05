@@ -312,6 +312,97 @@ fi
 
 echo ""
 
+# 9. Command surface coverage (commands/help.md + README.md)
+# WHY: help.md and README.md hand-duplicate data that already lives in every command's
+# frontmatter, and adding a command has no step that touches either file. They drift by
+# omission — six real commands (close, close-project, emergent, foundations, monitor-pr,
+# research-synthesis) went missing from help.md before this check existed, which makes a
+# command effectively undiscoverable no matter how good it is. Generating these files was
+# rejected: their value is the human judgment about WHICH command fits WHICH situation,
+# which no frontmatter field encodes. So enforce coverage and leave the curation alone.
+# Bidirectional, because both directions fail: a new command going unlisted (observed),
+# and a renamed/deleted command leaving a dangling reference (not yet, but inevitable).
+echo "Checking command surface coverage (help.md + README.md)..."
+echo "-------------------------------------------"
+
+# NOTE: the report goes to a temp file rather than through $(...). bash 3.2 (still the
+# default /bin/bash on macOS) mis-parses a heredoc containing apostrophes when it sits
+# inside command substitution, failing with "unexpected EOF while looking for matching `'".
+COVERAGE_TMP="$(mktemp)"
+trap 'rm -f "$COVERAGE_TMP"' EXIT
+
+python3 - "$PLUGIN_DIR" > "$COVERAGE_TMP" <<'PY'
+import os, re, sys
+
+plugin_dir = sys.argv[1]
+cmd_dir = os.path.join(plugin_dir, "commands")
+help_rel = "commands/help.md"
+help_path = os.path.join(plugin_dir, help_rel)
+readme_path = "README.md"
+
+# Every command's declared name, from frontmatter (the filename may differ: e.g.
+# commands/git/create-pr.md declares playbook:git-pr).
+real = {}
+for root, _, files in os.walk(cmd_dir):
+    for fn in sorted(files):
+        if not fn.endswith(".md"):
+            continue
+        path = os.path.join(root, fn)
+        with open(path) as f:
+            for line in f:
+                m = re.match(r'^name:\s*(\S+)', line)
+                if m:
+                    real[m.group(1)] = os.path.relpath(path, plugin_dir)
+                    break
+
+if not real:
+    print("ERR||no commands with a 'name:' field found")
+
+if os.path.isfile(help_path):
+    with open(help_path) as f:
+        help_txt = f.read()
+    problems = 0
+    for name, src in sorted(real.items()):
+        # Trailing (?![\w-]) so /playbook:work is not satisfied by /playbook:work-multiple.
+        if not re.search(r'/' + re.escape(name) + r'(?![\w-])', help_txt):
+            print(f"ERR|{name}|not listed in {help_rel} (defined in {src})")
+            problems += 1
+    for ref in sorted(set(re.findall(r'/(playbook:[a-z0-9][a-z0-9-]*)', help_txt))):
+        if ref not in real:
+            print(f"ERR|{ref}|referenced in {help_rel} but no command defines it")
+            problems += 1
+    if not problems:
+        print(f"OK||{help_rel} covers all {len(real)} commands, no dangling references")
+else:
+    print(f"ERR||{help_rel} not found")
+
+if os.path.isfile(readme_path):
+    with open(readme_path) as f:
+        readme_txt = f.read()
+    # Require a real table row, not a prose mention: /playbook:close-project was named in
+    # README prose while absent from every command table.
+    problems = 0
+    for name, src in sorted(real.items()):
+        if not re.search(r'^\|\s*`/' + re.escape(name) + r'`\s*\|', readme_txt, re.M):
+            print(f"ERR|{name}|no README.md command-table row (defined in {src})")
+            problems += 1
+    if not problems:
+        print(f"OK||README.md has a table row for all {len(real)} commands")
+else:
+    print("WARN||README.md not found - skipping README coverage")
+PY
+
+while IFS='|' read -r status name detail; do
+    [ -z "$status" ] && continue
+    case "$status" in
+        OK)   success "$detail" ;;
+        WARN) warning "$detail" ;;
+        ERR)  if [ -n "$name" ]; then error "$name: $detail"; else error "$detail"; fi ;;
+    esac
+done < "$COVERAGE_TMP"
+
+echo ""
+
 # Summary
 echo "=========================================="
 echo "Validation Summary"
