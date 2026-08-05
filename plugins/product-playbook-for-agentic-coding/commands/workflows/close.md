@@ -15,7 +15,7 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
 1. **Branch state check (do first)**: The current branch may not be a valid commit target for your close-out. Two common failure modes:
 
    **(a) Branch is merged.** If the current branch's PR is already merged, new commits on this branch will NOT reach the target.
-   - `gh pr list --head $(git branch --show-current) --state merged --limit 1` (or check `git log <target>..HEAD` against a known squash-merge commit on the target).
+   - `gh pr list --head $(git branch --show-current) --state merged --limit 1` (or check `git log <target>..HEAD` against a known squash-merge commit on the target — but see step 6: on a stale branch that range is measured from the merge base and over-reports).
    - If merged, warn the user and offer to branch off the target before committing:
      > "Current branch `<name>` is already merged into `<target>` (likely via squash). Any commits made here will be local-only. Want me to branch off `<target>` so the close-out commits reach production?"
 
@@ -38,6 +38,49 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    - **If unique or uncertain** → preserve it durably BEFORE dropping — you likely didn't create it. Salvage to a branch and push: `git branch <archive-name> stash@{N} && git push -u origin <archive-name>`. Then it's captured off the stash list and off this worktree; the user can review/discard later.
    - **Leave stashes tagged to OTHER branches alone** — they're separate work streams; dropping them can destroy another effort's WIP.
    - This closes a real gap: the working-tree check above catches uncommitted changes but not stashes. A user asking "is everything in the PR / safe to archive?" needs both checked.
+
+6. **Merged-ness check — required before answering "is it safe to archive?"** Clean tree
+   + everything pushed still does not mean the branch is disposable, and the two obvious
+   commands both over-report, for *different* reasons:
+
+   - `git log <target>..HEAD` is measured from the **merge base**. On a branch N commits
+     behind, work that already shipped via another branch still lists as unmerged.
+   - `git cherry <target> HEAD` matches by **patch-id**, so it does catch byte-identical
+     duplicates (they print as `-`). But patch-id is defeated by **squash-merges** and by
+     any edit made to the work after it left your branch — a rebase, a conflict
+     resolution, a one-line path fix. Those print `+`, indistinguishable from genuinely
+     new work. If the repo squash-merges PRs (most do), assume `+` is unreliable.
+
+   ```bash
+   git fetch origin <target>
+   git rev-list --left-right --count origin/<target>...HEAD   # behind / ahead
+   git diff --stat origin/<target> HEAD                       # TWO-dot: vs the tip
+   ```
+
+   The two-dot diff is the honest answer to "what does this branch still have that the
+   target doesn't?" (It also lists the target's newer files as removals — that is the
+   branch being stale, not a proposed deletion. Ignore that side.) Cross-check anything
+   that still looks unique:
+
+   ```bash
+   gh pr list --state merged --search "<commit subject>"   # did it land from another branch?
+   ```
+
+   Grounding case (chef-chopsky, 2026-07-29): a never-pushed branch showed six commits as
+   `+` under `git cherry`, including a parallel agent's security fix, and the close-out told
+   the user archiving would destroy them. Every one had already merged — squash-merged from
+   that agent's *own* branch, which is exactly the case patch-id cannot see. Real
+   contribution: one checkpoint file. **A tiny diff is the tell** — a file differing by a
+   single line (there, a doc path `projects/in-progress/…` → `projects/done/…`) almost
+   always means the target holds a *newer* version of your own work, not that you hold
+   something new.
+
+   Two consequences worth acting on:
+   - **Merge the target in before opening the PR.** It collapses the already-merged content
+     so the PR shows its true contribution instead of a stale re-proposal.
+   - **A stale branch carries superseded duplicates.** Merging it can re-create a directory
+     that `close-project` already moved to `done/`. Diff your copies against the target's
+     `done/` versions and delete rather than merge when they match.
 
 ## Phase 2: Task Cleanup
 
@@ -176,6 +219,15 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    ```bash
    git branch --show-current   # still the branch Phase 1 validated?
 
+   # The index must be EMPTY before you stage. Anything already staged here is not
+   # yours — in a shared workspace it is another agent's in-flight work — and
+   # `git commit` will sweep it into a commit labelled "session checkpoint".
+   if [ -n "$(git diff --cached --name-only)" ]; then
+     echo "REFUSING: index is dirty; these staged paths are not this session's:"
+     git diff --cached --stat
+     # Do NOT commit. Leave the index exactly as found and surface it to the user.
+   fi
+
    # Stage ONLY the files this session wrote. Never `git add` the directory.
    CKPT_FILES=(docs/checkpoints/latest.md)
    # If step 4 archived a prior checkpoint, it MUST go in this list too — otherwise the
@@ -186,13 +238,25 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    # pattern does NOT make `git check-ignore -q docs/checkpoints/` return true, even
    # though `git add` on that directory refuses. Testing the dir silently picks the
    # wrong branch here.
-   if git check-ignore -q docs/checkpoints/latest.md; then
-     # The repo ignores this path on purpose. ASK before overriding that, then:
+   #
+   # Test EVERY file you are about to stage, not one representative file. `git
+   # check-ignore` reports nothing for an *already-tracked* path, so a tracked
+   # `latest.md` answers "not ignored" while a brand-new sibling in the same ignored
+   # directory is ignored — and `git add` aborts the whole invocation on it.
+   needs_force=""
+   for f in "${CKPT_FILES[@]}"; do
+     git check-ignore -q -- "$f" && needs_force=1
+   done
+
+   if [ -n "$needs_force" ]; then
+     # Ignored path. Check whether siblings are tracked first (see below) — if they
+     # are, `-f` restores the repo's convention. Otherwise ASK. Then:
      git add -f -- "${CKPT_FILES[@]}"
    else
      git add -- "${CKPT_FILES[@]}"
    fi
    git commit -m "chore: session checkpoint"
+   git show --stat HEAD   # verify it contains every CKPT_FILE and nothing else
    ```
 
    **Do not decide `-f` vs plain `add` from a tracked-ness check you ran earlier in this
@@ -239,6 +303,24 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
      that contains the archive and not the handoff. Always `git check-ignore` the file
      immediately before staging, and verify the commit contains **both** files
      (`git show --stat HEAD`) rather than trusting the exit code.
+   - **`git check-ignore` reports nothing for an already-tracked path**, so testing one
+     representative file answers for that file only. A tracked `latest.md` returns
+     "not ignored" — correctly — while the *new* dated sibling you are also staging is
+     ignored, and `git add` aborts on it. Testing `latest.md` and concluding "plain
+     `add` is fine" is the same false negative as testing the directory, one level in.
+     Loop over every path in `CKPT_FILES`. (chef-chopsky, 2026-07-29: a session that
+     wrote only a dated file and deliberately left `latest.md` alone tested `latest.md`
+     anyway — a file it was not staging — and got a green light for a `git add` that
+     staged nothing.)
+   - **Whatever is already staged when you arrive may belong to another agent.** The
+     bullet above assumes the pre-staged content is your own step-4 rename; in a shared
+     workspace (Conductor, worktrees) it can be an unrelated agent's in-flight work.
+     `git commit` without `-a` still commits it, under your message. Same run as above:
+     the checkpoint `git add` no-opped on the ignored path and the commit captured a
+     *different agent's* staged file deletion instead — a "session checkpoint" commit
+     whose entire content was someone else's 121-line deletion. Assert `git diff
+     --cached --name-only` is empty **before** staging; if it is not, do not commit, and
+     leave the index exactly as found (`git reset --soft HEAD~1` if you already did).
 
    When the path is gitignored, force-adding overrides a deliberate repo decision, so
    **ask** rather than defaulting. If the user wants checkpoints to stay local, skip the
@@ -246,6 +328,33 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    along with the fact that a `git checkout` can delete it. A repo keeping checkpoints local
    is a fine choice to make on purpose — just not one to arrive at by a silent no-op, and
    not one to silently overrule either.
+
+   **First, check whether the ignore rule is already dead.** Before asking the user to
+   choose, count how many files under the path are *already tracked*:
+
+   ```bash
+   git ls-files docs/checkpoints/ | wc -l          # tracked despite the ignore rule
+   git ls-files --others docs/checkpoints/ | wc -l # untracked
+   ```
+
+   If tracked files exist, the repo has been **force-adding past its own ignore rule**, one
+   checkpoint at a time — the rule is not expressing a real preference, it is just generating
+   silent `git add` no-ops. Say so and offer the durable fix instead of the per-session dance:
+
+   > "`docs/checkpoints/` is gitignored, but N checkpoints are already tracked — the rule has
+   > been force-added past every time. Want me to remove the ignore rule so this stops
+   > recurring, rather than force-adding again?"
+
+   Removing the rule is a two-line change, makes every future `git add` behave, and eliminates
+   the failure mode where a handoff sits untracked under an ignored path one `git checkout`
+   away from deletion. Before removing it, confirm nothing unexpected becomes trackable
+   (`git ls-files --others <path>` should list only the checkpoint you just wrote).
+
+   *(Found chef-chopsky, 2026-07-29: the ignore rule had been in place for months while all 11
+   existing checkpoints were tracked. Every close-out re-litigated the same force-add question;
+   the founder's actual preference — "checkpoints should always get merged to remote" — had
+   never been written down anywhere, because the skill only ever offered "force-add this once"
+   or "leave it local.")*
 
 ## Phase 4: Learn Flow
 
