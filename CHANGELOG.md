@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.1] - 2026-08-04
+
+### Fixed
+- **`/playbook:merge-prs` Step 4: `.git/info/exclude` fails inside a git worktree** — The
+  snippet ran `mkdir -p .git/info`, which assumes `.git` is a directory. In a worktree
+  (Conductor workspaces, `git worktree add`) `.git` is a **file** containing a `gitdir:`
+  pointer, so the command aborts with `Not a directory` and the plan file is never excluded
+  — leaving the working tree dirty, which is itself one of the two triggers for
+  `gh pr merge --delete-branch` half-failing.
+
+  Now resolves the path with `git rev-parse --git-common-dir` and verifies with
+  `git check-ignore`. Common-dir rather than `--git-dir` because `info/exclude` lives in the
+  common directory, shared across worktrees — which is also where git actually reads it from.
+
+  Found on the command's first real run, in exactly the environment it was written for.
+
 ## [0.26.0] - 2026-08-04
 
 ### Added

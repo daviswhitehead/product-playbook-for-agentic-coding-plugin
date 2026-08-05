@@ -151,14 +151,19 @@ triggers for `gh pr merge --delete-branch` half-failing and leaving the remote b
 alive. So, after writing it:
 
 ```bash
-mkdir -p .git/info
-grep -qxF 'docs/merge-plans/' .git/info/exclude 2>/dev/null || echo 'docs/merge-plans/' >> .git/info/exclude
+# NOT ".git/info/exclude" — in a git worktree (Conductor, `git worktree add`) .git is a
+# FILE pointing at the real gitdir, so that path fails with "Not a directory". Ask git.
+EXCLUDE="$(git rev-parse --git-common-dir)/info/exclude"
+mkdir -p "$(dirname "$EXCLUDE")"
+grep -qxF 'docs/merge-plans/' "$EXCLUDE" 2>/dev/null || echo 'docs/merge-plans/' >> "$EXCLUDE"
+git check-ignore -q docs/merge-plans/ && echo "excluded OK"
 git status --porcelain    # MUST be empty before Step 5
 ```
 
-`.git/info/exclude` is local and uncommitted, so this works in any repo without touching a
-shared `.gitignore`. If the user would rather commit the plan, commit it — either way the
-tree ends clean.
+`info/exclude` is local and uncommitted, so this works in any repo without touching a
+shared `.gitignore`. Use `--git-common-dir`, not `--git-dir`: `info/exclude` lives in the
+common directory and is shared across all worktrees, which is also what git actually reads.
+If the user would rather commit the plan, commit it — either way the tree ends clean.
 
 The plan contains, per PR: number, title, verdict + reason, assigned version (if any),
 required fix (if FIX-THEN-MERGE), and a status column starting at `pending`.
