@@ -7,6 +7,116 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.2] - 2026-08-04
+
+### Fixed
+- **`/playbook:close` — a clean tree does not mean the branch is disposable** — Phase 1 gains a
+  merged-ness check, because the two obvious commands both over-report for *different* reasons:
+  `git log <target>..HEAD` measures from the merge base (stale branches list already-shipped
+  work as unmerged), and `git cherry` matches by patch-id, which squash-merges and any
+  post-departure edit defeat. The honest answer is the two-dot `git diff --stat origin/<target> HEAD`.
+  Grounding case: a branch showed six commits as "unmerged" including a parallel agent's
+  security fix, and the close-out warned that archiving would destroy them — every one had
+  already squash-merged. Real contribution: one checkpoint file.
+- **`/playbook:close` — refuse to commit a dirty index** — Phase 3 asserts
+  `git diff --cached --name-only` is empty before staging. In a shared workspace whatever is
+  already staged may be another agent's in-flight work, and `git commit` sweeps it in under a
+  "session checkpoint" message. Observed: a checkpoint commit whose entire content was a
+  different agent's 121-line deletion.
+- **`/playbook:close` — `git check-ignore` must be tested per-file, not on a representative** —
+  It reports nothing for an already-tracked path, so a tracked `latest.md` answers "not ignored"
+  while a brand-new sibling in the same ignored directory is ignored, and `git add` aborts on the
+  whole invocation. Now loops over every path in `CKPT_FILES`.
+- **`/playbook:close` — notice when an ignore rule is already dead** — Before asking the user to
+  force-add past a gitignore rule for the Nth time, count how many files under the path are
+  already tracked. If any are, the repo has been force-adding past its own rule one checkpoint at
+  a time and the rule expresses no real preference. Offer to remove it instead of re-litigating
+  every session.
+- **`/playbook:learnings` — audit a pre-registered escalation before executing it** — A recurrence
+  doc's planned "next escalation" encodes an assumption about the *mechanism*, drawn from the
+  prior occurrences. A recurrence in the same family is not necessarily the same mechanism, and
+  executing the pre-registered fix against a different one produces a plausible-looking non-fix.
+  Ask explicitly whether it would have caught this occurrence; answering "no" out loud is the
+  high-value move.
+
+## [0.26.1] - 2026-08-04
+
+### Fixed
+- **`/playbook:merge-prs` Step 4: `.git/info/exclude` fails inside a git worktree** — The
+  snippet ran `mkdir -p .git/info`, which assumes `.git` is a directory. In a worktree
+  (Conductor workspaces, `git worktree add`) `.git` is a **file** containing a `gitdir:`
+  pointer, so the command aborts with `Not a directory` and the plan file is never excluded
+  — leaving the working tree dirty, which is itself one of the two triggers for
+  `gh pr merge --delete-branch` half-failing.
+
+  Now resolves the path with `git rev-parse --git-common-dir` and verifies with
+  `git check-ignore`. Common-dir rather than `--git-dir` because `info/exclude` lives in the
+  common directory, shared across worktrees — which is also where git actually reads it from.
+
+  Found on the command's first real run, in exactly the environment it was written for.
+
+## [0.26.0] - 2026-08-04
+
+### Added
+- **`/playbook:merge-prs` — autonomous open-PR backlog clearing** — The capability had been
+  exercised twice by hand (4 PRs in 2026-07, 9 PRs in 2026-07-26) with the procedure split
+  across three places that nothing composed: `/playbook:monitor-pr` owned the per-PR merge
+  mechanics, CLAUDE.md held the stacked-bump ordering as prose, and a learnings doc held the
+  evidence. Every run re-derived the orchestration.
+
+  The command triages every open PR (including drafts — draft status is frequently neglect,
+  not intent), classifies each **MERGE / FIX-THEN-MERGE / SKIP / ESCALATE** with a stated
+  reason, orders the queue, then presents **one merge plan for one approval**. After that
+  gate it runs unattended. All human judgment is spent once, up front, where it belongs;
+  what follows is mechanical and long-running.
+
+  Design points that came from the two hand-run sessions:
+  - **Skip, don't halt.** A PR that breaks its triage assumptions mid-run is skipped and
+    reported; the remaining approved PRs still merge. Forfeiting eight good merges because
+    the fourth developed a conflict is the failure mode this prevents.
+  - **The plan file must not dirty the working tree.** A dirty tree is one of two known
+    triggers for `gh pr merge --delete-branch` half-failing and leaving the remote branch
+    alive. The plan goes to `docs/merge-plans/` with the path added to `.git/info/exclude`
+    (local, uncommitted, works in any git repo), and Step 5 asserts a clean tree before each
+    merge.
+  - **Version-guard machinery is detected, not assumed.** Sequential stacked bumps are
+    specific to repos with a version guard; the command looks for one and skips the whole
+    layer when absent.
+  - Worktree-aware branch claiming, and branch deletion verified with `git ls-remote` rather
+    than assumed.
+
+  It delegates per-PR CI work to `/playbook:monitor-pr` (which delegates failure analysis to
+  `/playbook:debug-ci`) rather than reimplementing either.
+
+### Fixed
+- **Command-surface drift, at the root cause** — Six real commands (`close`, `close-project`,
+  `emergent`, `foundations`, `monitor-pr`, `research-synthesis`) were missing from
+  `commands/help.md`, and four were missing from README's command tables. A command nobody
+  can find is worth nothing regardless of how good it is.
+
+  Root cause: both files hand-duplicate data that already lives in each command's
+  frontmatter, and adding a command has no step that touches either file. `validate-plugin.sh`
+  now enforces coverage **bidirectionally** — every command must appear in help.md and as a
+  README table row, and every `/playbook:x` referenced in help.md must resolve to a real
+  command. `plugin-guard.yml` already runs that script on every PR, so an unlisted command is
+  now unmergeable.
+
+  Generating help.md from frontmatter was considered and rejected: its value is the human
+  judgment about which command fits which situation, which no frontmatter field encodes.
+  Enforce coverage, leave the curation alone.
+
+  Notes: the README check requires a **table row**, not a prose mention — `close-project` was
+  named in README prose while absent from every table. The help.md check uses a `(?![\w-])`
+  lookahead so `/playbook:work` is not considered covered by `/playbook:work-multiple`. And
+  the coverage report is written to a temp file rather than captured through `$(...)`, because
+  bash 3.2 (still macOS's default `/bin/bash`) mis-parses a heredoc containing apostrophes
+  inside command substitution.
+
+- Content backfill: help.md gains the six missing commands plus `help`/`hello`, new
+  **Strategy Foundations**, **Close-Out**, **Pull Requests**, and **Meta** categories, and a
+  "Clearing a PR Backlog" workflow recipe. README gains `close-project`, `emergent`,
+  `monitor-pr`, `hello`, and a Pull Request Commands table.
+
 ## [0.25.2] - 2026-07-29
 
 ### Added
