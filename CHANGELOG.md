@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.3] - 2026-08-04
+
+### Added
+- **`/playbook:close` — Phase 3.5: Org Deposit (agent-workforce repos only)** — Skips silently
+  unless the repo defines an agent workforce (`workflows/TEAM.md` with role charters). When a
+  session was ad-hoc rather than run as a chartered 1:1, it asks which workforce employee should
+  have done the work and what lever, charter line, or prompt they were missing — then requires
+  that edit **before** closing, so the session compounds into the workforce instead of competing
+  with it. "None — founder-only on purpose" is a valid answer; silently skipping the question is
+  not. Phase 5's summary gains a matching `Org deposit:` line.
+
 ## [0.26.2] - 2026-08-04
 
 ### Fixed

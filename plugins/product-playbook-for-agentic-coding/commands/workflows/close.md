@@ -356,6 +356,16 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    never been written down anywhere, because the skill only ever offered "force-add this once"
    or "leave it local.")*
 
+## Phase 3.5: Org Deposit (agent-workforce repos only)
+
+Skip silently unless the repo defines an agent workforce (`workflows/TEAM.md` with role charters exists).
+
+If this session was an ad-hoc working session (not already run as a chartered 1:1), ask:
+
+> "Which workforce employee should have done this session's work — and what lever, charter line, or prompt were they missing?"
+
+Then **make that edit before closing** (the role's `CHARTER.md`, its prompts, `workflows/OBJECTIVES.md`, or a planned-hire note in `TEAM.md`), so the session compounds into the workforce instead of competing with it. If the work genuinely belongs to no role, record it as either a future hire (`TEAM.md` → planned evolution) or deliberately founder-only work. A one-line answer of "none — founder-only on purpose" is a valid outcome; silently skipping the question is not.
+
 ## Phase 4: Learn Flow
 
 1. If `--quick` or `--skip-learnings` was passed: skip this phase.
@@ -385,6 +395,7 @@ Git: [Committed 3 files / Clean / 2 uncommitted (noted)]
 Tasks: [2 completed, 1 carried forward / No tasks document]
 Handoff: docs/checkpoints/latest.md [committed <sha> / left local — path is gitignored]
          [archived prior checkpoint to <file>]
+Org deposit: [Edited growth/CHARTER.md / Founder-only on purpose / Not a workforce repo]
 Learnings: [Captured / Skipped]
 Skills: [Suggested /lore / Not applicable]
 ```
