@@ -13,48 +13,83 @@ This bit us once already: a content-only commit shipped at the same version, and
 every local install silently stayed on the old copy. The guardrails below make that
 mistake impossible to merge.
 
-**IMPORTANT**: Every change to a plugin MUST bump its version in **both** files, which
-must always match:
-
-1. **`plugins/<plugin-name>/.claude-plugin/plugin.json`** — the plugin's own version
-2. **`.claude-plugin/marketplace.json`** — the marketplace entry's `version`
-
-Do the bump with the helper (it edits both together so they can't drift):
+**IMPORTANT**: Every change to a plugin MUST declare a version change. **Do not edit the
+version in a PR** — add a **changeset** instead:
 
 ```bash
-scripts/sync-version.sh <new-version>          # e.g. 0.22.0
-# then add a "## [<new-version>] - YYYY-MM-DD" section to CHANGELOG.md
+cat > .changes/my-change.md <<'EOF'
+---
+plugin: product-playbook-for-agentic-coding
+bump: patch
+---
+
+### Fixed
+- **What changed** — why it mattered, and what it prevents now.
+EOF
+```
+
+A changeset is a new file, so it can never conflict with another PR. The version itself is
+computed once, on `main`:
+
+```bash
+scripts/release.sh          # consumes .changes/*, bumps both manifests, writes CHANGELOG
+git add -A && git commit -m "chore: release" && git push
 ```
 
 Also update **`README.md`** if component counts/tables changed.
 
+### Why not bump in the PR?
+
+The version is a single monotonic counter on `main`, but PRs are parallel. Requiring each
+PR to bump it made N open PRs mutually exclusive — they all wanted the same next number —
+so merges had to serialize, one patch version per PR, with every PR's version-file edits
+conflicting with every other PR's.
+
+And that conflict was doing load-bearing safety work nobody designed. The guard compared
+against the **merge base**, so it verified "this branch bumped since it forked", not
+"main's version will increase": a branch forked at 0.26.1 and bumped to 0.26.2 passed even
+when `main` had already reached 0.26.4. The only thing preventing that merge from dragging
+main's version *backwards* was git conflicting on the version lines. Meanwhile the
+main-branch guard run compared main against itself, so it always reported "unchanged" and
+could never fail — there was no post-merge backstop at all.
+
+Changesets remove the shared-counter contention; the rewritten guard supplies the backstop
+that was missing. See `.changes/README.md`.
+
 ### Version Bumping Rules
+
+Set `bump:` in the changeset accordingly:
 
 - **MAJOR** (1.0.0 → 2.0.0): Breaking changes, major reorganization
 - **MINOR** (1.0.0 → 1.1.0): New commands, agents, or skills
 - **PATCH** (1.0.0 → 1.0.1): Bug fixes, doc updates, minor improvements
 
+When several changesets are released together, the **highest** bump type wins.
+
 ### Enforcement
 
-Two guards run on every PR to `main` (`.github/workflows/plugin-guard.yml`), and you
-can run them locally:
+Guards run on every PR to `main` and on every push to `main`
+(`.github/workflows/plugin-guard.yml`), and you can run them locally:
 
-- `scripts/validate-plugin.sh` — asserts each `marketplace.json` entry's version
-  matches the corresponding `plugin.json` version.
-- `scripts/check-version-bump.sh [base-ref]` — fails if any plugin's files changed
-  versus the base branch without a `plugin.json` version bump.
+- `scripts/validate-plugin.sh` — asserts each `marketplace.json` entry's version matches
+  the corresponding `plugin.json` version, and that every command appears in `help.md` and
+  README's tables.
+- `scripts/check-version-bump.sh [base-ref]` — two modes. On a **PR**: the changed plugin
+  must declare a changeset (a hand bump is still accepted). On **main**: fails while
+  changesets sit unreleased, and fails if plugin content changed without the version
+  increasing versus the previous commit.
+- `scripts/test-version-checks.sh` — 20 cases over both scripts. Run it after touching
+  either.
 
-### Merging multiple open PRs (stacked bumps)
+### Merging multiple open PRs
 
-When several content PRs are open at once, none will pass the guard until each
-bumps the version — and they can't all claim the same number. Merge them
-**sequentially, oldest first, one patch version per PR**: check out the PR
-branch (if another worktree holds it, use a temp branch + `git push origin
-HEAD:<branch>`), merge `origin/main` in, run `scripts/sync-version.sh
-<next-patch>`, add the CHANGELOG section, push, wait for the guard, merge, then
-repeat for the next PR against the new main. This keeps CHANGELOG↔PR mapping
-1:1 and lets every merge pass the guard independently. (Proven on the 2026-07
-four-PR backlog: 0.22.1 → 0.22.4.)
+Merge them in any order — changesets don't conflict, so nothing needs to be stacked. Then
+run `scripts/release.sh` **once** and push; that single release covers every PR merged
+since the last one. `main` is red between the first merge and the release, which is the
+forcing function: content on `main` at an unchanged version has reached zero installs.
+
+If another worktree holds a PR branch, don't disturb it — use a temp branch plus
+`git push origin HEAD:<branch>`. `/playbook:merge-prs` automates this whole flow.
 
 ### Delivering an update to installed machines
 
@@ -221,10 +256,10 @@ Two output targets:
 
 Before committing changes:
 
-- [ ] Version bumped in **both** `plugin.json` and `marketplace.json` (use `scripts/sync-version.sh`)
-- [ ] `CHANGELOG.md` has a section for the new version
-- [ ] `scripts/validate-plugin.sh` passes (incl. version consistency)
-- [ ] `scripts/check-version-bump.sh` passes (plugin changed ⇒ version bumped)
+- [ ] Changeset added under `.changes/` (do **not** hand-edit the version in a PR)
+- [ ] Changeset body is the CHANGELOG prose you actually want (`release.sh` uses it verbatim)
+- [ ] `scripts/validate-plugin.sh` passes (incl. version + command-surface coverage)
+- [ ] `scripts/check-version-bump.sh` passes (plugin changed ⇒ change declared)
 - [ ] README.md updated if components changed
 - [ ] All commands have proper frontmatter (name, description)
 - [ ] All agents have proper frontmatter (name, description, model)

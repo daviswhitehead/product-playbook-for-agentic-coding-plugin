@@ -60,15 +60,25 @@ is Step 6's escalation list — genuinely unsafe territory, where stopping is co
    - Merge-method policy (squash vs merge commit) and any forbidden patterns
    - **Release/versioning rules** — see next item
 
-5. **Detect version-guard machinery.** Some repos fail CI unless every change bumps a
-   version, which forces PRs to merge *sequentially with distinct versions*. Look for:
-   - A versioning section in CLAUDE.md (search: `version`, `bump`, `propagat`)
-   - A bump script (`scripts/sync-version.sh`, `npm version`, `bumpversion`, …)
-   - A guard workflow in `.github/workflows/` that diffs versions against the base branch
+5. **Detect release machinery, and which of two kinds it is.** Some repos fail CI unless
+   every change declares a version change. Look for a versioning section in CLAUDE.md
+   (search: `version`, `bump`, `changeset`, `propagat`), a release or bump script, and a
+   guard workflow in `.github/workflows/`. Then classify:
 
-   **If found**: the queue is *stacked* — each PR needs its own version, assigned in Step 3.
-   **If not found**: skip all version-bump handling. Most repos don't have this. Do not
-   invent it.
+   **(a) Changeset-style** — `.changes/`, `.changeset/`, `changie`, or a `release.sh` that
+   consumes declaration files. **Strongly preferred, and the queue is trivial**: each PR
+   declares a bump in its own new file, so nothing conflicts and merge order is free. Do
+   **not** assign per-PR versions. Merge everything, then run the release **once** at the
+   end (Step 5.9).
+
+   **(b) Bump-in-PR style** — the version is edited directly in a manifest and a guard
+   diffs it against the base branch. The queue is *stacked*: each PR needs its own version,
+   assigned in Step 3, and merges must serialize. This is the painful path — the version is
+   a serial counter on the default branch and PRs are parallel writers, so N open PRs all
+   want the same next number and their manifest edits conflict pairwise. If you find this,
+   run the queue, then **say so in the final report** and point at changesets as the fix.
+
+   **If neither**: skip all version handling. Most repos have none. Do not invent it.
 
 6. **Check auto-delete**: `gh repo view --json deleteBranchOnMerge`. If `false`, every
    merge in this run risks leaving an orphan branch (Step 5.6). Note it for the report and
@@ -136,10 +146,13 @@ Default: **oldest first** (by `createdAt`). Then apply two overrides:
 2. **Small and green before large and red.** Early merges move `main` forward; cheap ones
    first means later PRs rebase onto more settled ground.
 
-**If Step 0.5 found version-guard machinery**, assign each PR its own version now —
+**If Step 0.5 found bump-in-PR machinery (b)**, assign each PR its own version now —
 sequential patch bumps from the current version, one per PR, in queue order. This is what
 makes a stacked queue mergeable: the guard can't be satisfied by a shared version number,
 and it keeps the CHANGELOG↔PR mapping 1:1.
+
+**If it found changeset-style machinery (a)**, assign nothing. Versions are computed once
+at Step 5.9, and ordering only matters for the file-overlap reasons above.
 
 ### Step 4: The Gate — Write and Present the Merge Plan
 
@@ -198,9 +211,13 @@ run hit a conflict where a directory-level `git add -f docs/checkpoints/` would 
 force-committed everything the repo deliberately ignores; the fix was narrowing to the one
 explicit file.
 
-**5.3 — Version bump + CHANGELOG** (only if Step 0.5 found guard machinery). Use the
-repo's own script with this PR's assigned version, then add the matching CHANGELOG section.
-One version, one PR, one CHANGELOG entry.
+**5.3 — Declare the version change** (only if Step 0.5 found release machinery).
+
+- **Changeset-style (a)**: confirm the PR carries a changeset; add one if it doesn't. Never
+  edit the version manifest here — that reintroduces the conflicts changesets exist to
+  remove.
+- **Bump-in-PR style (b)**: run the repo's bump script with this PR's assigned version, then
+  add the matching CHANGELOG section. One version, one PR, one CHANGELOG entry.
 
 **5.4 — Validate locally, then push.** Run the project's local validation to exit 0 *before*
 pushing. Pushing an unvalidated commit burns a CI run and leaves the branch needing another
@@ -233,6 +250,25 @@ the Step 0.2 branch, and delete `tmp/pr<N>` if you made one.
 
 **5.8 — Tick it off.** Update the plan file: status `merged`, record the new `main` SHA.
 This is what makes the run resumable.
+
+**5.9 — Release once, after the queue drains** (changeset-style repos only). Run the repo's
+release script on an up-to-date default branch, then commit and push it:
+
+```bash
+git checkout main && git pull
+scripts/release.sh          # or the repo's equivalent
+git add -A && git commit -m "chore: release <version>" && git push
+```
+
+One release covers every PR merged in this run. Expect the default branch's CI to be **red
+between the first merge and this step** — that is the intended forcing function, not a
+failure to investigate: merged content sitting at an unchanged version has reached zero
+installs. Verify CI goes green after the release push, and report the released version.
+
+**5.6 already ran per PR** — a branch delete that reports success can still be asynchronous.
+If `git ls-remote` says the branch survived, re-check once after a few seconds before
+deleting by hand; server-side auto-delete (`deleteBranchOnMerge`) commonly lands a beat late
+and produces a false "it survived."
 
 ### Step 6: Exceptions — Skip, Don't Halt
 
