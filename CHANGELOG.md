@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.4] - 2026-08-04
+
+### Fixed
+- **`/playbook:monitor-pr` — check `mergeStateStatus` BEFORE interpreting any check results** —
+  When a PR is `DIRTY` (`mergeable: CONFLICTING`) it has no merge ref, so GitHub creates **zero**
+  `pull_request` workflow runs — while platform apps (Vercel/Supabase/Railway) still attach green
+  checks to the head commit. The check list looks healthy and nothing actually ran. Step 1 now
+  gates on `mergeStateStatus` first and corroborates with an empty `gh run list --branch`.
+  Grounding case: chef-chopsky #484, 2026-08-03 — two pushes, zero Actions runs, four green
+  platform checks. Fix is to merge the base branch in and push, which is what finally fires
+  Actions.
+
 ## [0.26.3] - 2026-08-04
 
 ### Added
