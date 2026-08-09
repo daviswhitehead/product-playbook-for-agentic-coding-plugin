@@ -214,6 +214,7 @@ Some things shouldn't depend on an agent remembering to do them. These run in th
 | `hooks/hooks.json` → `scripts/session-orientation.sh` | `SessionStart` hook | Gathers branch/tracking state, uncommitted count, active `projects/in-progress/` dirs, latest checkpoint, last 3 commits, and stashes tagged to this branch — with no tool round-trips. Silent outside a git repo or in a repo without the playbook layout. Opt out with `PLAYBOOK_NO_ORIENTATION=1`. |
 | `scripts/verify-close-project.sh <name>` | Executable check | Asserts a close-out actually completed — above all that the **source directory is gone**, not merely that `done/` exists. |
 | `scripts/check-version-bump.sh` | CI guard (PR + push) | On a PR: the changed plugin must declare a changeset. On `main`: fails while changesets sit unreleased, and fails if plugin content changed without the version increasing. |
+| `evals/run-static.sh` | Static instruction evals (run by `validate-plugin.sh`) | 15 incident-derived fixtures pin load-bearing phrases to the command files they cover (fixed-string match); an edit that drops one reintroduces a documented regression and fails CI. Behavioral expectations in the same fixtures await the LLM runner. See `evals/README.md`. |
 | `scripts/release.sh` | Release step | Consumes `.changes/*`, computes each plugin's new version, updates both manifests + `CHANGELOG.md`, deletes the changesets. `--dry-run` to preview. |
 
 Run `scripts/test-close-project-checks.sh` after changing either close-project piece (14

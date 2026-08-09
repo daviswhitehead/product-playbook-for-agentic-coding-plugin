@@ -454,6 +454,30 @@ fi
 
 echo ""
 
+# 11. Static instruction evals
+# WHY: fixtures under evals/ pin load-bearing phrases to the incidents that made them
+# necessary; an edit that drops one reintroduces a documented regression. This is the
+# deterministic floor of the eval harness (IMPROVEMENT.md "what the loop measures");
+# the behavioral layer runs via an LLM runner outside CI. See evals/README.md.
+echo "Running static instruction evals..."
+echo "-------------------------------------------"
+
+if [ -x "evals/run-static.sh" ]; then
+    EVAL_TMP="$(mktemp)"
+    if evals/run-static.sh > "$EVAL_TMP" 2>/dev/null; then
+        success "Static evals pass ($(grep -c $'\tstatic\tPASS\t' "$EVAL_TMP") expectations)"
+    else
+        while IFS=$'\t' read -r fixture _type _status detail; do
+            error "eval $fixture: $detail"
+        done < <(grep $'\tFAIL\t' "$EVAL_TMP")
+    fi
+    rm -f "$EVAL_TMP"
+else
+    warning "evals/run-static.sh not found or not executable — static evals skipped"
+fi
+
+echo ""
+
 # Summary
 echo "=========================================="
 echo "Validation Summary"

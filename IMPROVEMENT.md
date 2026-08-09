@@ -42,7 +42,9 @@ without reducing next-session cost is a regression dressed as progress.
    - `scripts/validate-plugin.sh`, `scripts/check-version-bump.sh`, `scripts/release.sh`
      and their test suites
    - `.github/workflows/plugin-guard.yml`
-   - eval fixtures and eval runner scripts (once they exist)
+   - `evals/` — fixtures, `run-static.sh`, and `baselines.tsv`. An autonomous run may
+     READ and must RUN them; weakening a fixture to make an edit pass is the one move
+     that must always cross a human
 
    An autonomous run that believes a guardrail is wrong writes that up as a finding for
    human review; it does not fix it.
@@ -69,14 +71,15 @@ Promotion between rungs is itself a human-approved edit to this table.
 
 ## What the loop measures
 
-Until the eval harness exists, these are tracked directionally in retrospectives; once it
-exists, they gate merges:
-
 - **Usage**: which commands/skills actually fire (`~/.claude/playbook-usage.log`, written
   by the `log-playbook-usage.sh` hook). A component unused for a month is a pruning
   candidate for `/playbook:review-playbook`.
-- **Eval fixtures**: scenario checks per high-traffic command; an instruction edit must
-  not regress them, and a claimed improvement should move at least one.
+- **Eval fixtures** (`evals/`): incident-derived scenario checks per high-traffic
+  command. The **static layer gates now** — `evals/run-static.sh` runs inside
+  `validate-plugin.sh`, so CI fails any edit that drops a load-bearing phrase. The
+  **behavioral layer** (LLM-scored assertions) is tracked directionally until the weekly
+  run wires it in; an instruction edit must not regress either, and a claimed
+  improvement should move at least one expectation.
 - **Outcome trend** (the real reward): user corrections per session, re-learned lessons
   per retrospective, time-to-green on PRs. If these worsen after a release, the release
   gets reverted first and debated second.

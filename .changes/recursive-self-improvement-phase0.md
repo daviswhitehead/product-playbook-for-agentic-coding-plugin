@@ -18,6 +18,14 @@ bump: minor
   timestamp + command + repo basename (never prompt content) to
   `~/.claude/playbook-usage.log`, silent and bounded, opt-out via
   `PLAYBOOK_NO_USAGE_LOG=1`. "Unused for a month" is now a grep.
+- **Instruction eval harness (`evals/`)** — 15 fixtures across the 5 highest-traffic
+  commands (monitor-pr, close, learnings, work, debug-ci), each derived from a real
+  incident in the CHANGELOG or learnings history. Two layers: **static** expectations
+  (load-bearing phrases, fixed-string matched by `evals/run-static.sh`, wired into
+  `validate-plugin.sh` so CI fails an edit that drops one — negative-tested by deleting
+  a covered phrase and observing the failure) and **behavioral** expectations awaiting
+  the LLM runner. Baseline committed at 25/25 static pass. Fixtures are guardrail files
+  per IMPROVEMENT.md rule 5: the improvement loop runs them but may never edit them.
 - **Instruction-file size budgets in `scripts/validate-plugin.sh`** — CLAUDE.md/AGENTS.md
   error over 300 lines (warn over 200, matching the thresholds the learnings workflow
   already enforces on target projects); command/agent/skill files error over 1200 lines

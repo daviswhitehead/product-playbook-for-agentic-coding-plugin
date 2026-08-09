@@ -1,0 +1,42 @@
+fixture	type	status	detail
+close/01-merged-branch-not-disposable.md	static	PASS	git diff --stat origin/
+close/01-merged-branch-not-disposable.md	static	PASS	git cherry
+close/01-merged-branch-not-disposable.md	behavioral	SKIP	The agent judges merged-ness by content (the two-dot diff against the target tip), not by commit ancestry or patch-id listings, and does not warn about "unmerged commits" that produce an empty diff.
+close/02-dirty-index-refusal.md	static	PASS	git diff --cached --name-only
+close/02-dirty-index-refusal.md	behavioral	SKIP	The agent asserts the index is empty before staging its own files, and on finding pre-staged content it stops and surfaces it rather than committing it.
+close/03-stash-check.md	static	PASS	git stash list
+close/03-stash-check.md	static	PASS	WIP on <branch>
+close/03-stash-check.md	behavioral	SKIP	The agent runs the stash check even when the tree is clean, compares stash entries against HEAD, and salvages unique-or-uncertain stashes to a pushed branch before dropping anything.
+debug-ci/01-triage-first.md	static	PASS	Step 0: Triage
+debug-ci/01-triage-first.md	behavioral	SKIP	The agent first establishes whether the failure is related to its changes (base-branch state, whether the failing test was touched, prior runs on the same commit) before any debugging.
+debug-ci/02-flake-rerun.md	static	PASS	gh run rerun --failed
+debug-ci/02-flake-rerun.md	static	PASS	not an empty commit
+debug-ci/02-flake-rerun.md	behavioral	SKIP	For a confirmed flake the agent re-runs only the failed jobs instead of pushing an empty commit.
+debug-ci/03-reproduce-locally.md	static	PASS	Reproduce Locally
+debug-ci/03-reproduce-locally.md	behavioral	SKIP	The agent attempts local reproduction before pushing candidate fixes, and pushes only after the fix passes locally (or documents why local reproduction is impossible).
+learnings/01-claude-md-size-gate.md	static	PASS	If over 24,000 chars or 300 lines
+learnings/01-claude-md-size-gate.md	static	PASS	Trim to a budget, not to the limit
+learnings/01-claude-md-size-gate.md	behavioral	SKIP	The agent blocks promotion until a trim lands, and computes the trim target as limit minus planned addition minus headroom, re-measuring after every edit.
+learnings/02-implemented-means-merged.md	static	PASS	MERGED, not written
+learnings/02-implemented-means-merged.md	static	PASS	merge-base --is-ancestor
+learnings/02-implemented-means-merged.md	behavioral	SKIP	The agent verifies the fix reached the default branch (ancestry check or PR state), and treats a fix on an unmerged branch as an unimplemented fix.
+learnings/03-autonomous-gates-in-writing.md	static	PASS	Ship changes as draft PRs, never direct commits
+learnings/03-autonomous-gates-in-writing.md	static	PASS	which gates were auto-answered
+learnings/03-autonomous-gates-in-writing.md	behavioral	SKIP	The agent answers each gate in writing with reasoning, defaults to executing reversible work rather than deferring, and its final summary discloses every auto-answered gate.
+monitor-pr/01-dirty-pr-zero-workflow-runs.md	static	PASS	mergeStateStatus
+monitor-pr/01-dirty-pr-zero-workflow-runs.md	static	PASS	BEFORE interpreting any check results
+monitor-pr/01-dirty-pr-zero-workflow-runs.md	static	PASS	gh run list --branch
+monitor-pr/01-dirty-pr-zero-workflow-runs.md	behavioral	SKIP	The agent checks merge state before drawing any conclusion from the check list, and treats an empty workflow-run list as corroboration that CI never fired rather than as success.
+monitor-pr/01-dirty-pr-zero-workflow-runs.md	behavioral	SKIP	The agent's fix path is merging the base branch into the PR and pushing, which is what finally fires Actions.
+monitor-pr/02-delete-branch-half-fail.md	static	PASS	half-fails — it deletes NEITHER branch
+monitor-pr/02-delete-branch-half-fail.md	static	PASS	re-checkout your working branch afterwards
+monitor-pr/02-delete-branch-half-fail.md	behavioral	SKIP	On any post-merge cleanup error the agent verifies the remote branch's actual state instead of assuming the error was cosmetic.
+monitor-pr/03-proof-of-completion-comment.md	static	PASS	proof-of-completion comment
+monitor-pr/03-proof-of-completion-comment.md	static	PASS	green CI alone is not reviewable evidence
+monitor-pr/03-proof-of-completion-comment.md	behavioral	SKIP	Before merging, the agent posts a comment covering what shipped, evidence it works, and what was deferred — with "nothing deferred" stated explicitly rather than left silent.
+work/01-commit-before-git-ops.md	static	PASS	Commit Checkpoints Before Git-Touching Operations
+work/01-commit-before-git-ops.md	behavioral	SKIP	The agent commits pending work before any operation that touches git state, without being reminded.
+work/02-learnings-before-task.md	static	PASS	search for relevant learnings
+work/02-learnings-before-task.md	behavioral	SKIP	The agent searches learnings/solutions docs before implementation begins and incorporates matches into the approach.
+work/03-proof-comment-on-merge.md	static	PASS	proof-of-completion comment
+work/03-proof-comment-on-merge.md	behavioral	SKIP	The agent posts the proof-of-completion comment (what shipped, evidence, deferrals) before merging, per the monitor-pr Step 4 canonical definition.

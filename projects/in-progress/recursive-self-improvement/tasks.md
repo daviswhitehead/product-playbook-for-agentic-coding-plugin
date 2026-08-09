@@ -7,8 +7,8 @@
 
 ## Current Focus
 
-**Active Task**: none — Phase 0 and Task 1.1 shipped 2026-08-09 (PR 1)
-**Next Task**: Task 1.2 — Eval harness v1 (critical path)
+**Active Task**: none — Phase 0 and Phase 1 (1.1–1.3) shipped 2026-08-09 (PR 1)
+**Next Task**: Task 2.1 — Correction-capture hook (parallel-track); Task 3.1 — `/playbook:self-improve` (critical path)
 
 ## Phase 0: Constitution
 
@@ -76,31 +76,29 @@
 
 ---
 
-### Task 1.2: Eval harness v1
-**Description**: Create `evals/` with fixtures for the 5 highest-traffic commands (seed from learnings-doc incidents: work, learnings, debug/debug-ci, monitor-pr, close). Runner = LLM session scoring binary expectations per fixture; baselines committed to `evals/baselines.tsv`.
+### Task 1.2: Eval harness v1 ✅
+**Description**: Create `evals/` with fixtures for the 5 highest-traffic commands. Design refinement during implementation: expectations split into **static** (load-bearing phrase, fixed-string matched — deterministic, CI-able today via `run-static.sh` called from `validate-plugin.sh`) and **behavioral** (binary assertions for the LLM runner, wired in at Phase 3).
 
 **Acceptance Criteria**:
-- [ ] ≥3 fixtures per top-5 command, each citing the real incident it derives from
-- [ ] Runner produces a deterministic-format TSV score sheet
-- [ ] Baseline committed; `IMPROVEMENT.md` "what the loop measures" updated from "directional" to "gating"
-- [ ] Fixtures + runner added to rule 5's guardrail list
+- [x] 3 fixtures each for monitor-pr, close, learnings, work, debug-ci — every one citing a real incident (CHANGELOG version or learnings lineage)
+- [x] Runner produces deterministic TSV; baseline committed (`evals/baselines.tsv`, 25/25 static pass, 16 behavioral pending)
+- [x] IMPROVEMENT.md "what the loop measures" updated: static layer gating, behavioral directional
+- [x] `evals/` added to rule 5's guardrail list
 
-**Dependencies**: none (critical path start)
-**Estimated Effort**: 1–2 sessions
+**Status**: [x] Complete — 2026-08-09
 
-**Status**: [ ] Not Started
+**Notes**: "Top-5" chosen by incident richness (usage log has no data yet — revisit selection once it does). Static layer means CI now fails any edit that drops a phrase encoding a documented fix.
 
 ---
 
-### Task 1.3: Harness negative test `[GATE]`
-**Description**: Deliberately break a command file (remove a load-bearing step covered by a fixture), run the harness, observe FAIL; restore. The harness is not trusted until it has been seen failing.
+### Task 1.3: Harness negative test ✅ `[GATE]`
+**Description**: Break a command file, run the harness, observe FAIL; restore.
 
 **Acceptance Criteria**:
-- [ ] Broken input produced a fixture failure with an actionable message
-- [ ] Restoration verified (git diff clean); result recorded in baselines notes
+- [x] Rewrote the monitor-pr GATE phrase ("BEFORE interpreting any check results" → paraphrase) → `run-static.sh` exit 1 with `FAIL phrase missing from commands/workflows/monitor-pr.md: ...`
+- [x] Restored via `git checkout --`, clean status verified, post-restore run 25/25 PASS
 
-**Dependencies**: 1.2
-**Status**: [ ] Not Started
+**Status**: [x] Complete — 2026-08-09
 
 ---
 
@@ -204,7 +202,7 @@
 ### Task N.1: Guard verification sweep
 **Description**: Every guard this project added has been negative-tested (0.2 ✅, 1.3, 4.1's ownership check); every instrumentation task shows a consuming query with real output (1.1 ✅, 2.1, 5.1).
 
-**Status**: [ ] In Progress — 2 of 5 verified (the 2 shipped so far)
+**Status**: [ ] In Progress — 4 of 6 verified (0.2 budgets ✅, 1.1 instrumentation ✅, 1.2 static evals in CI ✅, 1.3 harness fire-drill ✅; pending: 2.1, 4.1, 5.1)
 
 ---
 
@@ -220,7 +218,9 @@
 - [x] 0.2 Size budgets (negative-tested) — 2026-08-09
 - [x] 0.3 CLAUDE.md/README pointers — 2026-08-09
 - [x] 1.1 Usage instrumentation (consuming query verified) — 2026-08-09
+- [x] 1.2 Eval harness v1 (static layer in CI, 25/25 baseline) — 2026-08-09
+- [x] 1.3 Harness negative test — 2026-08-09
 
 ### Next Up
-- [ ] 1.2 Eval harness v1 — ready to start
 - [ ] 2.1 Correction capture — ready (parallel)
+- [ ] 3.1 `/playbook:self-improve` command — ready (critical path)
