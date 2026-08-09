@@ -403,6 +403,57 @@ done < "$COVERAGE_TMP"
 
 echo ""
 
+# 10. Instruction-file size budgets
+# WHY: rule-following degrades as instruction count grows — Anthropic's guidance targets
+# <200 lines for always-loaded files, and the learnings workflow already polices *target
+# projects'* CLAUDE.md to exactly these numbers. But nothing policed this repo's own
+# instruction surface, and IMPROVEMENT.md's improvement loop makes unbounded growth a
+# mechanical risk (an autonomous loop adds content far faster than a human). Budgets are
+# env-overridable so the guard itself can be negative-tested (see IMPROVEMENT.md rule 5:
+# changing the *defaults* below requires human approval).
+echo "Checking instruction-file size budgets..."
+echo "-------------------------------------------"
+
+# Always-loaded files (every session pays for every line).
+BUDGET_ALWAYS_WARN="${BUDGET_ALWAYS_WARN:-200}"
+BUDGET_ALWAYS_MAX="${BUDGET_ALWAYS_MAX:-300}"
+# On-demand components (commands/agents/skills load when invoked; the budget exists to
+# stop unbounded growth, not to force terseness — the warn line marks refactor candidates).
+BUDGET_COMPONENT_WARN="${BUDGET_COMPONENT_WARN:-800}"
+BUDGET_COMPONENT_MAX="${BUDGET_COMPONENT_MAX:-1200}"
+
+for f in CLAUDE.md AGENTS.md; do
+    [ -f "$f" ] || continue
+    lines=$(wc -l < "$f" | tr -d ' ')
+    if [ "$lines" -gt "$BUDGET_ALWAYS_MAX" ]; then
+        error "$f is $lines lines (hard cap $BUDGET_ALWAYS_MAX). Demote content to docs/ or delete — see IMPROVEMENT.md rule 3."
+    elif [ "$lines" -gt "$BUDGET_ALWAYS_WARN" ]; then
+        warning "$f is $lines lines (soft limit $BUDGET_ALWAYS_WARN). New additions should follow one-in-one-out."
+    else
+        success "$f within budget ($lines/$BUDGET_ALWAYS_MAX lines)"
+    fi
+done
+
+OVER_BUDGET=0
+COMPONENT_TOTAL=0
+while IFS= read -r f; do
+    COMPONENT_TOTAL=$((COMPONENT_TOTAL + 1))
+    lines=$(wc -l < "$f" | tr -d ' ')
+    if [ "$lines" -gt "$BUDGET_COMPONENT_MAX" ]; then
+        error "$(basename "$f") is $lines lines (hard cap $BUDGET_COMPONENT_MAX). Split into a skill + references, or demote sections."
+        OVER_BUDGET=$((OVER_BUDGET + 1))
+    elif [ "$lines" -gt "$BUDGET_COMPONENT_WARN" ]; then
+        warning "$(basename "$f") is $lines lines (soft limit $BUDGET_COMPONENT_WARN) — refactor candidate"
+        OVER_BUDGET=$((OVER_BUDGET + 1))
+    fi
+done < <(find "$PLUGIN_DIR/commands" "$PLUGIN_DIR/agents" "$PLUGIN_DIR/skills" -name "*.md" 2>/dev/null)
+
+if [ $OVER_BUDGET -eq 0 ]; then
+    success "All $COMPONENT_TOTAL component files within budget (warn >$BUDGET_COMPONENT_WARN, cap $BUDGET_COMPONENT_MAX lines)"
+fi
+
+echo ""
+
 # Summary
 echo "=========================================="
 echo "Validation Summary"

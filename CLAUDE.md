@@ -97,6 +97,15 @@ Because this is a marketplace-embedded plugin (plugin source is a relative path
 inside the marketplace repo), a pushed-to-`main` version bump is the trigger, but a
 machine may need a marketplace refresh to pull it. See README → "Updating the Plugin".
 
+## Self-Improvement Loop
+
+**`IMPROVEMENT.md` governs every change to instruction files** (commands, agents, skills,
+templates, this file). The short version: friction-driven only (cite the incident),
+itemized edits never wholesale rewrites, size budgets are CI-enforced, and the loop's own
+guardrail files (IMPROVEMENT.md, the guard scripts, eval fixtures) are human-approved
+only — an autonomous improvement run must not edit them. See the autonomy ladder there
+for which change-classes may auto-merge.
+
 ## Directory Structure
 
 ```

@@ -210,6 +210,7 @@ Some things shouldn't depend on an agent remembering to do them. These run in th
 
 | Component | Kind | What it does |
 |---|---|---|
+| `hooks/hooks.json` → `scripts/log-playbook-usage.sh` | `UserPromptSubmit` hook | Appends one line (UTC timestamp, command, repo basename) to `~/.claude/playbook-usage.log` for each `/playbook:*` command a prompt mentions — no prompt content is stored. Feeds `/playbook:review-playbook` pruning and `IMPROVEMENT.md`'s usage metric with real data instead of intuition. Silent, bounded (~1 MB, self-truncating), never fails the session. Opt out with `PLAYBOOK_NO_USAGE_LOG=1`. |
 | `hooks/hooks.json` → `scripts/session-orientation.sh` | `SessionStart` hook | Gathers branch/tracking state, uncommitted count, active `projects/in-progress/` dirs, latest checkpoint, last 3 commits, and stashes tagged to this branch — with no tool round-trips. Silent outside a git repo or in a repo without the playbook layout. Opt out with `PLAYBOOK_NO_ORIENTATION=1`. |
 | `scripts/verify-close-project.sh <name>` | Executable check | Asserts a close-out actually completed — above all that the **source directory is gone**, not merely that `done/` exists. |
 | `scripts/check-version-bump.sh` | CI guard (PR + push) | On a PR: the changed plugin must declare a changeset. On `main`: fails while changesets sit unreleased, and fails if plugin content changed without the version increasing. |
@@ -292,6 +293,12 @@ This meta-workflow:
 7. **Creates** a pull request
 
 The playbook learns from how you actually use it and grows to better support your workflows.
+
+The rules governing this loop — its objective ("make the next session cheaper and more
+correct"), the itemized-edits-only rule, CI-enforced size budgets, which files an
+autonomous run may never touch, and the autonomy ladder for what can auto-merge — live in
+[`IMPROVEMENT.md`](IMPROVEMENT.md). The roadmap toward a fully autonomous loop is tracked
+in `projects/in-progress/recursive-self-improvement/`.
 
 ### Forging Reusable Skills with Lore (optional)
 `/playbook:improve-playbook`, `/playbook:identify-improvements`, `/playbook:learnings`, and `/playbook:close` all mine your sessions, but they target *this* plugin and your codebase docs. When a pattern is instead a **portable, repeatable workflow you'd reuse across projects and harnesses**, those commands now point you to [**SpecStory Lore**](https://github.com/specstoryai/getspecstory) (`/lore`) — an external skill that forges such workflows into reusable, cross-harness `SKILL.md` packages grounded in your own session history.
