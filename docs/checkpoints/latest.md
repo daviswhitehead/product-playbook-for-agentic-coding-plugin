@@ -50,9 +50,11 @@ zero open PRs, main green at **0.27.0**, install synced.
 - **~20 stale remote branches** noted in the 2026-07-26 checkpoint were not swept, again.
 
 ## Next Steps
-1. **Restart Claude Code** — the install is at 0.26.0 while `main` shipped 0.27.0; run
-   `claude plugin marketplace update product-playbook-marketplace && claude plugin update
-   product-playbook-for-agentic-coding@product-playbook-marketplace`, then restart.
+1. **Restart Claude Code** — the install is already at **0.27.0** (`61fb6613`, verified: the
+   installed `merge-prs.md` is byte-identical to main), so only a restart is needed for this
+   session's shipped commands to load. *(Corrected: this step originally claimed the install
+   was one version behind. autoUpdate had already picked up 0.27.0 — version-keyed
+   propagation working as designed.)*
 2. Optionally remove the legacy hand-bump acceptance from `check-version-bump.sh` PR mode.
 3. Next multi-PR merge is the real test of the new flow: merge freely in any order, then one
    `scripts/release.sh` + push. Watch that `main`'s red window stays short.
