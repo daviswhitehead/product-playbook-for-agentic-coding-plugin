@@ -26,6 +26,13 @@ bump: minor
   a covered phrase and observing the failure) and **behavioral** expectations awaiting
   the LLM runner. Baseline committed at 25/25 static pass. Fixtures are guardrail files
   per IMPROVEMENT.md rule 5: the improvement loop runs them but may never edit them.
+- **Correction-capture hook (`log-corrections.sh`, `UserPromptSubmit`)** — corrections
+  are the highest-signal learning source and the easiest to lose by session end. Prompts
+  that *open* with a correction shape ("no,", "don't", "that's wrong", "revert") queue to
+  `~/.claude/playbook-corrections.log` (≤200 chars, secret-shaped content withheld,
+  slash commands excluded, `PLAYBOOK_NO_CORRECTION_LOG=1` opt-out) for the weekly
+  improvement run to triage. Deliberately precision-over-recall; tune after a week of
+  real data.
 - **Instruction-file size budgets in `scripts/validate-plugin.sh`** — CLAUDE.md/AGENTS.md
   error over 300 lines (warn over 200, matching the thresholds the learnings workflow
   already enforces on target projects); command/agent/skill files error over 1200 lines

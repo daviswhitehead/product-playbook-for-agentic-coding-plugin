@@ -105,15 +105,16 @@
 ## Phase 2: Autonomous Capture
 
 ### Task 2.1: Correction-capture hook
-**Description**: UserPromptSubmit hook matching high-precision correction shapes ("no,", "don't", "instead", short imperative after agent output) → append to a bounded queue (location decision: global `~/.claude/` vs per-repo, decide here). Same constraints as usage hook (silent, exit 0, opt-out).
+**Description**: UserPromptSubmit hook matching high-precision correction *openers* → `~/.claude/playbook-corrections.log` (global, matching the usage log — location decision made). Same constraints as usage hook.
 
 **Acceptance Criteria**:
-- [ ] Happy/no-op/malformed/opt-out paths tested like 1.1
-- [ ] Precision spot-check on a week of real usage: >70% of queued items are genuine corrections
-- [ ] No prompt content beyond the matched correction snippet is stored; secrets-shaped strings excluded
+- [x] Happy/no-op/malformed/slash-command/opt-out paths tested (2026-08-09): correction openers queued, mid-sentence "no" ignored, `/playbook:*` prompts excluded, opt-out honored
+- [x] ≤200-char snippet only; secret-shaped content withheld (`api_key=` test case observed redacted)
+- [ ] Precision spot-check on a week of real usage: >70% of queued items are genuine corrections — **needs real-world time; check during first weekly run (3.1)**
 
-**Dependencies**: none (parallel to Phase 1)
-**Status**: [ ] Not Started
+**Status**: [ ] In Progress — shipped 2026-08-09; open criterion is the real-usage precision check
+
+**Notes**: Deliberately precision-over-recall (openers only). Known accepted looseness: "don't forget…" reminders match the `don't` opener — evaluate in the precision spot-check.
 
 ---
 
