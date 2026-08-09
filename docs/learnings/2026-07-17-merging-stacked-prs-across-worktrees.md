@@ -206,3 +206,119 @@ that — only running the guard against the input it exists to reject can. This 
 - [x] `/playbook:monitor-pr`: bulk-delete safety — open-PR check + content-not-ancestry check
 - [ ] Audit the repo's other guards the same way — has `validate-plugin.sh` ever been run
       against input it should reject?
+
+---
+
+## 2026-08-04 fourth-incident addendum — the guard's *frame of reference*, and Learning #1 retired
+
+A fourth merge-all-open-PRs session (4 PRs, #85/#81/#82/#83, 0.26.1 → 0.26.4), which then
+went looking for why the stacked-bump dance was needed at all. Learnings #2 and #3 held.
+**Learning #1 is now obsolete** — the pattern it recommends has been removed rather than
+refined.
+
+### First: auditing the pre-registered escalation (per `/playbook:learnings`)
+
+The third addendum pre-registered:
+
+> - [ ] Audit the repo's other guards the same way — has `validate-plugin.sh` ever been run
+>       against input it should reject?
+
+**Would it have caught this one? No.** Two reasons, and naming them is the point:
+
+1. It aims at a **different guard**. The defect was in `check-version-bump.sh` — the guard
+   the third addendum had just finished fixing and therefore treated as done.
+2. More importantly, it prescribes the **wrong kind of test**. "Run it against input it
+   should reject" varies the *input* while holding the *frame of reference* fixed. Every
+   negative test written in 0.24.0 did exactly that: same base, different version values
+   (backwards / unchanged / forward). The new defect lived in **which base was chosen**, so
+   no amount of input-variation could surface it.
+
+Same family — "a guard that does not actually check what it claims" — but a different
+mechanism. Executing the pre-registered escalation would have produced a plausible-looking
+non-fix: a freshly negative-tested `validate-plugin.sh` and an untouched real bug.
+
+### The mechanism: a guard measured from the wrong reference
+
+`check-version-bump.sh` compared the working tree against the **merge base**. That answers
+*"did this branch bump since it forked?"* — not *"will main's version increase?"* Reproduced
+in a scratch clone:
+
+```
+branch forked at 0.26.1, content change, bumped to 0.26.2
+main meanwhile at 0.26.4
+Version-bump check PASSED.        # and merging sets main's version BACKWARDS to 0.26.2
+```
+
+That is the *same regression class* the third addendum fixed, arriving through a door that
+fix left open. The operator was made semver-aware; the operands were never questioned.
+
+Second finding, worse in a quiet way: the **push-to-`main` invocation was vacuous**. The
+workflow passes `origin/main` while `HEAD == origin/main`, so `merge-base(main, HEAD) == HEAD`
+and it compared main against itself — reporting "unchanged" and passing under every possible
+input. The repo believed it had a post-merge backstop. It had a no-op wearing a green check.
+
+### The real lesson: the friction was load-bearing
+
+The obvious read of "N PRs each need their own version" is *pointless ceremony, remove it*.
+That read is wrong, and acting on it would have shipped the bug.
+
+Because a stale PR and current `main` both edit the same `"version":` line, **git conflicts**
+— and that conflict, not the guard, is what actually stopped a backwards version from
+merging. Safety and friction were the same mechanism. Remove the conflicts naively (drop the
+per-PR bump) and the only real protection disappears with them, leaving a guard that had
+already been demonstrated to pass the failing case.
+
+> **Before removing friction, establish what the friction was accidentally protecting.**
+> Long-standing annoyances are load-bearing more often than they look, especially where they
+> overlap a guard nobody has negative-tested along that axis.
+
+The fix had to do both at once: changesets (a new file per PR — cannot conflict) *plus* a
+two-mode guard that supplies the protection the conflicts had been providing by accident.
+
+### Learning #1 is retired, not refined
+
+> ~~Multiple open content PRs → merge oldest-first, one patch version per PR.~~
+
+Correct for three sessions; now unnecessary. The version is a monotonic counter on `main`
+while PRs are parallel writers — a plain write-conflict on a shared resource, and the
+stacked-bump ritual was the manual serialization protocol working around it. Changesets
+remove the contention: PRs declare `bump: patch|minor|major` in their own file, merge in any
+order, and `scripts/release.sh` computes the number once on `main`.
+
+**Merge freely, release once.** `main` is red between the first merge and the release, by
+design — content on `main` at an unchanged version has reached zero installs, so the failure
+is now loud instead of silent.
+
+### Learning #3, refined again: the delete can be async
+
+`--delete-branch` half-failed on both worktree-held branches, as the second addendum
+predicts. But with `delete_branch_on_merge: true` (enabled 2026-07-27 by that same addendum),
+the remote delete is **asynchronous** — an immediate `git ls-remote` reported the branch
+alive, and it cleared on re-check seconds later. The second addendum's rule, applied
+literally, now produces a *false* positive and sends you to delete a branch already being
+reaped.
+
+| Signal | Response |
+|---|---|
+| `--delete-branch` errors, `ls-remote` says the branch is alive | **Re-check once after a few seconds** before deleting by hand |
+
+### Cumulative rule of thumb
+
+| Signal | Response |
+|---|---|
+| A guard passes | Ask what it compares *against*, not just how it compares |
+| A guard runs on the target branch | Confirm the invocation can fail at all — compute its comparison by hand once |
+| Long-standing friction you want to remove | Find what it was accidentally protecting first |
+| Negative tests exist | Check which axis they vary; the untested axis is where the bug is |
+
+### Fourth-addendum action items
+
+- [x] `scripts/check-version-bump.sh`: rewritten with PR mode + a non-vacuous main mode (#86)
+- [x] Changesets (`.changes/` + `scripts/release.sh`) replace in-PR bumps (#86, released 0.27.0)
+- [x] `scripts/test-version-checks.sh`: 20 cases, **varying the base**, not just the version
+- [x] CLAUDE.md: "stacked bumps" section replaced with the changeset flow and this why
+- [x] `/playbook:merge-prs`: classifies repos as changeset-style vs bump-in-PR style
+- [ ] The third addendum's item is still open and still worth doing — but reframed: audit
+      each guard by asking *what it compares against*, then negative-test **that** axis.
+      `validate-plugin.sh`'s new command-surface check was built this way (verified in both
+      directions before merge); the older sections of it were not.
