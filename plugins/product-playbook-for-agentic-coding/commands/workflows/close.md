@@ -19,6 +19,29 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    - If merged, warn the user and offer to branch off the target before committing:
      > "Current branch `<name>` is already merged into `<target>` (likely via squash). Any commits made here will be local-only. Want me to branch off `<target>` so the close-out commits reach production?"
 
+   **(a2) Branch has no upstream and no PR.** The two checks above both assume the branch is
+   *trying* to reach the target. A workspace branch that was never pushed fails for a different
+   reason: there is nothing to merge it, so close-out artifacts committed there are stranded on
+   one machine, and archiving the workspace destroys them. This is easy to miss because the
+   branch looks perfectly healthy — clean tree, commits present, no warnings.
+
+   ```bash
+   git rev-parse --abbrev-ref '@{u}' 2>/dev/null || echo "NO UPSTREAM"
+   gh pr list --head "$(git branch --show-current)" --state all --limit 1
+   ```
+
+   If both come back empty, do **not** commit the checkpoint here. Two things to do, in order:
+   1. **Preserve what is already on it** — those commits are unbacked-up work, often not yours.
+      `git push origin <sha>:refs/heads/<descriptive-name>` captures them without opening a PR
+      or implying they are ready for review.
+   2. **Branch off the target** for the close-out commits, exactly as in case (a).
+
+   *(chef-chopsky, 2026-08-15: the workspace branch held the founder's own in-progress design
+   docs — two commits, never pushed, no PR. The close-out's checkpoint would have landed on top
+   of them and gone nowhere. Note the founder added the second commit **mid-session**, so a
+   check run once at the start would have missed it; re-check before you commit, not only at
+   Phase 1.)*
+
    **(b) Branch was changed by another agent (parallel-agent workspaces — Conductor, git worktrees, etc.).** If multiple agents share a working directory, the current branch may have been switched while you were sleeping/waiting on tools. Detection:
    - `git branch --show-current` — does it match the branch *your* session has been working on? Compare against the branch you last pushed to, or the PR head you've been monitoring.
    - If unfamiliar, ask the user before committing anywhere: it likely belongs to another agent's in-flight work.
