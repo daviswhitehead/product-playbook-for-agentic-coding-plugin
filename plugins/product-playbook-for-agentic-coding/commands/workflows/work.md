@@ -218,6 +218,50 @@ If the audit finds that prior tasks emitted events with the WRONG property shape
 6. Plan testing strategy
 5. **When multiple viable approaches exist**, present 2-3 options with clear tradeoffs (pros, cons, complexity) and a recommendation before implementing. Do not default to the most sophisticated approach — the simplest correct solution is usually best.
 
+### Step 3.5: Taste Gate — Show It Before You Build It (subjective work only)
+
+**Applies when the task's acceptance criterion is a human judgment, not a check.**
+Trigger signals: the task says *"make it look different"*, *"feel more premium"*,
+*"cleaner"*, *"more approachable"*; the deliverable is a visual treatment, tone of
+voice, or naming; or you cannot write a test that distinguishes success from failure.
+If a reasonable reviewer could look at a correct, well-built implementation and say
+*"I don't like it"*, this step applies.
+
+**Do this**: produce the smallest artifact that shows the *result* — a screenshot, a
+static mock, two side-by-side variants — and put it in front of the user **before**
+building it out. Then implement whatever they pick.
+
+**Do NOT** substitute your own verification for their judgment here. Automated checks,
+browser automation, and self-review confirm the change *works*; none of them can
+confirm it is *wanted*. On subjective work those two questions are independent, and
+only one of them is yours to answer.
+
+#### Why this is not already covered by Step 5.5
+
+Step 5.5 (Autonomous Pre-Review) says to maximize autonomous progress "so the user's
+review focuses on taste, direction, and edge cases — not bugs you could have found
+yourself." That is right when taste is a **check on** functional work: catching bugs
+first means the taste review isn't wasted on noise.
+
+It inverts when taste **is** the deliverable. Then Step 5.5 places the only decision
+that matters *after* the entire build, so a "no" discards implementation, tests,
+documentation, and a PR — all of which were downstream of an unvalidated premise. The
+more diligently the agent works, the more a rejection costs.
+
+| Task type | Taste review belongs | Rationale |
+|---|---|---|
+| Functional (bug, API, refactor) | End (Step 5.5) | Taste is a check; clear the noise first |
+| Subjective (visual, tone, naming) | **Before build (here)** | Taste is the deliverable; everything else is downstream of it |
+
+**Grounding case** (chef-chopsky, 2026-08-15): a card-differentiation task was
+implemented, unit-tested, browser-verified in light and dark, documented, and opened as
+a PR before the founder saw a single rendered pixel. He then disliked the result. The
+same founder had already named the correct practice in an April retrospective —
+*"having the agent do its own UX critique, take screenshots, and make prototypes to
+show me options"* — but it was recorded as an observation rather than a step, so it
+never fired. A screenshot at Step 3.5 would have cost minutes and been the whole
+deliverable of the check.
+
 ### Step 4: Execute Implementation
 
 **From Senior Engineer + Junior Engineer perspectives:**
