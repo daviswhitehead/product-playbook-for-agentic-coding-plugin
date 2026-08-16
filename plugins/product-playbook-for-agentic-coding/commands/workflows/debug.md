@@ -234,6 +234,38 @@ Create or update a debugging session document:
    - Manual verification
 3. Ensure no regressions
 
+#### Run the regression test against the PRE-FIX code before trusting it
+
+A regression test you have never seen fail is a test you have not written. Green on a fixed
+codebase is indistinguishable from asserting nothing at all — and the bug you just fixed is
+the only input that can tell those apart.
+
+```bash
+cp <file> /tmp/new.<ext>                    # keep the fix
+git checkout <pre-fix-sha> -- <file>        # restore the bug
+<test command>                              # EXPECT RED
+cp /tmp/new.<ext> <file>                    # restore the fix
+<test command>                              # EXPECT GREEN
+```
+
+Do this per test, not per suite, and **read which ones went red**. "Some of them failed" is
+not the check — a test that stays green here is testing a path the bug never touched.
+
+> Real incident (chef-chopsky, 2026-08-15). A focus-trap fix shipped with 8 new unit tests.
+> Against the pre-fix hook, 4 went red — and one that had been *written specifically for the
+> bug* stayed green: it dispatched the key from a button instead of the text input that
+> caused the failure. Without this step it would have shipped as coverage for a case it never
+> exercised, and the next regression would have been just as invisible as the first.
+
+**When the mechanism is environmental, keep one test at the real layer.** If the bug depends
+on something the unit-test environment simulates rather than reproduces — event phases,
+browser layout, real network or DB behaviour — a unit test only catches it because you
+modeled it correctly, and the next author may model it wrong. Add one integration/E2E test
+and verify *that* against the pre-fix code too.
+
+This generalizes the negative-testing rule in the `autonomous-execution` skill (which covers
+guards and CI checks) to the far more common case: the regression test attached to a bug fix.
+
 ### Step 9: Capture Learning
 
 After fixing, use `/playbook:learnings` with trigger type "blocker-overcome" to:
