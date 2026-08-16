@@ -76,6 +76,32 @@ If `/playbook:learnings` was invoked from `/playbook:close`, the close skill's P
 
 1. Run `wc -c -l CLAUDE.md` (skip if no CLAUDE.md exists in the project).
 
+   **Measure the default branch too, before declaring a violation.** A long-lived feature
+   branch that predates a trim still carries the pre-trim file, so this check fires on a
+   problem that was already fixed — and the prescribed response ("trimming is **mandatory**")
+   is a large, destructive edit aimed at nothing.
+
+   ```bash
+   git fetch -q origin <default-branch>
+   echo -n "here:       "; wc -c -l < CLAUDE.md
+   echo -n "default:    "; git show origin/<default-branch>:CLAUDE.md | wc -c -l
+   ```
+
+   - **Both over the limit** → a real violation. Proceed with the mandatory trim.
+   - **Only the working branch is over** → the branch is *stale*, not bloated. The fix is
+     `git merge <default-branch>`, not doc surgery. Report it as branch staleness and do not
+     trim. Trimming here would also produce a gratuitous conflict against the default
+     branch's already-trimmed version.
+
+   Treat a large gap between the two as its own finding: it usually has siblings. The same
+   staleness that hides a trim also hides ignore-rule changes, CI gates, and lint rules added
+   since the branch point — so check for those rather than reporting the size alone.
+
+   *(Found 2026-08-15, chef-chopsky: a retro measured 39,948 chars / 555 lines on a
+   three-week-old stack and nearly began a mandatory ~16k-char trim. `production` was
+   14,477 chars / 115 lines — comfortably passing. The same staleness was simultaneously
+   producing a dead `docs/checkpoints/` ignore rule and a missing CLAUDE.md size gate.)*
+
    **Thresholds** (revised 2026-07-26). **Lines are the published number; the char figures are a derived companion.**
 
    - **Lines — cited.** Anthropic's docs: *"target under 200 lines per CLAUDE.md file. Longer files consume more context and reduce adherence."* HumanLayer treats **300 lines as a hard ceiling** (their own root CLAUDE.md is under 60). Hence 200 soft / 300 hard.
