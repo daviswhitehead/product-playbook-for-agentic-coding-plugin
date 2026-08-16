@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.27.2] - 2026-08-16
+
+### Fixed
+- **`close`: notice dead ignore rules; `learnings`: audit pre-registered escalations** — a gitignored path with tracked files means the rule is dead, so stop re-litigating force-adds; and a recurrence doc's "next escalation" encodes a mechanism assumption that must be re-verified before executing the planned fix.
+- **`close`: test every staged path; refuse to commit a dirty index** — `git check-ignore` says nothing about already-tracked paths, and a pre-dirtied index can sweep another agent's in-flight work into a "session checkpoint" commit.
+- **`close`: verify merged-ness against the target tip, not the merge base** — `git log <target>..HEAD` over-reports on stale branches and `git cherry` is defeated by squash-merges; use `git diff --stat origin/<target> HEAD`.
+- **`close`: name the no-upstream/no-PR branch, and preserve what's on it** — a never-pushed workspace branch with no PR dies with the workspace; push its commits to a named ref before branching away, and re-check before committing, not only at Phase 1.
+- **`close`: target branch held by another worktree** — when the close-out target is checked out elsewhere, branch off the remote ref and `git push HEAD:<target>` instead of forcing a checkout that steps on another agent's live workspace; run `git worktree list` in full, and treat a rejected push mid-close-out as a normal fetch/rebase/re-verify signal.
+- **`close`: check whether a blocking ignore rule is stale on this branch** — a long-lived branch carries stale policy (ignore rules, lint/CI config, hooks); check the default branch's version before treating the blocker as a live decision to re-ask the user about.
+- **`debug`: a regression test you haven't seen fail isn't a test** — Step 8 now requires running each new test against the pre-fix code and reading *which* tests go red, not just that some did; generalizes the autonomous-execution guard rule to the far more common bug-fix case, with a corollary for environmental mechanisms (keep one test at the real layer and verify it pre-fix too).
+- **`work`: taste gate before build (new Step 3.5)** — when taste is the deliverable (visual treatment, tone, naming, or no test can separate success from failure), render the smallest artifact that shows the result and get a pick *before* implementing; Step 5.5's post-build review is the wrong place for the only decision that matters on subjective work.
+- **`learnings`: CLAUDE.md size check must compare against the default branch** — measuring the working tree on a stale branch reports hard-limit violations the branch never caused; the remedy (trimming) would re-delete content already deleted upstream.
+
 ## [0.27.1] - 2026-08-09
 
 ### Fixed
