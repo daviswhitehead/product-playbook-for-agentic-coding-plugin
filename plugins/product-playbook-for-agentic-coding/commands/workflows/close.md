@@ -47,7 +47,28 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    - If unfamiliar, ask the user before committing anywhere: it likely belongs to another agent's in-flight work.
    - Stash any unrelated uncommitted changes (they may be the other agent's WIP) before switching back: `git stash push -m "other-agent-WIP" <paths>`. Restore after your work completes.
 
-   **In both cases**, if the user approves, create a fresh branch off `origin/<target>` and continue close-out there. Cherry-pick later if needed. The skill previously assumed the current branch was always a valid commit target — both (a) (session continues after the main PR merges — close-out, follow-up docs, learnings) and (b) (parallel agents) violate that assumption.
+   **(c) The target branch is checked out by another worktree.** The remedy for (a) and (b) is "branch off the target" — but in a multi-worktree repo the target itself is frequently *held* by another worktree, and git refuses to check it out twice:
+
+   ```
+   fatal: 'daviswhitehead/memory-vocab-pr5-ui' is already used by worktree at '/path/to/other'
+   ```
+
+   Do **not** resolve this by `--force`-ing the checkout, deleting the other worktree, or committing somewhere convenient. That worktree is another agent's live workspace. Instead:
+
+   ```bash
+   git worktree list            # who holds what — run this BEFORE choosing a target
+   git checkout -b closeout/<topic> origin/<target>   # branch off the REMOTE ref, not the local branch
+   # ...commit the checkpoint...
+   git push origin HEAD:<target>                       # fast-forward straight onto the target
+   ```
+
+   Pushing `HEAD:<target>` lands the commit on the target branch without either agent checking the other's branch out. Verify it is a genuine fast-forward first (`git rev-parse origin/<target> HEAD~1` should match) so you cannot clobber work pushed while you were writing. If it is *not* a fast-forward, the target moved — fetch, rebase onto the new tip, and re-check rather than forcing.
+
+   **Run `git worktree list` in full.** Truncating it with `head` is how you conclude a branch is free when it is not.
+
+   **In all three cases**, if the user approves, create a fresh branch off `origin/<target>` and continue close-out there. Cherry-pick later if needed. The skill previously assumed the current branch was always a valid commit target — (a) (session continues after the main PR merges — close-out, follow-up docs, learnings), (b) (parallel agents), and (c) (the target is held elsewhere) all violate that assumption.
+
+   **Expect the target to move under you during a long close-out.** In an active multi-agent repo another agent may push to the same target between your first commit and your last. A rejected push (`cannot lock ref ... is at X but expected Y`) is normal, not an error to force past: fetch, inspect what landed, rebase, and re-verify. If what landed touches the same files you are about to write — `latest.md` above all — re-read Phase 3 step 4's freshness rule before overwriting anything. *(chef-chopsky, 2026-08-15: the target moved twice during one close-out; the second time another agent had claimed `latest.md` with a newer handoff and correctly archived the earlier one. The right response was to redirect the pending edit into the archived copy, not to reclaim `latest.md`.)*
 
 2. Run `git status`.
 3. If there are uncommitted changes:
@@ -378,6 +399,34 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    the founder's actual preference — "checkpoints should always get merged to remote" — had
    never been written down anywhere, because the skill only ever offered "force-add this once"
    or "leave it local.")*
+
+   **Then check whether the rule is merely *stale on this branch*.** The check above asks
+   whether the repo has been ignoring its own rule. This one asks a different question: has
+   the rule **already been deleted on the default branch**, and you are simply on a
+   long-lived branch that predates the deletion?
+
+   ```bash
+   git show origin/<default-branch>:.gitignore | grep -n "<path>" \
+     || echo "RULE ALREADY REMOVED ON DEFAULT — this branch is stale"
+   ```
+
+   If the default branch no longer has the rule, do **not** ask the user whether to
+   force-add — the decision is already made and you are looking at a branch that never
+   merged it back. Delete the rule on your branch (copying the default branch's replacement
+   text, comment and all, so the rationale travels) and commit it with the checkpoint. That
+   is propagating a decision, not overriding one, and it needs no permission.
+
+   *(Found chef-chopsky, 2026-08-15: a close-out on a branch open since 2026-07-18 hit the
+   ignored path and was about to ask for a force-add. `production` had removed the rule on
+   2026-07-29 — the exact fix the paragraph above recommends — and left a comment explaining
+   why. The branch had simply never merged production. Asking the founder to re-decide a
+   question they had already answered two weeks earlier is worse than not asking at all.)*
+
+   The general lesson is worth carrying past `.gitignore`: **a long-lived branch carries
+   stale policy, not just stale code.** Lint config, CI config, ignore rules, and hook
+   definitions on a branch opened weeks ago may all have been superseded on the default
+   branch. When any of them blocks a close-out, check the default branch's version before
+   treating the blocker as a live decision to work around.
 
 ## Phase 3.5: Org Deposit (agent-workforce repos only)
 
