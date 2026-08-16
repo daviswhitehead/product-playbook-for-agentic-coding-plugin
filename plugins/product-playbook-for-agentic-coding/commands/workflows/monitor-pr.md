@@ -63,9 +63,18 @@ Rules that fall out of this hierarchy:
 ### Step 1: Snapshot Current State
 
 ```bash
-gh pr view <N> --json statusCheckRollup,state,isDraft,mergeable,headRefOid
+gh pr view <N> --json statusCheckRollup,state,isDraft,mergeable,mergeStateStatus,headRefOid
 gh run list --branch <BRANCH> --limit 5 --json databaseId,name,status,conclusion,createdAt,event
 ```
+
+**GATE — check `mergeStateStatus` BEFORE interpreting any check results.** If it is
+`DIRTY` (`mergeable: CONFLICTING`), the PR has no merge ref and GitHub creates **ZERO**
+`pull_request` workflow runs — while platform apps (Vercel/Supabase/Railway) still attach
+green checks to the head commit. The check list looks healthy; nothing actually ran.
+Corroborate with an empty `gh run list --branch <BRANCH>`. Fix: merge the base branch in,
+resolve conflicts, push — Actions will fire on that push. Do NOT read a conflicted PR's
+green platform checks as "CI passed." (Hit on chef-chopsky #484, 2026-08-03: two pushes,
+zero Actions runs, four green platform checks.)
 
 Classify each check into one of:
 
@@ -230,6 +239,16 @@ Post it immediately before `gh pr merge`. If you find an already-merged PR missi
 > ```
 >
 > Check with `git ls-remote` (authoritative), not `git branch -r`, which reads a possibly-stale local cache.
+>
+> **But re-check once before deleting by hand — the delete can be asynchronous.** With
+> `delete_branch_on_merge: true`, GitHub reaps the head branch server-side a beat *after* the
+> merge returns, so an immediate `git ls-remote` can report the branch alive when it is
+> simply not reaped yet. Deleting it yourself at that moment races a delete already in
+> flight. Sleep a few seconds, `git fetch --prune`, and look again; only if it still
+> resolves is it genuinely orphaned. (Observed 2026-08-04: both worktree-held branches in a
+> four-PR queue errored on local cleanup, one read as surviving, and it cleared on re-check.)
+> This is the second-order effect of the repo-level fix below — enabling auto-delete is still
+> right, it just makes "did it survive?" a question with a settling time.
 >
 > *Corrected 2026-07-26. This note previously said the local-delete failure was "harmless (the remote branch is still deleted)" — false, and the wrong version was load-bearing: it tells you not to look, so the surviving branch is never noticed. Verified both directions in one session (gh 2.88.0): 6 merges where `--delete-branch` succeeded left 0 remote branches; all 4 merges whose local cleanup errored left the remote branch alive. The 4th arrived while merging the very PR that fixed this note — via the dirty-working-tree trigger rather than the worktree one, which is how the "any error, not just the worktree message" generalization was found.*
 >

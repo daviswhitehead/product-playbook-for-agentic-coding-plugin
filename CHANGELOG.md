@@ -7,6 +7,199 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.27.1] - 2026-08-09
+
+### Fixed
+- **`/playbook:monitor-pr` — a branch that looks like it survived may just not be reaped yet** —
+  Step 4 tells you to treat any error from `gh pr merge --delete-branch` as "the remote branch
+  probably survived" and verify with `git ls-remote`. Correct, but incomplete: with
+  `delete_branch_on_merge: true` (which this repo enabled in 2026-07 precisely to disarm this
+  failure mode) GitHub reaps the head branch server-side a beat *after* the merge returns, so an
+  immediate `ls-remote` can report the branch alive when the delete is simply still in flight —
+  and deleting it by hand at that moment races a delete already running.
+
+  Step 4 now says to sleep briefly, `git fetch --prune`, and re-check before concluding a branch
+  is orphaned. Observed 2026-08-04: both worktree-held branches in a four-PR queue errored on
+  local cleanup, one read as surviving, and it cleared on re-check seconds later. The rule as
+  written would have produced a false positive — a second-order effect of the repo-level fix,
+  which is still the right fix.
+
+## [0.27.0] - 2026-08-04
+
+### Changed
+- **Version bumps move out of PRs and onto `main` (changesets)** — PRs now add a file under
+  `.changes/` declaring `bump: patch|minor|major` plus its CHANGELOG prose, instead of editing
+  the version. `scripts/release.sh` consumes those files on `main`, computes each plugin's new
+  version (highest bump type wins), updates `plugin.json` + `marketplace.json` + `CHANGELOG.md`,
+  and deletes the changesets.
+
+  **Root cause this fixes.** The version is a single monotonic counter on `main`, but PRs are
+  parallel writers. Requiring each PR to advance it made N open PRs mutually exclusive — they
+  all wanted the same next number — which forced serialized merges (one patch version per PR:
+  0.22.1→0.22.4 in 2026-07, 0.23.0→0.24.3 across nine PRs in 2026-07-26, 0.26.1→0.26.4 today)
+  and made every PR's version-file edits conflict with every other PR's. A changeset is a new
+  file, so it cannot conflict; merge order is free and one release covers the whole batch.
+
+### Fixed
+- **`check-version-bump.sh` was checking the wrong thing, and its `main` run could never fail** —
+  It compared the working tree against the **merge base**, which verifies "this branch bumped
+  since it forked", not "main's version will increase". A branch forked at 0.26.1 and bumped to
+  0.26.2 passed the guard even when `main` had already reached 0.26.4 — and merging it would drag
+  the version *backwards*, the exact failure the guard's own comments warn about. The only thing
+  preventing that was git conflicting on the version lines, i.e. the friction above was doing
+  load-bearing safety work nobody designed. Separately, the push-to-`main` invocation compared
+  `main` against itself, always reported "unchanged", and could not fail under any input, so
+  there was no post-merge backstop at all.
+
+  The script now has two modes. **PR**: the changed plugin must declare a changeset (a hand bump
+  is still accepted, with a nudge). **main**: fails while changesets sit unreleased, and fails if
+  plugin content changed without the version increasing versus the previous commit — a real
+  backstop that catches a duplicate or backwards version however it arrived.
+
+### Added
+- **`scripts/test-version-checks.sh`** — 20 cases across both scripts in a sandbox repo,
+  including the two the old guard was structurally blind to: content merged at an unchanged
+  version, and a version moving backwards on `main`.
+- **`/playbook:merge-prs` distinguishes the two release styles** — Step 0.5 now classifies a repo
+  as changeset-style or bump-in-PR style. Changeset repos skip per-PR version assignment entirely
+  and run a single release after the queue drains (new Step 5.9); bump-in-PR repos keep the
+  stacked behaviour and get told in the final report that changesets are the fix. Step 5.6 also
+  learned that server-side branch auto-delete is asynchronous, so a branch that looks like it
+  survived should be re-checked once before deleting by hand.
+
+## [0.26.4] - 2026-08-04
+
+### Fixed
+- **`/playbook:monitor-pr` — check `mergeStateStatus` BEFORE interpreting any check results** —
+  When a PR is `DIRTY` (`mergeable: CONFLICTING`) it has no merge ref, so GitHub creates **zero**
+  `pull_request` workflow runs — while platform apps (Vercel/Supabase/Railway) still attach green
+  checks to the head commit. The check list looks healthy and nothing actually ran. Step 1 now
+  gates on `mergeStateStatus` first and corroborates with an empty `gh run list --branch`.
+  Grounding case: chef-chopsky #484, 2026-08-03 — two pushes, zero Actions runs, four green
+  platform checks. Fix is to merge the base branch in and push, which is what finally fires
+  Actions.
+
+## [0.26.3] - 2026-08-04
+
+### Added
+- **`/playbook:close` — Phase 3.5: Org Deposit (agent-workforce repos only)** — Skips silently
+  unless the repo defines an agent workforce (`workflows/TEAM.md` with role charters). When a
+  session was ad-hoc rather than run as a chartered 1:1, it asks which workforce employee should
+  have done the work and what lever, charter line, or prompt they were missing — then requires
+  that edit **before** closing, so the session compounds into the workforce instead of competing
+  with it. "None — founder-only on purpose" is a valid answer; silently skipping the question is
+  not. Phase 5's summary gains a matching `Org deposit:` line.
+
+## [0.26.2] - 2026-08-04
+
+### Fixed
+- **`/playbook:close` — a clean tree does not mean the branch is disposable** — Phase 1 gains a
+  merged-ness check, because the two obvious commands both over-report for *different* reasons:
+  `git log <target>..HEAD` measures from the merge base (stale branches list already-shipped
+  work as unmerged), and `git cherry` matches by patch-id, which squash-merges and any
+  post-departure edit defeat. The honest answer is the two-dot `git diff --stat origin/<target> HEAD`.
+  Grounding case: a branch showed six commits as "unmerged" including a parallel agent's
+  security fix, and the close-out warned that archiving would destroy them — every one had
+  already squash-merged. Real contribution: one checkpoint file.
+- **`/playbook:close` — refuse to commit a dirty index** — Phase 3 asserts
+  `git diff --cached --name-only` is empty before staging. In a shared workspace whatever is
+  already staged may be another agent's in-flight work, and `git commit` sweeps it in under a
+  "session checkpoint" message. Observed: a checkpoint commit whose entire content was a
+  different agent's 121-line deletion.
+- **`/playbook:close` — `git check-ignore` must be tested per-file, not on a representative** —
+  It reports nothing for an already-tracked path, so a tracked `latest.md` answers "not ignored"
+  while a brand-new sibling in the same ignored directory is ignored, and `git add` aborts on the
+  whole invocation. Now loops over every path in `CKPT_FILES`.
+- **`/playbook:close` — notice when an ignore rule is already dead** — Before asking the user to
+  force-add past a gitignore rule for the Nth time, count how many files under the path are
+  already tracked. If any are, the repo has been force-adding past its own rule one checkpoint at
+  a time and the rule expresses no real preference. Offer to remove it instead of re-litigating
+  every session.
+- **`/playbook:learnings` — audit a pre-registered escalation before executing it** — A recurrence
+  doc's planned "next escalation" encodes an assumption about the *mechanism*, drawn from the
+  prior occurrences. A recurrence in the same family is not necessarily the same mechanism, and
+  executing the pre-registered fix against a different one produces a plausible-looking non-fix.
+  Ask explicitly whether it would have caught this occurrence; answering "no" out loud is the
+  high-value move.
+
+## [0.26.1] - 2026-08-04
+
+### Fixed
+- **`/playbook:merge-prs` Step 4: `.git/info/exclude` fails inside a git worktree** — The
+  snippet ran `mkdir -p .git/info`, which assumes `.git` is a directory. In a worktree
+  (Conductor workspaces, `git worktree add`) `.git` is a **file** containing a `gitdir:`
+  pointer, so the command aborts with `Not a directory` and the plan file is never excluded
+  — leaving the working tree dirty, which is itself one of the two triggers for
+  `gh pr merge --delete-branch` half-failing.
+
+  Now resolves the path with `git rev-parse --git-common-dir` and verifies with
+  `git check-ignore`. Common-dir rather than `--git-dir` because `info/exclude` lives in the
+  common directory, shared across worktrees — which is also where git actually reads it from.
+
+  Found on the command's first real run, in exactly the environment it was written for.
+
+## [0.26.0] - 2026-08-04
+
+### Added
+- **`/playbook:merge-prs` — autonomous open-PR backlog clearing** — The capability had been
+  exercised twice by hand (4 PRs in 2026-07, 9 PRs in 2026-07-26) with the procedure split
+  across three places that nothing composed: `/playbook:monitor-pr` owned the per-PR merge
+  mechanics, CLAUDE.md held the stacked-bump ordering as prose, and a learnings doc held the
+  evidence. Every run re-derived the orchestration.
+
+  The command triages every open PR (including drafts — draft status is frequently neglect,
+  not intent), classifies each **MERGE / FIX-THEN-MERGE / SKIP / ESCALATE** with a stated
+  reason, orders the queue, then presents **one merge plan for one approval**. After that
+  gate it runs unattended. All human judgment is spent once, up front, where it belongs;
+  what follows is mechanical and long-running.
+
+  Design points that came from the two hand-run sessions:
+  - **Skip, don't halt.** A PR that breaks its triage assumptions mid-run is skipped and
+    reported; the remaining approved PRs still merge. Forfeiting eight good merges because
+    the fourth developed a conflict is the failure mode this prevents.
+  - **The plan file must not dirty the working tree.** A dirty tree is one of two known
+    triggers for `gh pr merge --delete-branch` half-failing and leaving the remote branch
+    alive. The plan goes to `docs/merge-plans/` with the path added to `.git/info/exclude`
+    (local, uncommitted, works in any git repo), and Step 5 asserts a clean tree before each
+    merge.
+  - **Version-guard machinery is detected, not assumed.** Sequential stacked bumps are
+    specific to repos with a version guard; the command looks for one and skips the whole
+    layer when absent.
+  - Worktree-aware branch claiming, and branch deletion verified with `git ls-remote` rather
+    than assumed.
+
+  It delegates per-PR CI work to `/playbook:monitor-pr` (which delegates failure analysis to
+  `/playbook:debug-ci`) rather than reimplementing either.
+
+### Fixed
+- **Command-surface drift, at the root cause** — Six real commands (`close`, `close-project`,
+  `emergent`, `foundations`, `monitor-pr`, `research-synthesis`) were missing from
+  `commands/help.md`, and four were missing from README's command tables. A command nobody
+  can find is worth nothing regardless of how good it is.
+
+  Root cause: both files hand-duplicate data that already lives in each command's
+  frontmatter, and adding a command has no step that touches either file. `validate-plugin.sh`
+  now enforces coverage **bidirectionally** — every command must appear in help.md and as a
+  README table row, and every `/playbook:x` referenced in help.md must resolve to a real
+  command. `plugin-guard.yml` already runs that script on every PR, so an unlisted command is
+  now unmergeable.
+
+  Generating help.md from frontmatter was considered and rejected: its value is the human
+  judgment about which command fits which situation, which no frontmatter field encodes.
+  Enforce coverage, leave the curation alone.
+
+  Notes: the README check requires a **table row**, not a prose mention — `close-project` was
+  named in README prose while absent from every table. The help.md check uses a `(?![\w-])`
+  lookahead so `/playbook:work` is not considered covered by `/playbook:work-multiple`. And
+  the coverage report is written to a temp file rather than captured through `$(...)`, because
+  bash 3.2 (still macOS's default `/bin/bash`) mis-parses a heredoc containing apostrophes
+  inside command substitution.
+
+- Content backfill: help.md gains the six missing commands plus `help`/`hello`, new
+  **Strategy Foundations**, **Close-Out**, **Pull Requests**, and **Meta** categories, and a
+  "Clearing a PR Backlog" workflow recipe. README gains `close-project`, `emergent`,
+  `monitor-pr`, `hello`, and a Pull Request Commands table.
+
 ## [0.25.2] - 2026-07-29
 
 ### Added

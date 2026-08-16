@@ -66,20 +66,32 @@ This plugin also uses a marketplace-embedded structure (plugin source is a relat
 inside the marketplace repo), so a machine may need a marketplace refresh to pull a new
 version, and the "Update now" button on the *plugin* won't work directly.
 
-**To pull the latest version onto a machine:**
+**To pull the latest version onto a machine** — two steps, because the marketplace clone
+and the plugin install are refreshed separately:
 
-1. **Refresh the marketplace** (pulls latest from GitHub):
-   ```
-   /plugin → Marketplaces tab → select "product-playbook-marketplace" → Update now
-   ```
+```bash
+claude plugin marketplace update product-playbook-marketplace
+claude plugin update product-playbook-for-agentic-coding@product-playbook-marketplace
+```
 
-2. **Reinstall the plugin** if it didn't refresh to the new version automatically:
-   ```
-   /plugin → Installed tab → select the plugin → Uninstall
-   /plugin → Marketplaces tab → select marketplace → Install
-   ```
+**Use `update`, not `install`.** On an already-installed plugin, `claude plugin install`
+short-circuits with *"already installed"* and does **not** upgrade — it can leave the new
+version's files sitting in `~/.claude/plugins/cache/<marketplace>/<plugin>/<version>/`
+while the install still points at the old one. `update` is the subcommand that moves the
+pointer. Never hand-edit `installed_plugins.json`.
 
-You can confirm the live version under `/plugin → Installed`.
+The update applies on **restart** — a session already running keeps the version it loaded.
+Confirm with `claude plugin list`, or under `/plugin → Installed`.
+
+<details>
+<summary>Equivalent via the <code>/plugin</code> UI</summary>
+
+1. **Refresh the marketplace**: `/plugin` → Marketplaces tab → select
+   "product-playbook-marketplace" → Update now
+2. **Reinstall the plugin** if it didn't refresh automatically: `/plugin` → Installed tab →
+   select the plugin → Uninstall, then Marketplaces tab → select marketplace → Install
+
+</details>
 
 **Note:** The "Local plugins cannot be updated remotely" message appears because the
 plugin uses a relative path source within the marketplace. This is the same pattern used
@@ -97,14 +109,22 @@ by many plugins in Anthropic's official marketplace.
 | `/playbook:tasks` | Break down work into specific, actionable tasks |
 | `/playbook:work` | Execute the next task from the tasks document |
 | `/playbook:work-multiple` | Work autonomously on multiple tasks without interruption |
+| `/playbook:emergent` | Capture emergent in-flight scope as a micro-PRD before implementing |
 | `/playbook:learnings` | Capture learnings to improve docs and plugin |
 | `/playbook:close` | Session close-out — uncommitted work check, task cleanup, handoff context, learnings |
+| `/playbook:close-project` | Project close-out — planned-vs-implemented diff, move to `done/`, retrospective |
 
 ### Debugging & CI Commands
 | Command | Description |
 |---------|-------------|
 | `/playbook:debug` | Systematic debugging workflow |
 | `/playbook:debug-ci` | Debug CI/CD failures using GitHub CLI |
+
+### Pull Request Commands
+| Command | Description |
+|---------|-------------|
+| `/playbook:monitor-pr` | Drive one PR's CI to green autonomously with local-first fixes, then merge |
+| `/playbook:merge-prs` | Triage every open PR, approve one merge plan, then merge the queue autonomously |
 
 ### Design Commands
 | Command | Description |
@@ -154,6 +174,7 @@ by many plugins in Anthropic's official marketplace.
 | Command | Description |
 |---------|-------------|
 | `/playbook:help` | List all commands and find the right one for your task |
+| `/playbook:hello` | Verify the plugin installed correctly |
 
 ## Agents
 
@@ -191,8 +212,21 @@ Some things shouldn't depend on an agent remembering to do them. These run in th
 |---|---|---|
 | `hooks/hooks.json` → `scripts/session-orientation.sh` | `SessionStart` hook | Gathers branch/tracking state, uncommitted count, active `projects/in-progress/` dirs, latest checkpoint, last 3 commits, and stashes tagged to this branch — with no tool round-trips. Silent outside a git repo or in a repo without the playbook layout. Opt out with `PLAYBOOK_NO_ORIENTATION=1`. |
 | `scripts/verify-close-project.sh <name>` | Executable check | Asserts a close-out actually completed — above all that the **source directory is gone**, not merely that `done/` exists. |
+| `scripts/check-version-bump.sh` | CI guard (PR + push) | On a PR: the changed plugin must declare a changeset. On `main`: fails while changesets sit unreleased, and fails if plugin content changed without the version increasing. |
+| `scripts/release.sh` | Release step | Consumes `.changes/*`, computes each plugin's new version, updates both manifests + `CHANGELOG.md`, deletes the changesets. `--dry-run` to preview. |
 
-Run `scripts/test-close-project-checks.sh` after changing either (14 cases, both directions).
+Run `scripts/test-close-project-checks.sh` after changing either close-project piece (14
+cases, both directions), and `scripts/test-version-checks.sh` after touching the version
+scripts (20 cases across both).
+
+**Why changesets**: the version is a single monotonic counter on `main`, but PRs are
+parallel. Requiring each PR to bump it made N open PRs mutually exclusive — they all wanted
+the same next number — forcing serialized merges and pairwise conflicts on the version
+lines. Worse, the guard compared against the *merge base*, so it checked "did this branch
+bump since it forked", not "will main's version increase"; the only thing preventing a
+stale PR from dragging the version backwards was that very conflict. A changeset is a new
+file per PR, so it cannot conflict, and the number is computed once on `main`. See
+`.changes/README.md`.
 
 **Why these are scripts rather than instructions**: `/playbook:close-project`'s checklist asked *"Project lives under `projects/done/`?"* — which was **true** while `forgot-password` and `illustration-batch` sat duplicated in both `in-progress/` and `done/` for ~3.7 months. The agent answering a checklist is the same one that just performed the move. A real guardrail has to be deterministic.
 
