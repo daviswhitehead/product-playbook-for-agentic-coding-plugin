@@ -1,106 +1,74 @@
 # Session Checkpoint
-**Date**: 2026-08-05 02:35 UTC
-**Branch**: main (even with origin/main @ `61fb661`)
+**Date**: 2026-08-16 ~18:30 UTC
+**Branch**: main (checkpoint committed to main; workspace branch `daviswhitehead/merge-open-prs-v2` is 0-ahead and disposable)
 
 ## Current Task
-Build a merge-PRs command, fix `help.md` drift at its root cause, then use the new command
-to clear the backlog and fix the version-conflict root cause it exposed. **Complete** —
-zero open PRs, main green at **0.27.0**, install synced.
+Second real run of `/playbook:merge-prs` — clear the 4-PR backlog (#89–#92) through the
+changeset flow end to end. **Complete** — zero open PRs, main green at **0.27.2**, install
+synced (auto-update picked it up without manual steps).
 
 ## Status
 - **Done this session**:
-  - **`/playbook:merge-prs`** (new command) — triage every open PR → one merge plan → one
-    approval → merge the queue unattended. Delegates per-PR CI to `/playbook:monitor-pr`.
-  - **Command-surface drift fixed at the root cause** — `validate-plugin.sh` now enforces
-    bidirectional coverage against `help.md` *and* README's tables. Backfilled 6 missing
-    commands + `help`/`hello`; README gained 5 rows.
-  - **Ran the command for real** — merged 7 PRs total (#84, #85, #81, #82, #83, #86, #87),
-    including a predicted `close.md` conflict between #81 and #82 (both blocks kept).
-  - **Version-bump root cause found and fixed (#86)** — changesets replace in-PR bumps; the
-    guard was rewritten with two real modes. Released as 0.27.0 through the new `release.sh`.
-  - **README sync instructions (#87)** — CLI path documented alongside the `/plugin` UI.
-  - Local install synced 0.25.2 → 0.26.0 via `claude plugin update`.
+  - Triaged 4 open PRs (all drafts, all content-complete, all red on the missing-changeset
+    guard) → one plan → one approval → merged all 4: #89 (`3f7642a`), #90 (`d411e49`),
+    #91 (`5891d1f`), #92 (`9240b71`).
+  - Each PR: main merged in, `bump: patch` changeset added, local validation green before
+    push, marked ready from draft, guard CI green, proof comment, squash-merge, remote
+    branch deletion verified via `git ls-remote`.
+  - One release at the end: `scripts/release.sh` consumed all 4 changesets →
+    **0.27.1 → 0.27.2** (`bf8bb68`), pushed, main CI green.
+  - This close-out: archived the 2026-08-05 checkpoint, wrote this one.
 - **In progress**: nothing.
 - **Blocked on**: nothing.
 
 ## Key Decisions
-- **One approval gate, up front** (not per-PR, not zero). All expensive judgment — is this
-  draft complete? does this PR ship without its WIP? — is front-loaded into triage; what
-  follows is mechanical and long-running, and shouldn't be babysat.
-- **Validate `help.md`, don't generate it.** Its value is the human judgment about which
-  command fits which situation, which no frontmatter field encodes. A generator would either
-  destroy that or become a template-with-holes.
-- **Changesets over auto-bump-on-merge CI.** No bot committing to `main` (would need write
-  permissions this repo hasn't granted). `release.sh` is run by hand or by merge-prs Step 5.9;
-  the red-main check makes forgetting loud, so the manual step fails safe.
-- **Merged all three original drafts** — all were content-complete; draft status was neglect.
-- **Left both old stashes untouched** (see Open Questions) — consistent with the 2026-07-26
-  close-out's decision.
+- **Merged #90 as-is** — its self-comment proposing a merge-base..HEAD CLAUDE.md
+  measurement stays future work (surfaced at the gate; user approved default).
+- **#89's `close.md` conflict resolved by keeping main's Phase 3.5 (Org Deposit) section**
+  alongside the PR's changes.
+- **Old stashes left untouched again** (third close-out in a row) — see Open Questions.
 
 ## Open Questions
-- **Two ancient stashes remain**, both predating this session:
-  - `stash@{0}` — `WIP on daviswhitehead/git-cleanup` (debug-ci.md, work.md; +67 lines)
-  - `stash@{1}` — `WIP on main` at `ddd8126` (**PR #1** — very old; learnings.md, templates,
-    2 SKILL.md files; +73/-4)
-  Both look plausibly superseded by ~6 months of subsequent edits, but neither was created by
-  this session and neither was verified line-by-line. Salvage to a branch before dropping.
-- **The legacy hand-bump path is now dead weight.** PR mode still accepts a hand bump (with a
-  nudge) so in-flight PRs written against the old rules kept working. There are none left, so
-  it can be removed whenever convenient.
-- **~20 stale remote branches** noted in the 2026-07-26 checkpoint were not swept, again.
+- **Two ancient stashes remain** (`stash@{0}` on `daviswhitehead/git-cleanup`,
+  `stash@{1}` on very-old `main`/PR #1). Untouched for a third session; if they matter,
+  salvage to branches; otherwise consider dropping deliberately.
+- **~20 stale remote branches** from the 2026-07-26 checkpoint still not swept.
+- **Legacy hand-bump acceptance** in `check-version-bump.sh` PR mode remains removable
+  dead weight (no in-flight PRs use it).
+- **Follow-up idea from #90's comment**: `learnings` CLAUDE.md size check could compare
+  `merge-base..HEAD` for CLAUDE.md specifically, distinguishing "branch bloated it" from
+  "branch is stale."
 
 ## Next Steps
-1. **Restart Claude Code** — the install is already at **0.27.0** (`61fb6613`, verified: the
-   installed `merge-prs.md` is byte-identical to main), so only a restart is needed for this
-   session's shipped commands to load. *(Corrected: this step originally claimed the install
-   was one version behind. autoUpdate had already picked up 0.27.0 — version-keyed
-   propagation working as designed.)*
-2. Optionally remove the legacy hand-bump acceptance from `check-version-bump.sh` PR mode.
-3. Next multi-PR merge is the real test of the new flow: merge freely in any order, then one
-   `scripts/release.sh` + push. Watch that `main`'s red window stays short.
+1. Nothing pending — workspace is archive-ready. Restart Claude Code sessions to load
+   0.27.2 commands (install already synced).
+2. Optional hygiene: sweep stale remote branches; resolve or drop the two old stashes;
+   the other worktree (`~/GitHub/product-playbook-for-agentic-coding-plugin`) still sits
+   on merged branch `improve/taste-gate-before-build` and should checkout main.
+3. Optional: implement #90's merge-base CLAUDE.md follow-up as a small PR.
 
 ## Hot Files (modified this session)
-- `plugins/.../commands/workflows/merge-prs.md`: **new** — the whole command (295 lines).
-- `plugins/.../commands/help.md`: 6 missing commands + `help`/`hello`; new Strategy
-  Foundations / Close-Out / Pull Requests / Meta categories; PR-backlog recipe.
-- `scripts/check-version-bump.sh`: **rewritten** — PR mode (must declare) + main mode
-  (unreleased changesets fail; version must increase vs previous commit).
-- `scripts/validate-plugin.sh`: bidirectional command-surface coverage check.
-- `scripts/release.sh`, `scripts/test-version-checks.sh`: **new** (20 test cases).
-- `.changes/README.md`: **new** — changeset format + the why.
-- `CLAUDE.md`: "stacked bumps" section replaced with the changeset flow.
+- None in-repo on a feature branch — all changes landed on `main` via PR branches:
+  `close.md` (+~185 across #89/#91), `learnings.md` (+41 across #89/#90), `work.md`
+  (+44, #90), `debug.md` (+32, #92), 4 changesets (consumed by release), `CHANGELOG.md`,
+  both version manifests (0.27.2).
+- `docs/merge-plans/2026-08-15-merge-plan.md`: local-only run log (excluded via
+  `info/exclude`), fully ticked off.
 
 ## Out-of-Repo Changes (runtime / system / external)
-- **Local plugin install synced 0.25.2 → 0.26.0** via
-  `claude plugin marketplace update` + `claude plugin update`. Pointer in
-  `~/.claude/plugins/installed_plugins.json`; prior version dirs remain in
-  `~/.claude/plugins/cache/product-playbook-marketplace/product-playbook-for-agentic-coding/`
-  (rollback = re-point to `0.25.2`). **Now one version behind main (0.27.0).**
-- **`.git/info/exclude` gained `docs/merge-plans/`** — written to the *common* dir
-  (`~/GitHub/product-playbook-for-agentic-coding-plugin/.git/info/exclude`), so it applies to
-  every worktree of this repo, not just this workspace.
-- **Memory added**: `plugin-sync-via-cli.md` (+ MEMORY.md index line).
+- **`.git/info/exclude` (common dir, applies to all worktrees) gained `.specstory/`** —
+  added alongside the existing `docs/merge-plans/` line to keep the tree clean during
+  merges.
+- Local plugin install auto-updated to **0.27.2** (verified via `claude plugin list`) —
+  no manual sync was needed this time; version-keyed propagation worked as designed.
 
 ## Context the Next Session Needs
-- **`main` goes red between a merge and the release — that is by design.** Unreleased
-  changesets fail the post-merge check because content on `main` at an unchanged version has
-  reached zero installs. Fix is `scripts/release.sh` + commit + push, not investigation.
-- **The old guard's blind spots are worth understanding before touching version logic.** It
-  compared against the *merge base*, so it verified "did this branch bump since it forked",
-  not "will main's version increase" — a branch forked at 0.26.1 bumping to 0.26.2 passed with
-  main already at 0.26.4. And the push-to-main run compared main against itself, so it could
-  never fail. The only real protection was git conflicting on the version lines, i.e. the
-  friction was load-bearing. Removing the conflicts *without* the two-mode rewrite would have
-  shipped the bug.
-- **`gh pr merge --delete-branch` half-fails whenever another worktree holds the branch** —
-  observed twice this session. With `deleteBranchOnMerge=true` the remote delete is
-  **asynchronous**, so an immediate `git ls-remote` can report "it survived" when it simply
-  hasn't been reaped yet. Re-check once before deleting by hand.
-- **In a git worktree `.git` is a file, not a directory.** Anything writing to `.git/info/...`
-  must resolve the path with `git rev-parse --git-common-dir`.
-- **bash 3.2 (macOS default) mis-parses heredocs containing apostrophes inside `$(...)`**,
-  failing with ``unexpected EOF while looking for matching `'``. Write the output to a temp
-  file instead. Bit `validate-plugin.sh` mid-build.
-- **A newly installed plugin version does not load into the running session.** To exercise a
-  just-shipped command in the same session, read and follow its command file from the repo
-  after diffing it against the installed copy.
+- **The changeset flow works end to end under real load** — 4 parallel PRs, zero version
+  conflicts, predicted file conflicts mostly evaporated after merging main into each
+  branch in queue order, one release covering everything. Main's red window (between
+  #92's merge and the release) lasted minutes and resolved exactly as documented.
+- **`gh pr merge --delete-branch` errors when another worktree holds the local branch**
+  ("cannot delete branch ... used by worktree") — the *remote* delete still succeeds
+  (`deleteBranchOnMerge=true`); verify with `git ls-remote`, don't trust the error's tone.
+- **Draft PRs must be `gh pr ready`'d before merge** — all 4 were drafts; `gh pr checks`
+  reports "no checks reported" for ~20s after push before the guard registers.
