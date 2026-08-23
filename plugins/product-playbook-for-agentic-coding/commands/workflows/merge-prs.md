@@ -115,7 +115,13 @@ Assess, and **write down the reasoning** — it goes in the plan:
   promising work the diff doesn't contain. A draft that is complete is a MERGE candidate;
   a non-draft that is incomplete is not.
 - **CI state.** Green / red / never ran. Red-on-one-known-check (e.g. a version guard that
-  every unbumped PR trips) is FIX-THEN-MERGE, not SKIP.
+  every unbumped PR trips) is FIX-THEN-MERGE, not SKIP. Read CI state **per head sha**
+  (`gh api repos/<o>/<r>/commits/<headRefOid>/check-runs`), not from `gh pr checks` — the
+  latter mixes cancelled/superseded runs into the list, and in an active merge queue every
+  merge cancels siblings' in-flight runs, so phantom "fails" are the norm, not the
+  exception. And a load-bearing suite that shows `skipped` on the head after an
+  update-branch push has NOT validated the PR (path filters evaluate the push event, not
+  the PR's files) — retrigger it on the current head before merging.
 - **Mergeability.** `CONFLICTING` means it needs a main merge in Step 5.2 — expected, not
   disqualifying.
 - **Unresolved review threads.** Unaddressed review feedback is an ESCALATE. Merging past
