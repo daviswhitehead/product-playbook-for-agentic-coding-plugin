@@ -238,6 +238,41 @@ Before writing "yes", **run the pre-registered fix against the current occurrenc
 
 Answering "no" out loud is the high-value move: it's the difference between a fix aimed at the real cause and one aimed at the last three incidents. Note the family/mechanism split explicitly in the addendum so the next reader inherits the distinction rather than re-deriving it.
 
+#### Verify the incident's causal claim against a timeline before writing it down
+
+An addendum's core sentence is almost always causal — *"X caused Y"* — and it gets written
+from what you **remember doing**, in the order you remember doing it. That memory is
+reconstructed, and adjacent events get fused into a cause. Once the wrong causality is in
+the doc it is load-bearing: every later reader inherits it, and the fix gets aimed at the
+wrong mechanism.
+
+**Before asserting that A caused B, pull the authoritative timeline and check the
+ordering.** It is one cheap call:
+
+```bash
+# GitHub — PRs/issues: what happened, in what order, with timestamps
+gh api repos/<o>/<r>/issues/<N>/timeline --paginate \
+  --jq '.[] | "\(.created_at)  \(.event)  \(.actor.login // "?")"'
+
+# Local — when commits/refs actually moved
+git log --format='%H %cI %s' <ref>
+git reflog --date=iso <ref>
+```
+
+If the timeline contradicts the remembered story, **say so in the addendum and correct the
+user if you already told them the wrong version.** If the timeline narrows the cause but
+does not pin it, record the verified part and mark the rest unresolved — an addendum that
+says "ordering verified, cause not" is far more useful than a confident wrong mechanism.
+Prefer a fix that is correct under *every* surviving hypothesis; that way the open question
+doesn't block the change.
+
+*(Found on this plugin, 2026-09-11. A `/playbook:merge-prs` run reported "my hand-delete of
+the branch closed PR #99." The timeline API showed the PR was `closed` 28 seconds **before**
+the `head_ref_deleted` event — so the delete could not have caused the close, and the real
+cause remains unexplained. The remembered story was plausible, wrong, and had already been
+reported to the user as fact. The prescribed fix — gate the delete on a `MERGED` verdict —
+was correct either way, which is what made shipping it safe despite the open question.)*
+
 *(Found chef-chopsky, 2026-07-29. A doc on "a metric reading 0 means not-wired" had pre-registered "build a module↔entrypoint inventory" for the 4th occurrence. The 4th arrived — but the un-invoked thing was a **CI job**, i.e. the verifier itself, not a product module. No module inventory would have covered it. The honest answer reframed the rule as "a guard that does not run is indistinguishable from a guard that passes" and produced a different, correct guard.)*
 
 *(Third branch found chef-chopsky, 2026-08-23, on the same doc. Its next escalation was a **standing distribution audit** — "flag any closed-set value at zero occurrences." The new occurrence was the inversion of every prior one: a zero that meant **deliberately off** (a staged rollout with its flags `false`), misread as broken, which cost a filed issue and a reverted production write. Simulating the audit against that input was decisive: it would have flagged `cron_run_completed{app_env=production} = 0` and manufactured exactly that false alarm, on a schedule, forever. It was re-registered with a required three-bucket enablement join — zero-and-enabled, zero-and-disabled, zero-and-unknown — rather than dropped.)*
