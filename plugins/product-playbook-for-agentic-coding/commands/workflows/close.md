@@ -465,6 +465,32 @@ If this session was an ad-hoc working session (not already run as a chartered 1:
 
 Then **make that edit before closing** (the role's `CHARTER.md`, its prompts, `workflows/OBJECTIVES.md`, or a planned-hire note in `TEAM.md`), so the session compounds into the workforce instead of competing with it. If the work genuinely belongs to no role, record it as either a future hire (`TEAM.md` → planned evolution) or deliberately founder-only work. A one-line answer of "none — founder-only on purpose" is a valid outcome; silently skipping the question is not.
 
+### First check whether the charter already said it
+
+Before writing a new charter line, **grep the charter for the rule you were about to add.** The
+common case is not that the guidance was missing — it is that it was already there, correctly
+worded, and inert.
+
+- **The charter did not cover it** → add the line. Normal deposit.
+- **The charter already covered it** → adding a second, more emphatic sentence is the failure
+  mode, not the fix. The finding is that a *prose* rule governed something only *code* can
+  enforce. Deposit an **executable guard** instead — a non-zero exit, a CI check, a hook, a
+  lint rule — and edit the charter only to record that the lever is now wired.
+
+> A charter line that exists only as prose is not a lever. If a role is accountable for a floor
+> condition, the floor needs a guard that fails the run; otherwise the guarantee is
+> indistinguishable from a wish.
+
+This mirrors the repo-level rule that deterministic guardrails belong in hooks and CI rather than
+in prose — it applies to charters for exactly the same reason, and charters are more tempting to
+"fix" with words because they are prose documents by nature.
+
+*(chef-chopsky, 2026-08-16: a pipeline run published four reports built on data it never fetched.
+The Data Pipeline Operator's charter already read "Do not silently degrade — flag and pause" and
+listed "Alert on persistent fetch failure — wired". Both were true statements of intent and
+neither stopped anything, because `fetch-data.sh` counted failures and exited 0 regardless. The
+deposit that mattered was the non-zero exit; the charter edit only recorded it.)*
+
 ## Phase 4: Learn Flow
 
 1. If `--quick` or `--skip-learnings` was passed: skip this phase.
