@@ -77,6 +77,26 @@ Check whichever of these are available for the project:
 
 **Rule**: Never change code based on an unverified hypothesis. If you catch yourself thinking "it's probably X," stop and find evidence first. State what you checked and what you found before proposing any fix.
 
+#### Read the whole artifact, not your filter of it
+
+Checking evidence is necessary but not sufficient — **a grep answers the question you asked, and a confidently wrong diagnosis is the usual result of asking a narrow one.** When a step writes a failure artifact (an errors file, a validation report, a rejected payload), open it whole and open the *input* it rejected, before naming a cause.
+
+Concretely, when something fails schema/contract validation:
+
+```bash
+sort -u <errors-file>                  # how many DISTINCT error classes, not the first few lines
+```
+
+Count the distinct classes before diagnosing. **Fixing one of four is indistinguishable from fixing none** — the run fails identically and the "fix" looks like it did nothing, or worse, ships and appears to work.
+
+*(chef-chopsky, 2026-08-16: an LLM stage failed validation and a grep for enum errors returned only enum errors, producing the diagnosis "the enum is too strict." The errors file actually held four classes — two renamed fields, one wrong type, one dropped field, plus the enum. The enum fix alone would have changed nothing, and had already been reported to the user as the cause.)*
+
+#### N identical failures across N retries is a signature, not flakiness
+
+If every attempt of a retry loop fails **the same way**, the loop almost certainly has no feedback edge — the retried operation is being handed byte-identical input each time, so it is resampling, not converging. Genuine flakiness produces *varied* failures.
+
+Check what actually differs between attempts before treating repeated failure as bad luck. For an LLM call, if you cannot name what the model sees differently on attempt 2, `maxAttempts` is a cost multiplier, not a reliability feature. The same reasoning applies to any retried operation whose inputs are recomputed identically each pass.
+
 ### Step 0.5: Triage — Is This Related to Current Changes?
 
 **For CI/test failures or issues discovered during development:**
