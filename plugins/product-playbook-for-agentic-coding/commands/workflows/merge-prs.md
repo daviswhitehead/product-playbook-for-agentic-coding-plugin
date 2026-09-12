@@ -254,17 +254,59 @@ discipline, failure triage, and the proof-of-completion comment. Do not duplicat
 
 **5.6 — Merge, then verify the branch actually died.**
 
+**Read the merge verdict before you touch any branch.** `gh pr merge` exiting non-zero
+does *not* mean "the merge worked and only cleanup failed" — that is one of two very
+different outcomes, and they demand opposite responses:
+
 ```bash
 gh pr merge <N> --squash --delete-branch     # match the repo's merge-method policy
+
+# The gate. Never skip it, never infer it from the error text.
+gh pr view <N> --json state,mergeCommit -q '.state + " " + (.mergeCommit.oid // "NONE")'
+```
+
+| Verdict | What happened | What to do |
+|---|---|---|
+| `MERGED <sha>` | Merge landed; any error was local cleanup | Proceed to the branch check below |
+| `OPEN NONE` | Merge failed, PR intact | Fix the cause and retry. **Do not delete the branch** |
+| `CLOSED NONE` | Merge failed *and* the PR is now closed | **Do not delete the branch** — it is the only copy of the head. Reopen, then retry |
+
+Only once the verdict reads `MERGED` does the branch become disposable:
+
+```bash
 git fetch -q origin --prune
 git ls-remote --heads origin <headRefName> | wc -l    # MUST be 0
 ```
 
-**Treat any non-empty error from `gh pr merge --delete-branch` as "the remote branch
-probably survived."** The merge succeeds, the local cleanup fails, and the operation
-deletes *neither* branch — but because the merge worked, the message reads as cosmetic.
-If the branch survived, finish it: `git push origin --delete <headRefName>`. Check with
-`git ls-remote` (authoritative), not `git branch -r` (stale local cache).
+**With a `MERGED` verdict in hand, treat any non-empty error from
+`gh pr merge --delete-branch` as "the remote branch probably survived."** The merge
+succeeds, the local cleanup fails, and the operation deletes *neither* branch — but
+because the merge worked, the message reads as cosmetic. If the branch survived, finish
+it: `git push origin --delete <headRefName>`. Check with `git ls-remote` (authoritative),
+not `git branch -r` (stale local cache).
+
+**That rule is scoped to `MERGED` for a reason — unscoped, it destroys live PRs.** It
+keys on the *presence* of an error and never on *which* error, so it silently assumes the
+merge succeeded. Apply it after a merge that actually failed and you hand-delete the head
+of a PR that still needs it, which also closes the PR. *(This repo, 2026-09-11: `gh pr
+merge 99` failed with `Base branch was modified` — a sibling PR had landed seconds
+earlier. #99 was already `CLOSED` with a null merge commit at that point; the hand-delete
+then removed its only remote copy. Recovered because every worktree of a repo shares one
+object store, so the head SHA was still reachable — see the recovery recipe below.)*
+
+**Recovering a branch you deleted out from under an unmerged PR.** The objects usually
+still exist somewhere local — a sibling worktree, your reflog, or a stale remote-tracking
+ref — because `git push --delete` only removes the *remote* ref:
+
+```bash
+git rev-parse <sha>                                     # from a sibling worktree, reflog, or the PR page
+git push origin <sha>:refs/heads/<headRefName>          # restore the ref
+gh pr reopen <N>                                        # PR returns at its original head
+```
+
+Verify with `gh pr view <N> --json state,headRefOid` that the head SHA matches what the
+PR had before, then re-run the merge. Do this *before* moving on to the next PR in the
+queue — the longer you wait, the more likely the objects get garbage-collected.
 
 **5.7 — Return to your branch.** `gh pr merge --delete-branch` silently checks out the
 default branch and pulls. In a parallel-agent workspace this strands the session. Re-checkout
@@ -326,6 +368,9 @@ because one went bad is the failure mode this step exists to prevent.
 - **Reimplementing `monitor-pr`.** CI polling, failure triage, and the proof-of-completion
   comment live there.
 - **Assuming `--delete-branch` worked.** Verify with `git ls-remote`, every time.
+- **Deleting a branch before reading the merge verdict.** `gh pr view <N> --json
+  state,mergeCommit` must say `MERGED` with a non-null sha first. A merge error is not
+  evidence the merge succeeded.
 - **Touching another worktree's checkout.** Read it, never write it.
 - **Inventing version bumps** in a repo with no version guard.
 - **Merging past an unresolved review thread.** That's an ESCALATE, always.
