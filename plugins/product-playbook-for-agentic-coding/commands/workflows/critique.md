@@ -87,7 +87,7 @@ Otherwise, recommend based on content type:
 - **Product/Marketing docs**: marketing-strategist, product-manager, investor
 - **Technical docs**: technical-reviewer, product-manager
 - **Domain-specific docs**: domain-expert (specify domain), product-manager
-- **UI/UX projects**: product-manager, technical-reviewer, **accessibility-expert** (WCAG compliance, contrast ratios, screen reader support), **design-system-architect** (token architecture, naming conventions, migration scope)
+- **UI/UX projects**: product-manager, technical-reviewer, **accessibility-expert** (WCAG compliance, contrast ratios, screen reader support), **design-system-architect** (token architecture, naming conventions, migration scope, **reuse-first**)
 - **Styling/theming projects**: technical-reviewer, **accessibility-expert**, **design-system-architect**
 - **Comprehensive**: all five personas
 
@@ -352,6 +352,20 @@ The Product Manager persona should specifically flag subjective acceptance crite
 - **Flag terms**: "appropriate", "premium", "feels like", "reasonable", "sufficient", "looks good", "nice"
 - **Suggest replacements**: measurable criteria (e.g., "contrast ratio >= 4.5:1", "matches token surface-base", "passes axe-core with 0 violations")
 - Subjective criteria lead to ambiguous sign-off and are a common source of scope creep.
+
+### Reuse-First Check (any document proposing UI)
+Whenever the reviewed document proposes UI — a tech plan, a design spec, or a diff — the reviewer must answer:
+
+> **Does every proposed new component or style have a rationale an existing one couldn't satisfy?**
+
+Check the document's Component Inventory (`/playbook:tech-plan` Step 3.5, `/playbook:design-spec` Step 2.5). Flag:
+- **A missing inventory entirely** — the document never enumerated what the project already has. This is the common case and the expensive one: nothing in the doc is wrong, it just quietly authorizes rebuilding what exists.
+- **New components with no rationale**, or a rationale that is really an absence ("I didn't find one", "nothing quite fit") rather than a named component that was considered and rejected for a specific reason.
+- **"Why extension fails" that isn't concrete** — "not flexible enough" / "too specific" are assertions. A real reason names the prop, coupling, or behavior that breaks.
+- **One-off components dressed as general ones** — a proposed component with exactly one call site and no named second consumer is a section of a screen, not a component.
+- **New styles that slipped the check** — a new color, spacing value, radius, shadow, or variant. These drift faster than components precisely because they're cheaper to add and easier to omit from an inventory.
+
+Severity: a missing inventory on a multi-surface UI plan is a **P1** at minimum — it is the cheapest possible moment to catch duplication, and the cost of catching it later is a rewrite rather than an edit.
 
 ---
 

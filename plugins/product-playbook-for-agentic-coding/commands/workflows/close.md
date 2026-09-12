@@ -305,6 +305,31 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    git show --stat HEAD   # verify it contains every CKPT_FILE and nothing else
    ```
 
+   **If the commit is rejected because the repo's hooks can't run, install the deps —
+   do NOT symlink them from a sibling worktree.** A fresh agent worktree (Conductor,
+   `git worktree add`) has the repo's hooks but no `node_modules`, so a pre-commit hook
+   that runs lint/typecheck/tests dies on `jest: command not found` and the checkpoint
+   never lands. The tempting shortcut — `ln -s ../other-worktree/node_modules` — is
+   *worse than the problem*: the test runner then walks the linked tree with no valid
+   cache and thrashes indefinitely.
+
+   ```bash
+   # WRONG — looks instant, then hangs
+   ln -s /path/to/other-worktree/node_modules node_modules
+
+   # RIGHT — bounded, and the hooks then run for real
+   npm ci --no-audit --no-fund            # repeat per workspace dir (e.g. frontend/, agent/)
+   ```
+
+   *(chef-chopsky, 2026-08-24: the symlink left 17 jest workers thrashing for 15+ minutes
+   across two attempts before being killed; a real `npm ci` made the same suites pass in
+   14s. Verify the lockfile matches first — `git show origin/<default>:<dir>/package-lock.json
+   | shasum` against the local one — so you know the install is the right one.)*
+
+   **Never bypass with `--no-verify` here.** The hook failing for an environmental reason
+   is not permission to skip it — the checkpoint commit is exactly the commit where a
+   silently-skipped gate is least likely to be noticed. Fix the environment, then commit.
+
    **Do not decide `-f` vs plain `add` from a tracked-ness check you ran earlier in this
    phase — step 4 invalidates it.** `latest.md` is normally *tracked*, so an early
    `git ls-files --error-unmatch docs/checkpoints/latest.md` says "tracked, plain `add`
