@@ -27,22 +27,29 @@ triaged, fixed, merged, and released as 0.28.1.
 - **Six drafts were neglect, not intent.** Every diff was content-complete prose from
   Aug 16–23. Draft status + the `guard` red were the same single cause (missing changeset),
   which is why they all cleared identically.
-- **PR #99's branch was deleted while unmerged, and recovered.** `gh pr merge 99` failed with
-  GraphQL "Base branch was modified" (#101 had just landed). Step 5.6 of `merge-prs.md` says
-  to treat a non-empty merge error as "the branch probably survived" and delete it by hand —
-  that rule assumes the *merge succeeded and only cleanup failed*. Here the merge itself
-  failed, so the hand-delete destroyed an unmerged PR's head and GitHub auto-closed #99.
-  Recovered because the head (`888a72f`) was still live in a sibling worktree's shared object
-  store: `git push origin <sha>:refs/heads/<branch>` + `gh pr reopen 99`. Re-merged as
-  `0f7f933`.
+- **PR #99's branch was deleted while the PR was unmerged, and recovered.** `gh pr merge 99`
+  failed with GraphQL "Base branch was modified" (#101 had just landed). Step 5.6 of
+  `merge-prs.md` says to treat a non-empty merge error as "the branch probably survived" and
+  delete it by hand — that rule assumes the *merge succeeded and only cleanup failed*. Here
+  the merge itself failed, so the hand-delete removed the only remote copy of a PR that still
+  needed it. Recovered because the head (`888a72f`) was still live in a sibling worktree's
+  shared object store: `git push origin <sha>:refs/heads/<branch>` + `gh pr reopen 99`.
+  Re-merged as `0f7f933`.
+- **Correction, verified during close-out:** the first report of this said the hand-delete
+  *closed* #99. It did not. GitHub's timeline API puts `closed` at 01:37:13Z and
+  `head_ref_deleted` at 01:37:41Z — the PR was already CLOSED with a null merge commit **28
+  seconds before** the branch was touched. The cause of that close is **unresolved**: it
+  lands within one second of #101's merge, which the "`gh pr merge` closed it" hypothesis
+  does not explain. Recorded as open rather than guessed at. The fix is correct under every
+  surviving hypothesis, so it did not block shipping.
 
 ## Open Questions
 - None blocking. The `merge-prs.md` Step 5.6 fix is specified (below) but not yet written.
 
 ## Next Steps
-1. **Land the Step 5.6 fix** in `merge-prs.md`: gate the hand-delete on
-   `gh pr view <N> --json state,mergeCommit` reading `MERGED` with a non-null sha *before* any
-   `git push origin --delete`. Needs a changeset; goes out as the next patch.
+1. **Review and merge PR #102** — the Step 5.6 fix (merge-verdict gate in `merge-prs.md` and
+   `monitor-pr.md`, plus a causality-verification rule in `learnings.md`). Guard green,
+   mergeable, two changesets attached. Then run `scripts/release.sh` once to ship them.
 2. Optionally prune the stale local worktrees — four of the five in `git worktree list` hold
    branches that no longer exist on the remote (all merged this session).
 3. Nothing else outstanding; backlog is empty.
@@ -63,9 +70,12 @@ triaged, fixed, merged, and released as 0.28.1.
   uncommitted, shared across all worktrees of this repo.
 
 ## Context the Next Session Needs
-- **The merge plan with the full incident write-up is at `docs/merge-plans/2026-09-11-merge-plan.md`** —
-  gitignored via `info/exclude`, so it exists only in the `auckland` worktree. Lift the
-  "Incident" section from it when writing the Step 5.6 fix.
+- **The full incident write-up now lives in
+  `docs/learnings/2026-07-17-merging-stacked-prs-across-worktrees.md`** (2026-09-11
+  fifth-incident addendum, shipped in PR #102) — that is the durable, *corrected* copy. The
+  working merge plan at `docs/merge-plans/2026-09-11-merge-plan.md` was gitignored and
+  worktree-local, and its incident section carries the pre-correction causality; it is
+  superseded and was allowed to die with the `auckland` worktree.
 - **`gh pr merge --delete-branch` reliably errors in this repo** whenever the PR branch is
   checked out in another worktree ("cannot delete local branch ... used by worktree at ..."),
   which happened on #101, #99, and #98. That error is cosmetic — server-side auto-delete
