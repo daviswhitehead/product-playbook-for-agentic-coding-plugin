@@ -70,6 +70,8 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
 
    **Expect the target to move under you during a long close-out.** In an active multi-agent repo another agent may push to the same target between your first commit and your last. A rejected push (`cannot lock ref ... is at X but expected Y`) is normal, not an error to force past: fetch, inspect what landed, rebase, and re-verify. If what landed touches the same files you are about to write — `latest.md` above all — re-read Phase 3 step 4's freshness rule before overwriting anything. *(chef-chopsky, 2026-08-15: the target moved twice during one close-out; the second time another agent had claimed `latest.md` with a newer handoff and correctly archived the earlier one. The right response was to redirect the pending edit into the archived copy, not to reclaim `latest.md`.)*
 
+   **When that rebase conflicts, the `--ours`/`--theirs` labels are the OPPOSITE of merge intuition.** During `git rebase`, HEAD is the branch you are rebasing ONTO — so `--ours` is the *other* work that landed on the target, and `--theirs` is *your own* commit being replayed. A close-out resolving a `latest.md` collision "in favor of the newer session" via `git checkout --theirs` therefore keeps **your** older handoff and clobbers the newer one — the exact outcome the freshness rule forbids, reported as a successful resolution. Sidestep the labels entirely: name the side by ref (`git checkout origin/<target> -- docs/checkpoints/latest.md` to keep what landed), then `git show <your-sha>:<file> > <dated-archive>` for your copy. Verify with `git show --stat HEAD` that the rebased commit no longer touches `latest.md` at all. *(chef-chopsky, 2026-08-16: a close-out hit this precisely — `--theirs` silently selected the session's own checkpoint over a newer ads-live handoff; caught only because the post-amend stat still showed `latest.md` modified.)*
+
 2. Run `git status`.
 3. If there are uncommitted changes:
    - Show a brief summary (files changed, not full diffs)
@@ -135,6 +137,12 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
 2. If a tasks document exists:
    - Scan for `in_progress` tasks. For each: is the work done? Mark completed or note what's left.
    - **Instrumented-task check**: before marking complete any task whose acceptance includes "event fires", "metric captured", or "tracked in <analytics>", confirm you have runtime evidence (the event/metric actually landed in the truth surface — PostHog/analytics/the gate query). If you only have static evidence ("the code is wired"), mark it **"done pending runtime verification"**, not ✅. Do not let close-out launder an unverified claim into "complete." (See the autonomous-execution "Instrumented-Task Verification Gate".)
+   - **Gate-verdict check**: before marking complete any task whose acceptance is "CI green", "`test:verify` passes", or "the suite is clean", confirm you read the **gate's own exit code**, not a proxy for it. Three proxies routinely lie:
+     - **A background-task notification reports the wrapper shell's exit status, not the command's.** `npm run test:verify > log 2>&1; echo "EXIT=$?"` ends with a successful `echo`, so a failing run is announced as *"completed (exit code 0)."* Capture the real code where you can read it back (`; echo "EXIT=$?" | tee /tmp/x.exit`, then `cat`) or grep the log for the runner's own verdict line.
+     - **Playwright exits 0 when a test is `flaky`** (failed, then passed on retry), so `✅ E2E tests passed!` can hide a failure. Grep for `flaky` explicitly.
+     - **A green CI check can mean "passed *or* never ran"** — path-filtered jobs report SUCCESS when every step skips. Confirm the job actually asserted something (test counts in the log), and audit `statusCheckRollup` for `SKIPPED` load-bearing suites.
+
+     Same shape as the instrumented-task check above: do not let close-out launder a proxy signal into "verified." *(chef-chopsky, 2026-08-22: a `test:verify` run was announced as exit 0 while actually exiting 1 with a genuine regression — 174 passed / 1 failed. The failing test was confirmed as caused by that branch, by reverting to base and re-running. Reading the notification at face value would have shipped it.)*
    - Scan for stale tasks (blocked with no recent activity). Propose deletion or deferral.
    - Note pending tasks as carryover.
    - Show a brief summary: "X completed, Y carried forward, Z stale."
@@ -303,6 +311,31 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    git show --stat HEAD   # verify it contains every CKPT_FILE and nothing else
    ```
 
+   **If the commit is rejected because the repo's hooks can't run, install the deps —
+   do NOT symlink them from a sibling worktree.** A fresh agent worktree (Conductor,
+   `git worktree add`) has the repo's hooks but no `node_modules`, so a pre-commit hook
+   that runs lint/typecheck/tests dies on `jest: command not found` and the checkpoint
+   never lands. The tempting shortcut — `ln -s ../other-worktree/node_modules` — is
+   *worse than the problem*: the test runner then walks the linked tree with no valid
+   cache and thrashes indefinitely.
+
+   ```bash
+   # WRONG — looks instant, then hangs
+   ln -s /path/to/other-worktree/node_modules node_modules
+
+   # RIGHT — bounded, and the hooks then run for real
+   npm ci --no-audit --no-fund            # repeat per workspace dir (e.g. frontend/, agent/)
+   ```
+
+   *(chef-chopsky, 2026-08-24: the symlink left 17 jest workers thrashing for 15+ minutes
+   across two attempts before being killed; a real `npm ci` made the same suites pass in
+   14s. Verify the lockfile matches first — `git show origin/<default>:<dir>/package-lock.json
+   | shasum` against the local one — so you know the install is the right one.)*
+
+   **Never bypass with `--no-verify` here.** The hook failing for an environmental reason
+   is not permission to skip it — the checkpoint commit is exactly the commit where a
+   silently-skipped gate is least likely to be noticed. Fix the environment, then commit.
+
    **Do not decide `-f` vs plain `add` from a tracked-ness check you ran earlier in this
    phase — step 4 invalidates it.** `latest.md` is normally *tracked*, so an early
    `git ls-files --error-unmatch docs/checkpoints/latest.md` says "tracked, plain `add`
@@ -437,6 +470,32 @@ If this session was an ad-hoc working session (not already run as a chartered 1:
 > "Which workforce employee should have done this session's work — and what lever, charter line, or prompt were they missing?"
 
 Then **make that edit before closing** (the role's `CHARTER.md`, its prompts, `workflows/OBJECTIVES.md`, or a planned-hire note in `TEAM.md`), so the session compounds into the workforce instead of competing with it. If the work genuinely belongs to no role, record it as either a future hire (`TEAM.md` → planned evolution) or deliberately founder-only work. A one-line answer of "none — founder-only on purpose" is a valid outcome; silently skipping the question is not.
+
+### First check whether the charter already said it
+
+Before writing a new charter line, **grep the charter for the rule you were about to add.** The
+common case is not that the guidance was missing — it is that it was already there, correctly
+worded, and inert.
+
+- **The charter did not cover it** → add the line. Normal deposit.
+- **The charter already covered it** → adding a second, more emphatic sentence is the failure
+  mode, not the fix. The finding is that a *prose* rule governed something only *code* can
+  enforce. Deposit an **executable guard** instead — a non-zero exit, a CI check, a hook, a
+  lint rule — and edit the charter only to record that the lever is now wired.
+
+> A charter line that exists only as prose is not a lever. If a role is accountable for a floor
+> condition, the floor needs a guard that fails the run; otherwise the guarantee is
+> indistinguishable from a wish.
+
+This mirrors the repo-level rule that deterministic guardrails belong in hooks and CI rather than
+in prose — it applies to charters for exactly the same reason, and charters are more tempting to
+"fix" with words because they are prose documents by nature.
+
+*(chef-chopsky, 2026-08-16: a pipeline run published four reports built on data it never fetched.
+The Data Pipeline Operator's charter already read "Do not silently degrade — flag and pause" and
+listed "Alert on persistent fetch failure — wired". Both were true statements of intent and
+neither stopped anything, because `fetch-data.sh` counted failures and exited 0 regardless. The
+deposit that mattered was the non-zero exit; the charter edit only recorded it.)*
 
 ## Phase 4: Learn Flow
 

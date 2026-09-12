@@ -27,6 +27,23 @@ The cost hierarchy of actions, cheapest first:
 
 Rules that fall out of this hierarchy:
 
+- **Judge a head by its check-runs, not by `gh pr checks`.** `gh pr checks` mixes results
+  from cancelled/superseded workflow runs into one list — a PR whose ready-for-review run
+  got concurrency-cancelled by a fresh push shows the dead run's jobs as `fail` next to the
+  live run's `pending`, and a monitor that trusts it starts "fixing" failures that never
+  happened on the current code. The authoritative read is per-sha:
+
+  ```bash
+  gh api "repos/<owner>/<repo>/commits/$(gh pr view <N> --json headRefOid -q .headRefOid)/check-runs?per_page=60" \
+    --jq '.check_runs[] | "\(.name): \(.conclusion // .status)"'
+  ```
+
+  Corollary: a load-bearing job can silently **skip** on an update-branch merge push even
+  when the PR's files match its path filter (filters evaluate the push event, not the PR).
+  A skip on a required suite is not green — force it onto the current head (project's
+  full-CI label + empty commit, or `gh workflow run`) before treating the PR as validated.
+  (Found chef-chopsky 2026-08-22: three PRs in one merge queue misread this way.)
+
 - **NEVER push without local validation passing first**. `npm run ci:local` (or project equivalent) must exit 0.
 - **NEVER push an empty commit to retrigger**. Use `gh run rerun --failed` — it's free and re-runs only the failed jobs.
 - **BATCH fixes** — if reading one failed log surfaces 3 root causes, fix all 3 in one commit, not three.

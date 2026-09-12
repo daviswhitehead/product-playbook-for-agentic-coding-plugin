@@ -254,6 +254,40 @@ When the plan includes cron jobs, scheduled tasks, or CI automation, add a pre-f
 - "What are the testing requirements?"
 - "What could go wrong?"
 
+### Step 3.5: Component Inventory (any plan with a UI surface)
+
+**Before designing any UI, enumerate what already exists.** A tech plan that starts from a blank component tree quietly authorizes rebuilding things the project already has — and nobody notices, because each new component looks reasonable in isolation. The cost only shows up in aggregate, as five drawings of the same button and eight copies of one label treatment.
+
+Do this at plan time, not review time. Once the code exists, "reuse that instead" is a rewrite, and it doesn't happen.
+
+**1. Read the project's inventory.** In rough order of usefulness:
+- The component library / design system directory (`components/`, `packages/ui/`, `app/components/`, wherever the project keeps shared UI).
+- Storybook or an equivalent component explorer, if the project has one — it is the browsable index and the fastest way to see what exists.
+- The design tokens / theme file: colors, spacing, radii, elevation, typography.
+- Any design-system guide in the project's docs.
+
+If the project has no such inventory, say so explicitly in the plan — that is itself a finding, and it changes the calculus for everything below.
+
+**2. List what each surface will use.** For every screen or surface in the plan, name the existing components and tokens it will be built from:
+
+| Surface | Existing components used | Tokens used |
+|---|---|---|
+| [Surface name] | [Component, Component, …] | [token group, token group] |
+
+**3. Justify anything new.** Every component that does not already exist goes in this table. An **empty table is the good default** and the outcome to aim for:
+
+| Proposed component | Existing component considered | Why extension fails | Why it's general, not one-off |
+|---|---|---|---|
+| [Name] | [The closest existing component] | [What specifically breaks if you extend it] | [Which other surfaces will use it, or what class of surface it serves] |
+
+Rules for that table:
+- **"I didn't find one" is not a rationale.** Name what you looked at. If the closest thing genuinely is nothing, say which directory you searched.
+- **"Why extension fails" must be concrete.** "It's not flexible enough" is not a reason; "it takes a `PricingTier[]` and formats currency, so a non-pricing caller would have to fabricate a tier" is.
+- **"Why it's general" needs a second consumer** — either one in this plan, or a named class of future surface. A component with exactly one call site and no foreseeable second is a section of that screen, not a component.
+- A new **style** (a new color, spacing value, radius, shadow, or a variant of an existing component) gets the same treatment. New styles drift faster than new components because they're cheaper to add.
+
+**4. Carry it into sequencing.** If the plan does propose new shared components, build them *before* the surfaces that consume them, not extracted afterwards — the same rule as Shared Pattern Alignment below.
+
 ### Step 4: Complete the Document
 
 Ensure all sections are filled with complexity matching project size:
@@ -264,6 +298,9 @@ Ensure all sections are filled with complexity matching project size:
 - Sequencing Plan
 - Technology Stack
 - Technical Risks
+
+**Required for any project with a UI surface**:
+- Component Inventory (existing components/tokens per surface, plus the new-components table — empty is the good default; see Step 3.5)
 
 **For Medium and Large Projects**:
 - Integration Approach
@@ -283,6 +320,7 @@ Review the document:
 - [ ] Technology stack is appropriate and justified
 - [ ] Integration points are identified
 - [ ] Technical risks are assessed with mitigation
+- [ ] **UI surfaces**: Component Inventory done — existing components/tokens named per surface, and every proposed new component has a rationale an existing one couldn't satisfy (Step 3.5)
 - [ ] Supersession protocol followed (see below)
 - [ ] Shared patterns identified for multi-consumer systems (see below)
 - [ ] Ready for Delivery phase
@@ -306,6 +344,7 @@ If the plan introduces shared infrastructure (libraries, runners, delivery mecha
 - **Focus on How (High-Level)**: Plan the approach, not implementation details
 - **Minimize Blockers**: Sequencing should enable parallel work
 - **Justify Choices**: Provide rationale for technology decisions
+- **Reuse First**: Start UI work from the existing component/token inventory. Reusing or extending is the default; a new component or style needs a stated rationale (Step 3.5)
 - **Identify Risks**: Surface technical challenges early
 - **Supersede Explicitly**: When plans evolve, mark old versions immediately
 

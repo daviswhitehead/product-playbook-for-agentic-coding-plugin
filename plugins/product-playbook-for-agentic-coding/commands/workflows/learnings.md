@@ -714,7 +714,7 @@ clobber the in-flight work. Verify with `git -C <plugin-repo> status --short` af
 
 **Step B — Map findings to skills/commands:**
 
-Read the plugin directory structure (`commands/workflows/`, `skills/`). For each finding, identify which file should change:
+Read the plugin directory structure. NOTE: in the plugin *repo* these live nested under `plugins/<plugin-name>/` (e.g. `plugins/product-playbook-for-agentic-coding/commands/workflows/`, `.../skills/`), not at the repo root — `find <repo>/plugins -name "<command>.md"` beats guessing paths. For each finding, identify which file should change:
 
 | Finding Pattern | Target File |
 |----------------|-------------|
