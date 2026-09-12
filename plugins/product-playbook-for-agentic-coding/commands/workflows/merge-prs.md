@@ -60,6 +60,14 @@ is Step 6's escalation list — genuinely unsafe territory, where stopping is co
    - Merge-method policy (squash vs merge commit) and any forbidden patterns
    - **Release/versioning rules** — see next item
 
+   Then **prove the local validation command actually runs in THIS worktree** before the
+   queue starts — a fresh agent worktree often has hooks but no installed deps, so the
+   very first push dies mid-queue on `eslint: command not found` (or worse, a pre-push
+   hook that half-runs). One dry probe (`npm run lint --prefix <dir> -- --version`-level,
+   or just run the validation once) converts a mid-queue surprise into a preflight
+   `npm install`. *(chef-chopsky 2026-08-16: PR 1 of 8 failed its first push this way;
+   the fix was three `npm install`s that should have happened before Step 5.)*
+
 5. **Detect release machinery, and which of two kinds it is.** Some repos fail CI unless
    every change declares a version change. Look for a versioning section in CLAUDE.md
    (search: `version`, `bump`, `changeset`, `propagat`), a release or bump script, and a
@@ -115,7 +123,13 @@ Assess, and **write down the reasoning** — it goes in the plan:
   promising work the diff doesn't contain. A draft that is complete is a MERGE candidate;
   a non-draft that is incomplete is not.
 - **CI state.** Green / red / never ran. Red-on-one-known-check (e.g. a version guard that
-  every unbumped PR trips) is FIX-THEN-MERGE, not SKIP.
+  every unbumped PR trips) is FIX-THEN-MERGE, not SKIP. Read CI state **per head sha**
+  (`gh api repos/<o>/<r>/commits/<headRefOid>/check-runs`), not from `gh pr checks` — the
+  latter mixes cancelled/superseded runs into the list, and in an active merge queue every
+  merge cancels siblings' in-flight runs, so phantom "fails" are the norm, not the
+  exception. And a load-bearing suite that shows `skipped` on the head after an
+  update-branch push has NOT validated the PR (path filters evaluate the push event, not
+  the PR's files) — retrigger it on the current head before merging.
 - **Mergeability.** `CONFLICTING` means it needs a main merge in Step 5.2 — expected, not
   disqualifying.
 - **Unresolved review threads.** Unaddressed review feedback is an ESCALATE. Merging past
@@ -123,6 +137,14 @@ Assess, and **write down the reasoning** — it goes in the plan:
 - **Authorship.** Someone else's PR is an ESCALATE unless the user's invocation clearly
   covers it (e.g. they said "merge all my PRs" and it's a bot's, or they named it).
 - **File overlap with other open PRs.** Record the overlapping paths — Step 3 needs them.
+- **Duplicate detection.** Two PRs with similar titles or the same `additions/deletions/
+  changedFiles` numbers may be the *same diff* — automated pipelines re-deliver work items
+  and open a second PR for content that already has one. Check cheaply:
+  `diff <(gh pr diff <A>) <(gh pr diff <B>)`. Byte-identical ⇒ triage them as ONE unit
+  (merge the newer or better-reviewed one, close the other with a comment) — but the
+  close is an ESCALATE unless the user's invocation covers it. *(chef-chopsky 2026-08-15:
+  #537/#589 were byte-identical deliveries of the same item, 7 days apart; the size
+  columns in `gh pr list` were the tell.)*
 
 Classify each as exactly one of:
 

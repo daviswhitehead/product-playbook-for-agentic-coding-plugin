@@ -67,11 +67,41 @@ If the user says a design spec is not needed, stop here and proceed to the next 
 2. If not, use the design-spec template from this plugin's `resources/templates/`
 3. Create it at: `projects/[project-name]/design-spec.md`
 
+### Step 2.5: Component Inventory (before designing anything)
+
+**Enumerate what the project already has before you draw a single new thing.** A spec written from a blank page quietly authorizes rebuilding components that already exist — and the drift is invisible at spec time, because each new component looks reasonable on its own. It only becomes obvious later, as five drawings of the same button.
+
+**1. Read the project's inventory:**
+- The component library / design system directory.
+- Storybook or an equivalent component explorer, if the project has one — the browsable index, and the fastest way to see what exists.
+- Design tokens / theme: colors, spacing, radii, elevation, typography.
+- Any design-system guide in the project's docs.
+
+If the project has no inventory to read, record that in the spec — it changes what "reuse" can mean here.
+
+**2. Map each screen to what exists.** Fill this in before drafting the spec body; the per-component spec cards in Step 3 should then describe *deltas from* these components, not components from scratch:
+
+| Screen / surface | Existing components used | Tokens used |
+|---|---|---|
+
+**3. Justify anything new.** An **empty table is the good default**:
+
+| Proposed component | Existing component considered | Why extension fails | Why it's general, not one-off |
+|---|---|---|---|
+
+- **"I didn't find one" is not a rationale.** Name what you looked at, or which directory you searched.
+- **"Why extension fails" must be concrete** — a specific prop, coupling, or behavior that breaks, not "not flexible enough".
+- **"Why it's general" needs a second consumer**, real or a named class of future surface. One call site with no foreseeable second is a section of a screen, not a component.
+- New **styles** (a color, spacing value, radius, shadow, or a new variant of an existing component) get the same treatment. They drift faster than components because they're cheaper to add.
+
+**4. Reuse survives into acceptance criteria.** "Uses the existing `X` component" is testable; "looks consistent" is not.
+
 ### Step 3: Draft the spec (Product Designer lead)
 
 Write the spec as if a junior engineer will implement it without further explanation:
 
 1. **Goals / Non-goals**
+1b. **Component Inventory** (carried in from Step 2.5 — what this spec reuses, and the rationale for anything new)
 2. **Content structure & hierarchy**
 3. **Layout / spacing / whitespace** (with explicit numbers)
 4. **Visual design** (color/typography/background/texture)
@@ -92,6 +122,7 @@ End the draft with a short "Open Decisions" list. Ask the user to resolve them. 
 ### Step 5: Validate completeness
 
 Confirm the doc has:
+- [ ] Component Inventory — existing components/tokens named per screen, and every proposed new component carries a rationale an existing one couldn't satisfy (Step 2.5)
 - [ ] Explicit state machines for interactive areas
 - [ ] Exact spacing/dimensions where pixel fidelity matters
 - [ ] Motion timings + reduced-motion behavior
