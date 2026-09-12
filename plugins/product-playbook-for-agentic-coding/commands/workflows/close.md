@@ -137,6 +137,12 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
 2. If a tasks document exists:
    - Scan for `in_progress` tasks. For each: is the work done? Mark completed or note what's left.
    - **Instrumented-task check**: before marking complete any task whose acceptance includes "event fires", "metric captured", or "tracked in <analytics>", confirm you have runtime evidence (the event/metric actually landed in the truth surface — PostHog/analytics/the gate query). If you only have static evidence ("the code is wired"), mark it **"done pending runtime verification"**, not ✅. Do not let close-out launder an unverified claim into "complete." (See the autonomous-execution "Instrumented-Task Verification Gate".)
+   - **Gate-verdict check**: before marking complete any task whose acceptance is "CI green", "`test:verify` passes", or "the suite is clean", confirm you read the **gate's own exit code**, not a proxy for it. Three proxies routinely lie:
+     - **A background-task notification reports the wrapper shell's exit status, not the command's.** `npm run test:verify > log 2>&1; echo "EXIT=$?"` ends with a successful `echo`, so a failing run is announced as *"completed (exit code 0)."* Capture the real code where you can read it back (`; echo "EXIT=$?" | tee /tmp/x.exit`, then `cat`) or grep the log for the runner's own verdict line.
+     - **Playwright exits 0 when a test is `flaky`** (failed, then passed on retry), so `✅ E2E tests passed!` can hide a failure. Grep for `flaky` explicitly.
+     - **A green CI check can mean "passed *or* never ran"** — path-filtered jobs report SUCCESS when every step skips. Confirm the job actually asserted something (test counts in the log), and audit `statusCheckRollup` for `SKIPPED` load-bearing suites.
+
+     Same shape as the instrumented-task check above: do not let close-out launder a proxy signal into "verified." *(chef-chopsky, 2026-08-22: a `test:verify` run was announced as exit 0 while actually exiting 1 with a genuine regression — 174 passed / 1 failed. The failing test was confirmed as caused by that branch, by reverting to base and re-running. Reading the notification at face value would have shipped it.)*
    - Scan for stale tasks (blocked with no recent activity). Propose deletion or deferral.
    - Note pending tasks as carryover.
    - Show a brief summary: "X completed, Y carried forward, Z stale."
