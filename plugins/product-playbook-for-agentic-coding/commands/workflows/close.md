@@ -70,6 +70,8 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
 
    **Expect the target to move under you during a long close-out.** In an active multi-agent repo another agent may push to the same target between your first commit and your last. A rejected push (`cannot lock ref ... is at X but expected Y`) is normal, not an error to force past: fetch, inspect what landed, rebase, and re-verify. If what landed touches the same files you are about to write — `latest.md` above all — re-read Phase 3 step 4's freshness rule before overwriting anything. *(chef-chopsky, 2026-08-15: the target moved twice during one close-out; the second time another agent had claimed `latest.md` with a newer handoff and correctly archived the earlier one. The right response was to redirect the pending edit into the archived copy, not to reclaim `latest.md`.)*
 
+   **When that rebase conflicts, the `--ours`/`--theirs` labels are the OPPOSITE of merge intuition.** During `git rebase`, HEAD is the branch you are rebasing ONTO — so `--ours` is the *other* work that landed on the target, and `--theirs` is *your own* commit being replayed. A close-out resolving a `latest.md` collision "in favor of the newer session" via `git checkout --theirs` therefore keeps **your** older handoff and clobbers the newer one — the exact outcome the freshness rule forbids, reported as a successful resolution. Sidestep the labels entirely: name the side by ref (`git checkout origin/<target> -- docs/checkpoints/latest.md` to keep what landed), then `git show <your-sha>:<file> > <dated-archive>` for your copy. Verify with `git show --stat HEAD` that the rebased commit no longer touches `latest.md` at all. *(chef-chopsky, 2026-08-16: a close-out hit this precisely — `--theirs` silently selected the session's own checkpoint over a newer ads-live handoff; caught only because the post-amend stat still showed `latest.md` modified.)*
+
 2. Run `git status`.
 3. If there are uncommitted changes:
    - Show a brief summary (files changed, not full diffs)
@@ -302,6 +304,31 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    git commit -m "chore: session checkpoint"
    git show --stat HEAD   # verify it contains every CKPT_FILE and nothing else
    ```
+
+   **If the commit is rejected because the repo's hooks can't run, install the deps —
+   do NOT symlink them from a sibling worktree.** A fresh agent worktree (Conductor,
+   `git worktree add`) has the repo's hooks but no `node_modules`, so a pre-commit hook
+   that runs lint/typecheck/tests dies on `jest: command not found` and the checkpoint
+   never lands. The tempting shortcut — `ln -s ../other-worktree/node_modules` — is
+   *worse than the problem*: the test runner then walks the linked tree with no valid
+   cache and thrashes indefinitely.
+
+   ```bash
+   # WRONG — looks instant, then hangs
+   ln -s /path/to/other-worktree/node_modules node_modules
+
+   # RIGHT — bounded, and the hooks then run for real
+   npm ci --no-audit --no-fund            # repeat per workspace dir (e.g. frontend/, agent/)
+   ```
+
+   *(chef-chopsky, 2026-08-24: the symlink left 17 jest workers thrashing for 15+ minutes
+   across two attempts before being killed; a real `npm ci` made the same suites pass in
+   14s. Verify the lockfile matches first — `git show origin/<default>:<dir>/package-lock.json
+   | shasum` against the local one — so you know the install is the right one.)*
+
+   **Never bypass with `--no-verify` here.** The hook failing for an environmental reason
+   is not permission to skip it — the checkpoint commit is exactly the commit where a
+   silently-skipped gate is least likely to be noticed. Fix the environment, then commit.
 
    **Do not decide `-f` vs plain `add` from a tracked-ness check you ran earlier in this
    phase — step 4 invalidates it.** `latest.md` is normally *tracked*, so an early
