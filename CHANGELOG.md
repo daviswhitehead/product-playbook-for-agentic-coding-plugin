@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.28.2] - 2026-09-13
+
+### Fixed
+- **`/playbook:merge-prs` and `/playbook:monitor-pr` — require a `MERGED` verdict before deleting any PR branch.** Both commands told you to treat *any* non-empty error from `gh pr merge --delete-branch` as "the remote branch probably survived" and to finish the delete by hand. That rule was derived entirely from *post-merge cleanup* failures (a worktree holding the branch, a dirty working tree, async server-side reaping) where the merge did succeed — but it keys on the presence of an error, never on which error, so it applies equally to a merge that was *rejected* (`Base branch was modified`, not mergeable, checks red). Applied there it deletes the head of a PR that still needs it, which also closes the PR. Both commands now gate the delete on `gh pr view <N> --json state,mergeCommit` reading `MERGED` with a non-null sha, with a verdict table covering `OPEN`/`CLOSED` + null, and carry a recovery recipe (`git push origin <sha>:refs/heads/<branch>` + `gh pr reopen`) since every worktree of a repo shares one object store.
+
+### Added
+- **`/playbook:learnings` — verify an incident's causal claim against an authoritative timeline before writing it into an addendum.** An addendum's core sentence is causal, and it gets written from what you remember doing, in the order you remember doing it — a reconstruction that fuses adjacent events into a cause. Once wrong causality is in the doc it is load-bearing: later readers inherit it and the fix gets aimed at the wrong mechanism. Adds the one-call check (`gh api .../issues/<N>/timeline`, `git log --format=%cI`, `git reflog --date=iso`), instructions to correct the user if the wrong version was already reported, and guidance to record a verified ordering with an unresolved cause rather than asserting a confident wrong mechanism — preferring fixes that hold under every surviving hypothesis.
+
 ## [0.28.1] - 2026-09-11
 
 ### Changed
