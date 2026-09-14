@@ -250,10 +250,27 @@ Post it immediately before `gh pr merge`. If you find an already-merged PR missi
 >
 > ```bash
 > gh pr merge <N> --merge --delete-branch          # may print a local-cleanup error
+>
+> # FIRST: did the merge actually land? An error is NOT evidence that it did.
+> gh pr view <N> --json state,mergeCommit -q '.state + " " + (.mergeCommit.oid // "NONE")'
+> # MERGED <sha> -> continue below.  OPEN/CLOSED + NONE -> the merge FAILED; stop.
+>
 > git fetch -q origin --prune
 > git ls-remote --heads origin <branch> | wc -l    # MUST be 0; if 1, it survived
 > git push origin --delete <branch>                # finish the delete yourself
 > ```
+>
+> **The merge-verdict line is load-bearing, not a formality.** "Any error ⇒ the branch
+> survived ⇒ delete it" keys on the *presence* of an error and never on *which* error, so
+> it silently assumes the merge succeeded. Both triggers above are post-merge cleanup
+> failures — but `gh pr merge` also fails *before* merging (`Base branch was modified`,
+> `Pull request is not mergeable`, required checks red). Applying the rule there deletes
+> the head of a PR that still needs it, and deleting a head ref closes its PR.
+> (Observed 2026-09-11 on this repo, PR #99: `Base branch was modified` after a sibling PR
+> landed seconds earlier; the PR was already `CLOSED` with a null merge commit when the
+> hand-delete removed its only remote copy. Recovered via
+> `git push origin <sha>:refs/heads/<branch>` + `gh pr reopen` — every worktree of a repo
+> shares one object store, so the head SHA was still reachable locally.)
 >
 > Check with `git ls-remote` (authoritative), not `git branch -r`, which reads a possibly-stale local cache.
 >

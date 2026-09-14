@@ -322,3 +322,118 @@ reaped.
       each guard by asking *what it compares against*, then negative-test **that** axis.
       `validate-plugin.sh`'s new command-surface check was built this way (verified in both
       directions before merge); the older sections of it were not.
+
+---
+
+## 2026-09-11 fifth-incident addendum — Learning #3's rule fires on the wrong axis
+
+A fifth merge-all-open-PRs session (8 PRs, #93–#99/#101, 0.28.0 → 0.28.1). The changeset
+flow from the fourth addendum worked exactly as designed — merge order was free, no version
+conflicts, one release at the end. Learnings #2 and #3's *worktree* behaviour held.
+
+**Learning #3 broke again — the fourth time this one rule has been wrong.** This time not
+because the claim is false, but because its **trigger condition is too broad**, and that
+cost a live PR its head branch.
+
+### What happened
+
+`gh pr merge 99 --squash --delete-branch` failed:
+
+```
+GraphQL: Base branch was modified. Review and try the merge again. (mergePullRequest)
+```
+
+(#101 had squash-merged seconds earlier.) The script then applied the rule as written —
+*"treat any non-empty error as 'the remote branch probably survived'"* → `git ls-remote`
+says 1 → `git push origin --delete`. That deleted the only remote copy of an unmerged PR's
+head.
+
+### The mechanism: a rule that keys on the presence of an error, never on which error
+
+Every prior observation behind Learning #3 came from **post-merge cleanup** failures — a
+worktree holding the branch (2026-07-26), a dirty working tree (same), async server-side
+reaping (2026-08-04). In all of them the merge *succeeded* and only gh's local step broke.
+The rule generalised correctly across those triggers — "don't pattern-match the message" —
+and then over-generalised past the boundary of the family it was derived from:
+
+| `gh pr merge` error class | Merge landed? | Correct response |
+|---|---|---|
+| Local cleanup failed (worktree / dirty tree / async reap) | **Yes** | Verify, delete the survivor |
+| Merge itself rejected (`Base branch was modified`, not mergeable, checks red) | **No** | **Touch nothing.** Fix and retry |
+
+The rule's text covers both rows and prescribes row 1's action for both.
+
+**This is the fourth addendum's own lesson, arriving in prose instead of a shell script.**
+That addendum's finding was: *a guard passes — ask what it compares **against**, not just
+how it compares.* `check-version-bump.sh` varied the version while holding the base fixed.
+Learning #3 varies the error *message* while holding "the merge succeeded" fixed. Same
+defect — an untested axis — one layer up, in a command doc rather than a guard.
+
+> **A prose rule has a frame of reference too.** When a rule says "treat *any* X as Y",
+> ask what the X's you observed had in common that the rule no longer requires.
+
+### Auditing the pre-registered escalation (per `/playbook:learnings`)
+
+The fourth addendum left open:
+
+> - [ ] Audit each guard by asking *what it compares against*, then negative-test **that** axis.
+
+**Would it have caught this one? No** — it scopes itself to *guards*, meaning the executable
+scripts in `scripts/`. The defect here is in a **command doc**, which nothing in the repo
+executes or tests. Same family (an untested frame of reference), different medium.
+
+**Would it have *caused* it? No** — orthogonal, not harmful. (Third branch per 0.28.1.)
+
+Re-registered, widened past `scripts/`:
+
+> **Next escalation:** when a prose rule in a command doc says "treat *any* A as B", list the
+> concrete A's that produced it and check whether they share a precondition the rule dropped.
+> Apply to the `merge-prs`/`monitor-pr` "any error" rules first — they have now been wrong
+> four times, which is itself the signal.
+
+### Recovery — worktrees share one object store
+
+Fully recoverable, and worth knowing before it is needed. `git push --delete` removes only
+the *remote* ref; the objects survive in any worktree, reflog, or remote-tracking ref that
+still references them. All five worktrees of this repo share one object store, so:
+
+```bash
+git push origin 888a72f:refs/heads/improve/merge-prs-sweep-learnings
+gh pr reopen 99
+```
+
+restored #99 at its original head SHA, and it re-merged cleanly as `0f7f933`. Total content
+lost: none. **Do the restore before moving to the next PR** — objects unreferenced by any ref
+are GC candidates.
+
+### One more state nobody had documented: CLOSED-and-unmerged
+
+When the failed merge was observed, `gh pr view 99 --json state,mergeCommit` already read
+`CLOSED` with a **null** merge commit — *before* any branch deletion (GitHub's timeline puts
+the close 28 seconds ahead of the `head_ref_deleted` event). So a failed `gh pr merge` can
+leave a PR closed and unmerged, which no step in `merge-prs.md` anticipates; it assumes a
+merge either succeeds or leaves the PR open.
+
+Honest scoping: the *ordering* is verified from the timeline API. The exact cause of that
+close is **not** — the close event lands within one second of #101's merge, which the
+"`gh pr merge` closed it" hypothesis does not explain. Left unresolved deliberately rather
+than asserted. It does not change the fix: read `state` + `mergeCommit` and require
+`MERGED` before touching a branch, which is correct under every hypothesis.
+
+### Updated rule of thumb (cumulative)
+
+| Signal | Response |
+|---|---|
+| `gh pr merge` exits non-zero | **Read `state` + `mergeCommit` first.** Only `MERGED` + non-null sha makes the branch disposable |
+| Error is a *cleanup* failure (worktree / dirty tree) | Merge landed — verify the remote branch, re-check for async reap, then delete |
+| Error is a *merge* rejection (base modified / not mergeable / checks red) | Nothing merged — do not delete, do not prune. Fix and retry |
+| You deleted a branch you shouldn't have | `git push origin <sha>:refs/heads/<branch>` + `gh pr reopen`; sibling worktrees share the object store |
+| A rule says "treat *any* A as B" | Ask what the observed A's had in common that the rule stopped requiring |
+
+### Fifth-addendum action items
+
+- [x] `/playbook:merge-prs` Step 5.6: merge-verdict gate (verdict table) before any branch
+      deletion; recovery recipe; anti-pattern entry
+- [x] `/playbook:monitor-pr`: same gate added to the post-merge block — it is the one that
+      actually runs per-PR
+- [ ] The fourth addendum's guard audit, widened to prose rules (re-registered above)
