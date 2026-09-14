@@ -136,6 +136,22 @@ Assess, and **write down the reasoning** — it goes in the plan:
   a human's open question is not yours to do.
 - **Authorship.** Someone else's PR is an ESCALATE unless the user's invocation clearly
   covers it (e.g. they said "merge all my PRs" and it's a bot's, or they named it).
+- **Does it edit the commands driving THIS run?** A command's instructions are loaded when
+  it is invoked, so merging a fix to `merge-prs.md` or `monitor-pr.md` changes nothing about
+  the run in progress — the sweep keeps executing the pre-fix rule to the last PR. And the
+  exposure is *correlated, not incidental*: a PR fixing `merge-prs.md` is almost always
+  merged **by** `merge-prs.md`, so this class of fix is systematically delivered under the
+  exact conditions it was written for. Detect it with data you already have:
+
+  ```bash
+  gh pr diff <N> --name-only | grep -E 'commands/workflows/(merge-prs|monitor-pr)\.md'
+  ```
+
+  A hit is **not** a reason to skip the PR. Read the behavioral change out of its diff,
+  **apply it by hand for the remainder of this run**, note it in the plan, and say so in the
+  final report. *(Observed twice on this repo: 2026-07-26, where the live recurrence is what
+  exposed an over-narrow rule, and 2026-09-13 merging #102 — which rewrote the
+  `--delete-branch` rule in both docs while this command ran the version it replaced.)*
 - **File overlap with other open PRs.** Record the overlapping paths — Step 3 needs them.
 - **Duplicate detection.** Two PRs with similar titles or the same `additions/deletions/
   changedFiles` numbers may be the *same diff* — automated pipelines re-deliver work items
@@ -360,6 +376,10 @@ because one went bad is the failure mode this step exists to prevent.
   skipped set)
 - **Leftovers**: any remote branch that survived its merge, any `tmp/pr*` still around
 - **Repo hygiene**: if `deleteBranchOnMerge` was `false`, say so and recommend flipping it
+- **Self-modifying merges**: any PR that edited this command or `monitor-pr.md`, and which of
+  its changes you hand-applied for this run. The fix is not live for an installed copy until
+  the version bumps, the install pulls it, and the command is invoked again — say that too,
+  so nobody assumes the next run is protected when it is a stale install.
 
 ## Anti-Patterns (Don't Do These)
 

@@ -1,86 +1,40 @@
 # Session Checkpoint
-**Date**: 2026-09-11 
-**Branch**: closeout/merge-prs-sweep → pushed to `main` (workspace branch `daviswhitehead/merge-prs` has no upstream and no PR, 0-ahead of main, disposable)
+**Date**: 2026-09-13
+**Branch**: `daviswhitehead/merge-prs-sweep` (PR #103, open)
 
 ## Current Task
-`/playbook:merge-prs` sweep of the plugin repo's open-PR backlog. Complete — all 8 open PRs
-triaged, fixed, merged, and released as 0.28.1.
+`/playbook:merge-prs` sweep → `/playbook:learnings` → `/playbook:close`. Sweep and release
+are **done**; the retrospective's own PR (#103) is open and green, awaiting merge + release.
 
 ## Status
 - **Done this session**:
-  - Merged all 8 open PRs (#93–#99, #101). Six were drafts failing `guard` for one identical
-    reason: no changeset. Each got a changeset authored from its own diff, `gh pr ready`,
-    local validation to exit 0, then push. All went green on first CI run.
-  - Ran `scripts/release.sh` once at the end: 0.28.0 → **0.28.1**, consuming 8 changesets.
-    `main` = `6443dec`, guard green.
-  - Recovered PR #99 after a close call (see Key Decisions) — restored at its original head
-    SHA with no content lost.
-  - Verified all 8 remote branches deleted, 0 `tmp/pr*` left, 0 open PRs.
-- **In progress**: nothing.
+  - Merged **#102** (`fix(merge-prs,monitor-pr): require a MERGED verdict before deleting a PR branch`) as `0afae7e`. Queue of 1; 0 iteration commits, 0 extra Actions minutes — guard was already green on head `4ddb421`.
+  - Ran `scripts/release.sh` → **0.28.1 → 0.28.2** (`2130aec`), pushed; main's guard green.
+  - Opened **#103** with the retrospective output: a sixth addendum to the recurring merge doc, a `merge-prs.md` triage check, and a `learnings.md` verification step. Guard green on both commits.
+- **In progress**: nothing. #103 is the only open thread.
 - **Blocked on**: nothing.
 
 ## Key Decisions
-- **Changeset-style release machinery ⇒ free merge order.** Confirmed `.changes/` +
-  `scripts/release.sh`, so no per-PR version assignment and one release at the end. This is
-  why 8 PRs merged in ~an hour with zero version conflicts — the stacked-queue pain the
-  CLAUDE.md describes never materialized.
-- **Six drafts were neglect, not intent.** Every diff was content-complete prose from
-  Aug 16–23. Draft status + the `guard` red were the same single cause (missing changeset),
-  which is why they all cleared identically.
-- **PR #99's branch was deleted while the PR was unmerged, and recovered.** `gh pr merge 99`
-  failed with GraphQL "Base branch was modified" (#101 had just landed). Step 5.6 of
-  `merge-prs.md` says to treat a non-empty merge error as "the branch probably survived" and
-  delete it by hand — that rule assumes the *merge succeeded and only cleanup failed*. Here
-  the merge itself failed, so the hand-delete removed the only remote copy of a PR that still
-  needed it. Recovered because the head (`888a72f`) was still live in a sibling worktree's
-  shared object store: `git push origin <sha>:refs/heads/<branch>` + `gh pr reopen 99`.
-  Re-merged as `0f7f933`.
-- **Correction, verified during close-out:** the first report of this said the hand-delete
-  *closed* #99. It did not. GitHub's timeline API puts `closed` at 01:37:13Z and
-  `head_ref_deleted` at 01:37:41Z — the PR was already CLOSED with a null merge commit **28
-  seconds before** the branch was touched. The cause of that close is **unresolved**: it
-  lands within one second of #101's merge, which the "`gh pr merge` closed it" hypothesis
-  does not explain. Recorded as open rather than guessed at. The fix is correct under every
-  surviving hypothesis, so it did not block shipping.
+- **Did not merge `main` into #102 before merging it.** It was `MERGEABLE`/`CLEAN` and only 1 commit behind (a checkpoint-doc edit it didn't touch); merging main in would have burned a CI run for no validation gain.
+- **Archived the 2026-09-11 checkpoint rather than overwriting it** — it was unarchived and belonged to the prior sweep. This session is newer, so it correctly claims `latest.md`.
+- **Killed a candidate finding instead of shipping it.** The retro nearly recorded "CI only tested the PR head, so validate a trial merge locally." `plugin-guard.yml` uses `actions/checkout@v4` with no `ref:`, which on `pull_request` checks out `refs/pull/N/merge` — GitHub already tested the merge result. The rule would have been false.
+- **No CLAUDE.md change.** The finding is command-specific, and CLAUDE.md sits at 277 lines (inside the 200–300 soft band), so a promotion would have owed a demotion.
 
 ## Open Questions
-- None blocking. The `merge-prs.md` Step 5.6 fix is specified (below) but not yet written.
+- The 2026-09-11 incident's root cause is still unresolved by design: PR #99's `closed` event lands within one second of #101's merge, which the "`gh pr merge` closed it" hypothesis doesn't explain. The shipped fix (gate on a `MERGED` verdict) is correct under every surviving hypothesis, so this doesn't block anything.
 
 ## Next Steps
-1. **Review and merge PR #102** — the Step 5.6 fix (merge-verdict gate in `merge-prs.md` and
-   `monitor-pr.md`, plus a causality-verification rule in `learnings.md`). Guard green,
-   mergeable, two changesets attached. Then run `scripts/release.sh` once to ship them.
-2. Optionally prune the stale local worktrees — four of the five in `git worktree list` hold
-   branches that no longer exist on the remote (all merged this session).
-3. Nothing else outstanding; backlog is empty.
+1. Merge **#103**, then run `scripts/release.sh` → 0.28.3 and push. Two changesets are pending (`self-modifying-command-merge`, `verify-finding-mechanism`); **main's guard stays red until that release runs** — intended, not a regression.
+2. Sync installs so the fixes actually reach sessions: `claude plugin marketplace update && claude plugin update`. A merged command fix is not live until version bump → install pull → next invocation.
+3. Optional: two stashes (`stash@{0}` on `daviswhitehead/git-cleanup`, `stash@{1}` on `main`) are old and belong to other branches. Left untouched; worth triaging in a session that owns them.
 
 ## Hot Files (modified this session)
-- `plugins/product-playbook-for-agentic-coding/commands/workflows/close.md`: four PRs landed
-  here (#101 worktree deps, #93 rebase conflict sides, #95 executable-guard deposit,
-  #97 gate exit code). No conflicts — all distinct sections.
-- `.../workflows/merge-prs.md`: #99 (duplicate-diff detection, worktree deps preflight) and
-  #96 (per-head-sha CI reads). Verified both bullet sets coexist in the triage list.
-- `.../workflows/learnings.md`: #98 (third escalation branch) + #96 (nested plugin paths).
-- `.../workflows/debug.md`: #94 (read whole artifact; N identical retries = signature).
-- `.../workflows/monitor-pr.md`: #96 (check-runs per head sha).
-- `CHANGELOG.md`, both manifests: released 0.28.1.
-
-## Out-of-Repo Changes
-- Added `docs/merge-plans/` to `$(git rev-parse --git-common-dir)/info/exclude` — local,
-  uncommitted, shared across all worktrees of this repo.
+- `docs/learnings/2026-07-17-merging-stacked-prs-across-worktrees.md`: sixth addendum — a command-doc fix does not protect the run that merges it.
+- `plugins/.../commands/workflows/merge-prs.md`: Step 2 self-modification check; Step 7 reports what was hand-applied.
+- `plugins/.../commands/workflows/learnings.md`: verify a finding's *mechanism*, not just its causality.
+- `.changes/self-modifying-command-merge.md`, `.changes/verify-finding-mechanism.md`: both `bump: patch`.
 
 ## Context the Next Session Needs
-- **The full incident write-up now lives in
-  `docs/learnings/2026-07-17-merging-stacked-prs-across-worktrees.md`** (2026-09-11
-  fifth-incident addendum, shipped in PR #102) — that is the durable, *corrected* copy. The
-  working merge plan at `docs/merge-plans/2026-09-11-merge-plan.md` was gitignored and
-  worktree-local, and its incident section carries the pre-correction causality; it is
-  superseded and was allowed to die with the `auckland` worktree.
-- **`gh pr merge --delete-branch` reliably errors in this repo** whenever the PR branch is
-  checked out in another worktree ("cannot delete local branch ... used by worktree at ..."),
-  which happened on #101, #99, and #98. That error is cosmetic — server-side auto-delete
-  (`deleteBranchOnMerge: true`) still removes the remote branch, usually a beat later. The
-  danger is only in what you do *next*: always confirm `state == MERGED` before reacting to it.
-- **Git objects survive in sibling worktrees.** All five worktrees share one object store, so a
-  deleted remote branch is recoverable from any worktree still holding its SHA. That is what
-  saved #99.
+- **This repo's commands modify themselves, and that has a one-run lag.** A PR editing `merge-prs.md` is almost always merged *by* `merge-prs.md`, so the run shipping the fix executes the pre-fix version. #103 adds the triage check; until #103 is merged *and* pulled, apply it by hand.
+- **`scripts/check-version-bump.sh` picks its mode from the branch's position.** Run locally on a branch sitting exactly at `main`, it takes the post-merge path and fails with "unreleased changesets" — that is mode selection, not a real failure. Commit first, then pass `origin/main` explicitly.
+- `main` was free of worktrees this session, so `git checkout main` for the release worked directly. Five worktrees exist — re-check `git worktree list` before assuming that again.
