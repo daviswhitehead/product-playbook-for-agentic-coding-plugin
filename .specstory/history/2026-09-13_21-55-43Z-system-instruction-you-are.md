@@ -5854,7 +5854,7 @@ User responses:
 ```
 </details></tool-use>
 
-_**Agent (claude-opus-5 2026-09-14 13:16:58Z)**_
+_**Agent (claude-opus-5 2026-09-14 13:16:59Z)**_
 
 <tool-use data-tool-type="shell" data-tool-name="Bash"><details>
 <summary>Tool use: **Bash**</summary>
@@ -5871,5 +5871,82 @@ for f in "${FILES[@]}"; do git check-ignore -q -- "$f" && echo "ignored (needs -
 git add -f -- "${FILES[@]}"
 git show --stat HEAD >/dev/null
 echo "=== staged ==="; git diff --cached --stat
+```
+
+```text
+(tree clean)
+=== index must be empty before staging ===
+(blank = empty)
+ignored (needs -f): .specstory/history/2026-09-13_21-55-43Z-system-instruction-you-are.md
+ignored (needs -f): .specstory/history/2026-09-14_01-52-32Z-review-this-change-for.md
+ignored (needs -f): .specstory/history/2026-09-14_12-54-12Z-review-this-change-for.md
+=== staged ===
+ ...6-09-13_21-55-43Z-system-instruction-you-are.md | 5875 ++++++++++++++++++++
+ .../2026-09-14_01-52-32Z-review-this-change-for.md |  147 +
+ .../2026-09-14_12-54-12Z-review-this-change-for.md |  137 +
+ 3 files changed, 6159 insertions(+)
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-09-14 13:17:07Z)**_
+
+<think><details><summary>Thought Process</summary>
+I'm confirming this is just the three transcript files with no plugin content, so no changeset is needed—check-version-bump should verify that. I'm weighing whether to commit directly to main given the repo's precedent for transcript captures, but I need to double-check CLAUDE.md's guidance about only committing or pushing when the user explicitly asks.
+
+</details></think>
+
+_**Agent (claude-opus-5 2026-09-14 13:17:14Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/hamburg
+git commit -q -m "chore: capture session transcripts (2026-09-13/14)
+
+Three transcripts existed only in the hamburg worktree and would have been
+lost on archive. Restores the capture convention last exercised 2026-07-27;
+.specstory/ sits in .git/info/exclude, so these need -f.
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
+echo "=== guard check locally (transcripts are not plugin content) ==="
+bash scripts/check-version-bump.sh 2>&1 | tail -5
+git push -q origin main && echo "pushed"
+echo "main now: $(git log --oneline -1)"
+```
+
+```text
+=== guard check locally (transcripts are not plugin content) ===
+OK: google-tasks unchanged
+OK: openai-image-gen unchanged
+OK: product-playbook-for-agentic-coding unchanged
+
+Version-declaration check PASSED.
+pushed
+main now: f3f24ec chore: capture session transcripts (2026-09-13/14)
+```
+</details></tool-use>
+
+_**Agent (claude-opus-5 2026-09-14 13:17:19Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+
+```bash
+cd /Users/daviswhitehead/conductor/workspaces/product-playbook-for-agentic-coding-plugin/hamburg
+SHA=$(git rev-parse HEAD)
+for i in $(seq 1 20); do
+  out=$(gh api repos/daviswhitehead/product-playbook-for-agentic-coding-plugin/commits/$SHA/check-runs --jq '.check_runs[] | "\(.name):\(.status)/\(.conclusion)"' 2>/dev/null)
+  echo "[$i] ${out:-no runs yet}"
+  case "$out" in *completed*) break;; esac
+  sleep 15
+done
+echo "=== FINAL ARCHIVE-SAFETY AUDIT ==="
+echo "branch: $(git branch --show-current) | $(git rev-list --left-right --count origin/main...HEAD | awk '{print "behind "$1", ahead "$2}')"
+git status --porcelain; echo "(blank = clean tree)"
+echo "--- anything untracked left in this worktree? ---"
+git ls-files --others --exclude-standard
+git ls-files --others --ignored --exclude-standard
+echo "--- open PRs ---"; gh pr list --state open --json number --jq 'length'
 ```
 </details></tool-use>
