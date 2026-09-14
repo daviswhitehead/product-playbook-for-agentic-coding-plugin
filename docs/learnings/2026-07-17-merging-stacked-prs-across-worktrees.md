@@ -437,3 +437,105 @@ than asserted. It does not change the fix: read `state` + `mergeCommit` and requ
 - [x] `/playbook:monitor-pr`: same gate added to the post-merge block — it is the one that
       actually runs per-PR
 - [ ] The fourth addendum's guard audit, widened to prose rules (re-registered above)
+
+---
+
+## 2026-09-13 sixth-incident addendum — the run that ships a command-doc fix is the run least protected by it
+
+A sixth merge-all-open-PRs session (1 PR, #102, 0.28.1 → 0.28.2). **Nothing went wrong.**
+The changeset flow, the worktree rules, and the brand-new merge-verdict gate all behaved.
+This addendum records a *latent* hazard noticed during the run, not a failure — and says so
+plainly, because inflating a clean run into an incident is its own way of making a doc
+untrustworthy.
+
+### The observation
+
+The only PR in the queue was #102, which rewrites the `--delete-branch` rule in
+**`merge-prs.md` and `monitor-pr.md` — the two command docs driving the sweep that was
+merging it.** A command's instructions are loaded when it is invoked, so merging #102
+changed nothing about the run in progress. The sweep executed the *pre-fix* rule from the
+first command to the last.
+
+It was harmless this time only because no `gh pr merge` failed. Had one failed, the session
+would have applied the exact rule #102 exists to remove — and deleted a live PR's head
+branch while merging the fix for deleting live PRs' head branches.
+
+### The mechanism: the exposure is correlated, not incidental
+
+This is the part worth keeping. A PR that fixes `merge-prs.md` is, in this repo, almost
+always merged *by* `merge-prs.md`. So the set of runs that ship a merge-prs fix is ~100%
+runs that exercise merge-prs — the bug's blast radius and the fix's delivery vehicle are
+the same code path. That is not bad luck; it is structural, and it means this class of fix
+is systematically delivered under the conditions it was written for.
+
+**It has now happened twice, and only the first was recorded** — as a parenthetical inside
+a correction note in `monitor-pr.md`, never as a hazard with a prescribed response:
+
+> *"The 4th arrived while merging the very PR that fixed this note — via the
+> dirty-working-tree trigger rather than the worktree one, which is how the 'any error, not
+> just the worktree message' generalization was found."* — 2026-07-26
+
+| Date | Ran the pre-fix rule? | Outcome |
+|---|---|---|
+| 2026-07-26 | Yes | **Beneficial** — the live recurrence is what exposed the over-narrow "worktree message" framing |
+| 2026-09-13 | Yes | **Benign** — no merge failed, and the gate was applied by hand |
+
+Two for two, neither costly. The honest read is that this is **low severity, high
+recurrence**: it will keep happening on every self-modifying command fix, and one day the
+draw won't be benign.
+
+### Full propagation is four stages, not one
+
+The load-time lag is only the last link. For a marketplace-embedded plugin a command-doc
+fix reaches an actual invocation after: (1) merge to `main`, (2) `release.sh` bumps the
+version — auto-update is version-keyed, so an unbumped change reaches zero installs,
+(3) the install pulls it (`claude plugin marketplace update && claude plugin update`), and
+(4) the *next* invocation loads it. A session already holding the command is behind all four.
+
+### Auditing the pre-registered escalation (per `/playbook:learnings`)
+
+The fifth addendum registered:
+
+> **Next escalation:** when a prose rule in a command doc says "treat *any* A as B", list the
+> concrete A's that produced it and check whether they share a precondition the rule dropped.
+
+**Was it executed? Yes**, by #102 — both "any error" rules are now scoped to a `MERGED`
+verdict. Re-running the audit this session (`grep -rniE 'treat \*?any\*?|any non-empty'`
+over `commands/` and `skills/`) returns only those two sites, both correctly scoped. The
+escalation worked as designed.
+
+**Would it have caught *this* finding? No.** Simulated against this session, the audit
+inspects the *content* of rules and reports "no dropped precondition." The defect here is
+not in what a rule says — it is in **when a rule arrives**. Same doc, different axis:
+the fifth addendum was about a rule's frame of reference, this is about its delivery latency.
+
+**Would it have caused it? No** — orthogonal.
+
+### The fix
+
+`merge-prs.md` Step 2 gains a self-modification check, because the detection is a one-liner
+on data triage already has:
+
+```bash
+gh pr diff <N> --name-only | grep -E 'commands/workflows/(merge-prs|monitor-pr)\.md'
+```
+
+A hit means the PR edits the instructions driving this run. The response is not to skip it —
+it is to **read the behavioral change out of the diff and apply it by hand for the rest of
+the run**, flag it in the plan, and say so in the final report.
+
+### Re-registered escalation
+
+> **Next escalation:** if a third occurrence lands — or any occurrence where running the
+> pre-fix rule actually costs something — stop treating this per-command. Generalize the
+> check to *any* PR in the queue that modifies a command or skill file the session has
+> invoked, and make the "apply it by hand" step a named, reported queue action rather than
+> operator diligence. The signal to watch for is a report that says "applied the fix
+> manually" without the plan having predicted it.
+
+### Updated rule of thumb (cumulative)
+
+| Signal | Response |
+|---|---|
+| A queued PR edits the command doc you are running | Loaded instructions are pre-fix. Extract its behavioral change and hand-apply for this run; note it in the plan and report |
+| A command-doc fix merged and you expect it to be live | It is not, until version bump → install pull → next invocation. Four stages, not one |
