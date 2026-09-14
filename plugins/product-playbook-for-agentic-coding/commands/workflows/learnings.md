@@ -273,6 +273,25 @@ cause remains unexplained. The remembered story was plausible, wrong, and had al
 reported to the user as fact. The prescribed fix — gate the delete on a `MERGED` verdict —
 was correct either way, which is what made shipping it safe despite the open question.)*
 
+**The same rule applies to a finding's *mechanism*, not just its causality.** A candidate
+finding usually rests on a claim about how the system behaves — *"CI only validated the head,
+so the merge result was never tested"*, *"that job is path-filtered"*, *"the hook runs on
+pre-push"*. Those feel like background knowledge rather than claims, so they get written
+without being checked. **Read the config, workflow file, or script that decides it before the
+finding goes in the doc.** A retrospective's output is a rule other sessions will follow, and
+this workflow's own demotion checklist says a wrong rule is worse than a missing one — so the
+cheapest moment to kill a false finding is before it ships, not at the next retro.
+
+Killing a finding you already drafted is a *success*, not wasted work. Say so in the summary:
+"considered X, checked Y, it was false" is useful signal about where your model of the system
+is wrong.
+
+*(Found on this plugin, 2026-09-13. A retro was about to record "run local validation on a
+trial merge — CI only tested the PR head" as a plugin improvement. One `sed` of
+`.github/workflows/plugin-guard.yml` showed `actions/checkout@v4` with no `ref:`, which on
+`pull_request` checks out `refs/pull/N/merge` — GitHub had already tested the merge result.
+The finding was false and would have shipped a wrong rule into a command doc.)*
+
 *(Found chef-chopsky, 2026-07-29. A doc on "a metric reading 0 means not-wired" had pre-registered "build a module↔entrypoint inventory" for the 4th occurrence. The 4th arrived — but the un-invoked thing was a **CI job**, i.e. the verifier itself, not a product module. No module inventory would have covered it. The honest answer reframed the rule as "a guard that does not run is indistinguishable from a guard that passes" and produced a different, correct guard.)*
 
 *(Third branch found chef-chopsky, 2026-08-23, on the same doc. Its next escalation was a **standing distribution audit** — "flag any closed-set value at zero occurrences." The new occurrence was the inversion of every prior one: a zero that meant **deliberately off** (a staged rollout with its flags `false`), misread as broken, which cost a filed issue and a reverted production write. Simulating the audit against that input was decisive: it would have flagged `cron_run_completed{app_env=production} = 0` and manufactured exactly that false alarm, on a schedule, forever. It was re-registered with a required three-bucket enablement join — zero-and-enabled, zero-and-disabled, zero-and-unknown — rather than dropped.)*
