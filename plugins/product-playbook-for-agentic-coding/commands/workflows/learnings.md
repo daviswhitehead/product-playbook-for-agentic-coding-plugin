@@ -150,6 +150,21 @@ If `/playbook:learnings` was invoked from `/playbook:close`, the close skill's P
 1. **Search for existing learnings docs**: `docs/learnings/*.md`, `docs/solutions/*.md`
 2. **Read YAML frontmatter** of each to understand categories, tags, and severity
 3. **Search for prior improvement ideas**: Look for `## Action Items` or `## Future Work` sections in prior learnings docs — these contain ideas that were documented but may never have been implemented
+
+   **On a doc that has grown addenda, read it back-to-front.** A recurring-pattern doc
+   accumulates dated addenda (this repo has one at seven), and the two things you need —
+   the **cumulative** rule-of-thumb table and the **re-registered escalation** — are at the
+   *end*, superseding everything above them. Reading forward means absorbing several
+   retired rules before reaching the live one. Navigate by structure, not by reading
+   linearly:
+
+   ```bash
+   grep -n '^## \|^### \|Next escalation' docs/learnings/<doc>.md | tail -20
+   ```
+
+   Then read the last addendum first. The escalation it registered is what the audit below
+   is about to test — and an earlier addendum's escalation may already have been retired by
+   a later one, so auditing the wrong one produces a confident, wrong verdict.
 4. **Build a "recurring patterns" list**: If the current project's themes (e.g., "CI churn", "testing gaps", "context loss") match tags or content from prior learnings, flag them:
 
 ```
