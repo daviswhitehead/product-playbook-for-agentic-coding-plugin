@@ -232,6 +232,16 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    should always be the most recent handoff for the workspace, not the most recently
    *written* one.
 
+   **The two `**Date**:` lines may be in different timezones.** Checkpoints are written by
+   sessions on different machines and harnesses; one prints local time, another UTC, and
+   neither says which. When the existing checkpoint's date is *later than your wall clock*
+   or within a couple of hours of it, treat the comparison as ambiguous and take the
+   conservative branch: write yours as the dated archive and leave `latest.md` alone. A
+   handoff filed under a dated name loses nothing; a clobbered newer handoff is gone.
+   *(chef-chopsky, 2026-09-16: `latest.md` on the target read `12:15` while the closing
+   session's clock read `08:31 EDT` — the same morning, unknowable which was newer. The
+   dated archive was the right call; guessing the timezone was not.)*
+
 5. Write to `docs/checkpoints/latest.md` using the session-checkpoint format:
 
 ```markdown
