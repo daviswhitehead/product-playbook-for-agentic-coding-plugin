@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.28.4] - 2026-09-16
+
+### Fixed
+- **`/playbook:close` — a checkpoint freshness comparison across timezones is ambiguous, so archive rather than clobber.** Phase 3's freshness check compares the existing `latest.md`'s `**Date**:` against the closing session's wall clock, but checkpoints are written by sessions on different machines and harnesses — one prints local time, another UTC, and neither says which. When the existing date is *later* than your clock or within a couple of hours of it, the comparison can't be resolved, so `close` now takes the conservative branch: write the dated archive and leave `latest.md` alone. A handoff filed under a dated name loses nothing; a clobbered newer handoff is gone. (chef-chopsky, 2026-09-16: the target's `latest.md` read `12:15` while the closing session's clock read `08:31 EDT` — same morning, unknowable which was newer.)
+
+### Changed
+- **design-critique: critique the real component when it already exists** — new Step 2b screenshots the implemented story headlessly at phone and desktop widths, presents the critique as a numbered list, and stops until the user picks; the loop (apply → re-screenshot → before/after) is the deliverable, not the document.
+- **close: Phase 2 no longer skips silently without a tasks doc** — it adds a dated status line to the project's status/action-plan doc, and edits the copy on the branch being committed to rather than the workspace branch's (which can carry an unmerged docs PR's version).
+- **learnings: path-scoped rules are a promotion target** — `.claude/rules/<topic>.md` with `paths:` frontmatter sits between CLAUDE.md and `docs/guides/` in the Track 1 decision tree; a paragraph-long technique is usually a one-argument script.
+
 ## [0.28.3] - 2026-09-14
 
 ### Added
