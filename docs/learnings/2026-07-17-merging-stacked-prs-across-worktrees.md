@@ -539,3 +539,126 @@ the run**, flag it in the plan, and say so in the final report.
 |---|---|
 | A queued PR edits the command doc you are running | Loaded instructions are pre-fix. Extract its behavioral change and hand-apply for this run; note it in the plan and report |
 | A command-doc fix merged and you expect it to be live | It is not, until version bump → install pull → next invocation. Four stages, not one |
+
+---
+
+## 2026-09-16 seventh-incident addendum — the rule this doc already had, in a place it never reached
+
+Seventh `/playbook:merge-prs` run on this repo. Three open PRs; **#105** and **#106** merged
+cleanly and released as **0.28.4**. The finding is **#104**, which should never have existed.
+
+### What happened
+
+#104 was queued **MERGE** by triage: complete diff, valid changeset, guard green, mine, no
+review threads. Every triage signal said ship it. After `git merge origin/main` in Step 5.2,
+its effective diff against `main` was *only* the changeset file — `close.md` on the branch had
+become byte-identical to main's blob. The content had shipped **weeks earlier as #101**
+(`bdfaa3d`), and the changeset body was already published verbatim at `CHANGELOG.md:38`.
+Merging would have added a second changeset duplicating a released entry while changing no code.
+
+It was caught **incidentally** — by reading a diff run for an unrelated reason. No step asked
+the question.
+
+### The mechanism: ancestry is not content, and squash-merge is where they diverge
+
+The squash commit on `main` shares no history with the branch it replaced. So every
+ancestry-shaped test reports a fully-landed branch as unmerged:
+
+| Test | On #104's head (`9ffd757`) | Truth |
+|---|---|---|
+| `git merge-base --is-ancestor 9ffd757 origin/main` | NOT ANCESTOR | content is 100% in main |
+| `git log --branches --remotes --not origin/main -- close.md` | lists it | " |
+| `gh pr view` / mergeability / CI | all green, looks like new work | " |
+| **content comparison of added lines vs `origin/main`** | **0 of 20 lines missing** | **correct** |
+
+### The part that makes this a process failure, not an accident
+
+**This doc already contains the rule.** The 2026-07-27 third addendum, §2 "Branch sweeps need
+a content check and an open-PR check", states it plainly — *"Branch looks unmerged → Check
+content — squash-merge discards ancestry."* It was written for **branch-deletion sweeps** and
+never propagated to the other two operations that ask the same question.
+
+Worse, the *upstream* cause is the same blind spot one command earlier. #104 was opened by a
+2026-09-16 `/playbook:learnings` **Step A2** pre-check, which prescribes exactly
+`git log --oneline --branches --remotes --not origin/main -- <file>` and reads its output as
+a verdict. Re-running that command on 2026-09-16 returns **four** commits for `close.md`:
+
+```
+476240e  improve(close): treat cross-timezone checkpoint dates as ambiguous
+a1cfb1f  improve(design-critique, close, learnings): critique the real component
+9ffd757  improve(close): install worktree deps, never symlink them
+75beacf  feat(close): org-deposit phase for agent-workforce repos
+```
+
+Checked by content, **all four are already in `main`** — a **4-of-4 false-positive rate**. The
+command that exists to catch stranded fixes was manufacturing phantom ones, and `merge-prs`
+triage had no check to catch what it manufactured.
+
+So the same defect appeared at two stages of one pipeline, and the fix for it had been sitting
+in this file for seven weeks.
+
+### Auditing the pre-registered escalation (per `/playbook:learnings`)
+
+The sixth addendum registered:
+
+> **Next escalation:** if a third occurrence lands — or any occurrence where running the
+> pre-fix rule actually costs something — stop treating this per-command. Generalize the
+> check to *any* PR in the queue that modifies a command or skill file the session has
+> invoked, and make the "apply it by hand" step a named, reported queue action.
+
+**Did it fire? No.** No PR in this queue edited `merge-prs.md` or `monitor-pr.md`; the Step 2
+check was run and returned clean. The trigger condition genuinely did not occur.
+
+**Would it have caught this one?** Simulated against this queue: the generalized check
+intersects each PR's changed files with *commands the session has invoked* — here
+`{merge-prs.md, monitor-pr.md}`. #104 changes `close.md`, which this session had not invoked
+at triage time. **It returns no hits, and #104 proceeds to MERGE.** So: no.
+
+**Would it have caused it? No** — orthogonal axis. The sixth addendum is about *when a fix
+arrives* (delivery latency); this is about *whether a fix is still needed* (landedness). Same
+family — "merge-prs triage missed something" — different mechanism.
+
+That distinction is the point the previous six addenda keep re-teaching: **a recurrence in the
+same family is not the same mechanism.** Executing the pre-registered escalation here would
+have produced a plausible-looking non-fix.
+
+### The fix
+
+Ship the content check as a **script**, not as prose in two places — per the rule #105 merged
+into `learnings.md` the same day ("a technique that took a paragraph is usually a script that
+takes one argument"):
+
+- **`scripts/content-landed.sh <ref> [base]`** — exit 0 if every line the ref added is already
+  present in the base, exit 1 if unique content remains. Treats `.changes/*.md` as *expected*
+  to be absent, since `release.sh` deletes changesets once consumed — without that carve-out
+  every merged PR looks unique.
+- **`merge-prs.md` Step 2** gains an already-on-`main` triage bullet. Verdict on exit 0 is
+  **SKIP**, not close — closing a PR remains an ESCALATE.
+- **`learnings.md` Step A2** now labels its `git log` a *candidate list*, requires a
+  per-candidate content confirmation, and adds a route for "already in main ⇒ not stranded".
+
+The script was verified in both directions before shipping: `9ffd757` and `476240e` → exit 0
+against `origin/main`; `476240e` → exit 1 against `bc6fbd7` (a base predating its merge);
+bad-ref and no-arg → exit 2. A checker that only ever says "landed" passes the positive tests
+alone, which is why the negative case was run.
+
+### Re-registered escalation
+
+> **Next escalation:** if a *fourth* operation turns out to ask "has this landed?" by ancestry,
+> stop patching call sites. The rule is not per-command — it is that **ancestry is never a
+> valid landedness test in a squash-merge repo**. Promote it to CLAUDE.md as a repo-level
+> invariant and add a guard that greps command docs for the ancestry idioms
+> (`--is-ancestor`, `--not origin/main`, `branch --merged`) used without an adjacent content
+> check. Signal to watch for: any report describing a "stranded" or "unmerged" fix that turns
+> out to be live.
+
+### Updated rule of thumb (cumulative)
+
+| Signal | Response |
+|---|---|
+| A queued PR edits the command doc you are running | Loaded instructions are pre-fix. Hand-apply its change for this run; note it in plan and report |
+| A command-doc fix merged and you expect it to be live | It is not, until version bump → install pull → next invocation. Four stages, not one |
+| **Any question of the form "did this land?"** | **Answer by content, never by ancestry — squash-merge discards ancestry. `--is-ancestor`, `--not origin/main`, and `branch --merged` are all candidate generators, not verdicts** |
+| **A PR looks like complete, unmerged new work** | **Confirm against `main` by content before queueing it. Metadata cannot see a squash-merged duplicate** |
+| **A changeset is the only file left in a PR's diff vs main** | **The content already landed. SKIP; do not close (ESCALATE)** |
+| **A tool reports a fix as "stranded" / "never merged"** | **Verify before acting. Measured false-positive rate of the ancestry form on this repo: 4 of 4** |

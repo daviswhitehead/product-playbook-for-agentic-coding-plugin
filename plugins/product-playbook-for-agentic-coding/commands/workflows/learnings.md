@@ -754,11 +754,35 @@ gh pr list --state open --json number,title,headRefName    # open PRs touching t
 git status --short                                          # uncommitted WIP in the checkout
 ```
 
+**That `git log` is a CANDIDATE list, not a verdict — confirm every hit by content before
+acting on it.** `--not origin/main` is an ancestry test, and squash-merge destroys ancestry:
+the squash commit on `main` shares no history with the branch it replaced, so a fix that
+landed weeks ago still prints here, indistinguishable from one that never shipped. Acting on
+the raw list means opening a PR to re-deliver content that is already live.
+
+```bash
+scripts/content-landed.sh <sha>     # exit 0 = already in main; exit 1 = genuinely unique
+```
+
+Run it on **each** candidate. Absent such a script, diff the commit's added lines against the
+base branch's copy of the same file — and note that a missing `.changes/*.md` proves nothing,
+since `release.sh` deletes changesets once consumed.
+
+*(Measured on this plugin, 2026-09-16: the `git log` above returned **four** commits for
+`close.md`; all four were already in `main` by content — a 4-of-4 false-positive rate. The
+un-audited list had already produced PR #104, re-delivering a fix that shipped as #101, which
+then consumed a slot in a `/playbook:merge-prs` queue and was caught only incidentally. Same
+mechanism the 2026-07-27 branch-sweep addendum documented: "compare file contents, not
+ancestry." It simply never propagated here.)*
+
 Route on what you find:
 - **Open PR already fixes it** → do NOT write a duplicate. Comment on that PR with this
   session's independent reproduction (a second real occurrence is the strongest possible
   argument for merging it) and report the PR to the user as the action item.
-- **Fixed on an unmerged/unpushed branch with no PR** → open the PR; that is the missing step.
+- **A candidate whose content is already in `main`** → it is **not** stranded; squash-merge
+  merely hid it. Do nothing, and do not open a PR for it.
+- **Fixed on an unmerged/unpushed branch with no PR, content genuinely absent from `main`** →
+  open the PR; that is the missing step.
 - **Uncommitted WIP in the plugin checkout** → surface it, don't commit it — it is likely
   another session's in-flight work. Note it as at-risk.
 - **Nothing exists** → proceed to Step B.

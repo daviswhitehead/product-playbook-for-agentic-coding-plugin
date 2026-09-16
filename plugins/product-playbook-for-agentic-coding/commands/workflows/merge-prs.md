@@ -161,6 +161,33 @@ Assess, and **write down the reasoning** — it goes in the plan:
   close is an ESCALATE unless the user's invocation covers it. *(chef-chopsky 2026-08-15:
   #537/#589 were byte-identical deliveries of the same item, 7 days apart; the size
   columns in `gh pr list` were the tell.)*
+- **Already-on-`main` detection — the duplicate the check above cannot see.** The rule
+  above compares open PRs *to each other*. A PR can equally duplicate content that already
+  **merged**, and under squash-merge nothing in the PR's metadata says so: the branch shares
+  no history with the squash commit that replaced it, so ancestry, `gh pr view`, and the
+  diff-vs-fork-point all present it as unmerged new work. Judge on content:
+
+  ```bash
+  scripts/content-landed.sh origin/<headRefName>     # exit 0 = adds nothing main lacks
+  ```
+
+  Exit 0 ⇒ **SKIP**. Merging it would land a changeset duplicating an already-released
+  CHANGELOG entry while changing no code. Do **not** close it — closing a PR is an
+  ESCALATE (see the rule above); comment with the evidence and leave the call to a human.
+
+  If the repo has no such script, the same signal falls out of Step 5.2 for free — after
+  `git merge origin/main`, run `git diff --name-only origin/main...HEAD`. **If the only
+  remaining file is a changeset (or the diff is empty), the content already landed.** That
+  is the cheap version and it costs nothing, but it fires *mid-merge* rather than at triage,
+  so prefer the content check here where the verdict still belongs in the plan.
+
+  *(This repo, 2026-09-16: #104 was queued MERGE, and only the post-merge diff revealed its
+  `close.md` blob had become byte-identical to main's — the same content had shipped as #101
+  weeks earlier. It reached the queue because `/playbook:learnings` Step A2 had flagged it as
+  a "stranded unpushed fix" using the same ancestry blind spot; that command's own content
+  check now closes the loop upstream. Note this is the third operation to need this rule —
+  branch sweeps got it 2026-07-27, PR triage here, learnings Step A2 the same day. Squash-merge
+  defeats ancestry **everywhere**; assume any "has this landed?" question needs content.)*
 
 Classify each as exactly one of:
 

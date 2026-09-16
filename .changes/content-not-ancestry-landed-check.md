@@ -1,0 +1,10 @@
+---
+plugin: product-playbook-for-agentic-coding
+bump: patch
+---
+
+### Fixed
+- **`/playbook:learnings` Step A2 and `/playbook:merge-prs` Step 2 no longer mistake squash-merged work for unmerged work.** Both asked "has this landed?" with an ancestry test, and squash-merge destroys ancestry — the squash commit on `main` shares no history with the branch it replaced, so a fix that shipped weeks ago still prints as stranded. Measured on this repo 2026-09-16: Step A2's prescribed `git log --branches --remotes --not origin/main` returned four commits for `close.md`, **all four already in `main` by content** — a 4-of-4 false-positive rate. That list had already produced a PR re-delivering a live fix (#104 duplicating #101), which then consumed a slot in a merge queue and was caught only incidentally, after the merge diff happened to be read. Step A2 now labels its `git log` a *candidate list* requiring per-candidate content confirmation, and adds a "content already in main ⇒ not stranded, open nothing" route. `merge-prs` triage gains an already-on-`main` duplicate check whose verdict is SKIP (never close — closing a PR stays an ESCALATE), plus the free mid-merge tell: if a changeset is the only file left in the diff against `main`, the content already landed. The rule itself is not new — the repo's own 2026-07-27 learnings addendum established "compare file contents, not ancestry" for branch sweeps; it had simply never propagated to the two commands that ask the same question.
+
+### Added
+- **`scripts/content-landed.sh <ref> [base]`** — the above as one executable check rather than prose duplicated across two command docs. Exit 0 when every line the ref added is already present in the base, 1 when unique content remains, 2 on bad input. Treats `.changes/*.md` as expected-absent, since `release.sh` deletes changesets once consumed — without that carve-out every merged PR reads as unique. Verified in both directions before shipping, including the negative case a always-says-landed checker would pass.
