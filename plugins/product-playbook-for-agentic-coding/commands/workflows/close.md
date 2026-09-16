@@ -146,7 +146,9 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    - Scan for stale tasks (blocked with no recent activity). Propose deletion or deferral.
    - Note pending tasks as carryover.
    - Show a brief summary: "X completed, Y carried forward, Z stale."
-3. If no tasks document found: skip silently.
+3. If no tasks document found, **look for the project's status or action-plan doc before skipping** — `projects/*/**/README.md`, `*-action-plan.md`, `*-status.md`, or the doc the session's PR body cites. Most projects that outgrew a tasks list track state there, and a merged PR that leaves the plan reading "awaiting founder walkthrough" is the stale-doc tax the next session pays. Add a dated status line (what shipped, PR/commit, what it pre-empts) rather than rewriting the plan. If there is genuinely nothing: skip silently.
+
+4. **Edit the copy on the branch you are committing to.** In a shared workspace the checked-out branch may carry an unmerged docs PR whose version of the plan differs from the target's. Match text against the file on your close-out branch (`git show origin/<target>:<path>` before editing), or the replacement silently fails to match — or worse, matches a line that will conflict when the other PR merges. *(chef-chopsky, 2026-09-16: the Step-2 status line the close-out tried to replace existed only on the workspace branch's open PR #936; the production copy had no such line, so the edit was re-aimed at a dated status note under the step heading.)*
 
 ## Phase 3: Handoff Context
 

@@ -691,7 +691,7 @@ CLAUDE.md is currently at <N> chars / <L> lines (over the 16k-char/200-line soft
 
 I have three options for this finding:
 1. **Trim first** — apply the demotion checklist above, then add the new content (estimated ~10 min of doc surgery)
-2. **Defer to docs/guides/** — write the finding as `docs/guides/[topic].md`; rely on grep-discovery instead of CLAUDE.md (zero CLAUDE.md cost, but the agent has to find it on its own)
+2. **Defer to a path-scoped rule or docs/guides/** — a `.claude/rules/<topic>.md` with `paths:` frontmatter if the finding only matters when a certain file type is open (zero CLAUDE.md cost, still loads automatically at the point of use); otherwise `docs/guides/[topic].md` and rely on grep-discovery
 3. **Skip** — the finding isn't important enough to warrant either option
 
 My recommendation: [option] because [rationale tying to finding severity + CLAUDE.md current state].
@@ -706,9 +706,10 @@ The recipes retrospective (2026-03-16) and the memory-phase-2 2c.5–2c.8 close-
 For each finding tagged `codebase` or `both`, route using this decision tree:
 
 1. **Broadly applicable gotcha or rule?** → CLAUDE.md (Known Issues or Architecture section)
-2. **Specific to one subsystem** (workflows, agent, frontend)? → Subsystem README or `docs/guides/`
-3. **Should be enforced in code?** → Lint rule, pre-commit hook, or script check
-4. **One-time fix?** → Just do it (no documentation needed)
+2. **Only matters when a certain kind of file is open** (a spec, a migration, a UI component, an auth file)? → a **path-scoped rules file** — `.claude/rules/<topic>.md` with `paths:` frontmatter — if the repo has them. It loads at the point of use and costs CLAUDE.md nothing, which usually beats both a CLAUDE.md line (always loaded, rarely relevant) and `docs/guides/` (never loaded unless grepped). Check `.claude/rules/` (or `.claude/README.md`) for the convention before defaulting to a guide.
+3. **Specific to one subsystem** (workflows, agent, frontend) and not tied to a file pattern? → Subsystem README or `docs/guides/`
+4. **Should be enforced in code?** → Lint rule, pre-commit hook, or script check. **A technique that took a paragraph to explain is usually a script that takes one argument** — ship the script and let the doc point at it (chef-chopsky, 2026-09-16: "map the spec to its Playwright shard" became `scripts/e2e-shard-of.sh`; the addendum shrank to a table row).
+5. **One-time fix?** → Just do it (no documentation needed)
 
 **Present a single batch summary:**
 
