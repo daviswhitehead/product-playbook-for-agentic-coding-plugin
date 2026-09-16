@@ -86,6 +86,31 @@ Help the user organize their visual materials:
 3. Recommend saving images in the project directory
 4. Keep track of what each image shows for documentation
 
+### Step 2b: When the design is already implemented, critique the real component
+
+A critique of a mockup and a critique of shipped code are different jobs. If the surface
+under review already exists in the codebase (a PR is open, a story renders it), do not ask
+for screenshots and do not critique the prototype image — **screenshot the real component
+yourself**, at the widths that matter, and critique that:
+
+1. Find the story (`curl -s localhost:6006/index.json` in a Storybook project) or the live
+   route. Prefer the story: it isolates the component and re-renders in seconds.
+2. Screenshot headlessly at phone and desktop widths (a `@playwright/test` script against
+   `/iframe.html?id=<story>&viewMode=story`; wait on a testid, not `networkidle`). If the repo
+   has a screenshot script, use it. Chrome/Playwright MCP tools may be unavailable or
+   un-resizable in a shared session — a headless script works regardless.
+3. Drive the live app only when the surface depends on real state (e.g. a gate that appears
+   after N sends), and say which one each screenshot came from.
+4. **Present the critique as a numbered list of ideas and stop.** Do not apply any of them
+   until the user picks. Taste work is the user's call; the critique's job is to make the
+   choice cheap. After approval, apply the chosen items in one round, re-screenshot, and
+   present the before/after — the loop, not the document, is the deliverable.
+
+*(chef-chopsky, 2026-09-15: three founder rounds on a gate sheet ran this way — ~10 s per
+screenshot round, six of seven critique items taken, one rejected before any code moved.
+The existing Step 2 would have asked the founder for screenshots of a component the agent
+could render itself.)*
+
 ### Step 3: Create the Critique Document
 
 Create a design critique document in the project folder (e.g., `projects/[project-name]/design-critique.md`) with:
