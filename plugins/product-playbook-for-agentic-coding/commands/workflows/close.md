@@ -74,8 +74,11 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
 
 2. Run `git status`.
 3. If there are uncommitted changes:
-   - Show a brief summary (files changed, not full diffs)
-   - Offer to commit. If the user approves, draft a commit message and commit.
+   - **First, sort them by author: this session's, or not.** Compare each changed path against the files this session actually wrote. In a shared workspace (Conductor, worktrees), another agent can edit files **on the same branch** while you work. Case (b) above doesn't fire because the branch never changed, yet the tree holds work that isn't yours.
+   - Changes that aren't yours: **leave them exactly as found.** Don't commit, stage, revert or stash them. The stash stack is shared across worktrees, so stashing another agent's work can hand it to someone else's `stash pop`. From here on, stage your own files by explicit path, and name the foreign paths in the Phase 5 summary.
+   - For your own changes: show a brief summary (files changed, not full diffs) and offer to commit. If the user approves, draft a commit message and commit.
+
+   *(chef-chopsky, 2026-09-24: at close-out, `workflows/TEAM.md` and `CHARTER-template.md` carried a 26-line "Levels and promotion" policy this session never wrote, on its own branch, mid-edit by a parallel agent. "Offer to commit" would have swept it into a PR about something else.)*
 4. If the working tree is clean: skip silently.
 
 5. **Stash check (do even when the working tree is clean and every commit is pushed).** A branch can have every commit in its PR yet still have work hiding in a `git stash` that vanishes when the worktree/branch is archived. "All commits pushed" ≠ "everything is safe." Run `git stash list` and look for entries whose label references the branch being closed (`stash@{N}: On <branch>: ...` or `WIP on <branch>: ...`).
@@ -347,6 +350,15 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    **Never bypass with `--no-verify` here.** The hook failing for an environmental reason
    is not permission to skip it — the checkpoint commit is exactly the commit where a
    silently-skipped gate is least likely to be noticed. Fix the environment, then commit.
+
+   **The environment includes local services, not just `node_modules`.** A hook's "unit" suite
+   may still reach a local database or emulator. When it fails with a connection error aimed at
+   `localhost`/`127.0.0.1` (`ECONNREFUSED`, `fetch failed`, `AuthRetryableFetchError`), start
+   that service (for example Docker, then `supabase start`) and commit again. Start shared
+   services freely, but never *stop* one to test a theory: other worktrees may be using it.
+   *(chef-chopsky, 2026-09-24: after `npm ci`, a docs-only commit still failed on
+   `persistence.test.ts` because Docker was off. The repo now has a preflight that says so in
+   one line.)*
 
    **Do not decide `-f` vs plain `add` from a tracked-ness check you ran earlier in this
    phase — step 4 invalidates it.** `latest.md` is normally *tracked*, so an early

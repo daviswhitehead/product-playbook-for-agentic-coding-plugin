@@ -1026,6 +1026,14 @@ For each systemic finding (especially from deep analysis), check if it should in
 
 **How to apply**: Don't just note "we should do X next time" — actually edit the template so the next project starts with the improved structure. Add template changes to the plugin PR (Step 9.3).
 
+#### 9.6: Refresh the Checkpoint If One Was Written Before This Retro
+
+`/playbook:close` writes `docs/checkpoints/latest.md` in Phase 3 and runs this workflow in Phase 4. So whenever learnings runs from close, or right after it, the handoff **predates everything this retro shipped**: the plugin PRs, the guards, the issues it filed. The next session reads a checkpoint that is wrong on the day it was written.
+
+If a checkpoint from this session exists, append this retro's outputs to its **Done this session** / **Next Steps** before finishing, and commit that with the retro's own commit, not as a separate one.
+
+*(chef-chopsky, 2026-09-24: close wrote the checkpoint, then learnings shipped a pre-commit guard and plugin PR #110. The handoff listed neither.)*
+
 ### Step 10: Improve This Workflow (Meta-Retrospective) — MANDATORY
 
 > **This step is MANDATORY and must ALWAYS be the final step. Never skip it. Never forget it.** The learnings workflow itself is a product. Every time you run it, you discover gaps between what the skill prescribes and what actually works. This step closes the loop — the retrospective retrospectes on itself.
