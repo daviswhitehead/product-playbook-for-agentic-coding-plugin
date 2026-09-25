@@ -203,6 +203,7 @@ by many plugins in Anthropic's official marketplace.
 | `session-checkpoint` | Patterns for session checkpoint and context preservation |
 | `user-journey-testing` | Patterns for user journey testing and validation |
 | `chat-insights` | Patterns for analyzing chat sessions to extract product insights |
+| `video-evidence` | Turn videos (frames + transcript via `/watch`) and session replays (metadata → events → console logs) into citable evidence |
 
 ## Hooks & Checks
 

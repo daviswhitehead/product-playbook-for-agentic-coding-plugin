@@ -101,6 +101,10 @@ Use Agent Browser CLI or Playwright MCP to walk through each step:
 4. After all steps pass: compile evidence report
 ```
 
+### Seeding Journeys from Real Sessions
+
+The journeys worth testing are the ones real users actually take. When session replays exist, mine a few recent ones (see the `video-evidence` skill: metadata → event timeline → console logs) for the paths people take and the places they stall. Then turn those into journey definitions. A replay with console errors on a path your journeys don't cover is a missing journey.
+
 ### The Autonomous Testing Prompt
 
 At major milestones, use this pattern:
