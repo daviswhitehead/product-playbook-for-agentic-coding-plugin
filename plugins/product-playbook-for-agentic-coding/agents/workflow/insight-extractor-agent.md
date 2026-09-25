@@ -35,6 +35,7 @@ Execute a comprehensive search strategy:
    - Note file types (interview notes, research, meeting notes)
    - Identify the most promising sources
    ```
+   Video sources (URLs, recordings, session replays) need converting first. Use the `video-evidence` skill, and cite timestamps (`video-url [04:12]`) in place of line numbers.
 
 2. **Keyword search**:
    - Search for insight indicators: "idea", "insight", "opportunity", "finding", "pattern", "observation", "hypothesis", "concern", "risk", "suggestion"
