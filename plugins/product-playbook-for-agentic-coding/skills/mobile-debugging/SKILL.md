@@ -26,18 +26,19 @@ Real case (chef-chopsky, 2026-07): an "Android Chrome rendering bug" — raw SEO
 
 Only proceed to the sections below once the bug reproduces **exclusively** on real mobile devices or mobile-emulated viewports.
 
-## Critical Insight: Real Devices Required
+## Critical Insight: Desktop Emulation Is Not Enough
 
 **Many mobile bugs cannot be reproduced in:**
 - Browser developer tools device emulation
-- Playwright/Puppeteer automated tests
-- iOS Simulator or Android Emulator
+- Playwright/Puppeteer automated tests (including Playwright WebKit: it has no on-screen keyboard)
 
-**Always test on real physical devices** for:
-- Keyboard viewport resizing
-- Overscroll/bounce behavior
-- Touch gesture nuances
-- Safari-specific viewport handling
+**The iOS Simulator is a real step up.** It runs the real Safari engine and the real on-screen keyboard, and an agent can drive it with real taps. Use the `ios-simulator-testing` skill for keyboard appearance, the `focus()` gesture rule, and Safari viewport questions before asking a human for a phone. (An earlier version of this skill said the Simulator could not reproduce keyboard behavior. Measured on iOS 27.0, it does.)
+
+**A physical device is still the last word** for:
+- Older iOS versions and installed home-screen web apps
+- Overscroll/bounce feel and touch gesture nuances
+- Android Chrome (the Simulator is iOS only)
+- Performance
 
 ### Testing Setup Recommendations
 

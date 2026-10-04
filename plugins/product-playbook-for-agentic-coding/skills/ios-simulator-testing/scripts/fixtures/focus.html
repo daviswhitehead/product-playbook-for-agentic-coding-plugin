@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Focus spike</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; font: 16px -apple-system, system-ui, sans-serif; background: #f6f1ea; color: #2b2420; }
+  main { padding: 12px; padding-bottom: 260px; }
+  h1 { font-size: 18px; margin: 4px 0 8px; }
+  p.note { font-size: 13px; margin: 0 0 12px; color: #6b5d52; }
+  button { font: inherit; display: block; width: 100%; text-align: left; margin: 6px 0; padding: 12px; border-radius: 10px; border: 1px solid #c9b9a8; background: #fff; }
+  button b { display: inline-block; min-width: 1.6em; }
+  #log { font: 12px ui-monospace, monospace; white-space: pre-wrap; background: #fff; border: 1px solid #ddd; padding: 8px; border-radius: 8px; min-height: 60px; }
+  /* Fake chat panel: display:none while closed, like a typical mobile overlay. */
+  #panel { position: fixed; inset: 0; background: #fffaf4; display: none; flex-direction: column; z-index: 50; }
+  #panel.open { display: flex; }
+  #panel header { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px solid #e3d8cc; }
+  #panel header button { width: auto; margin: 0; padding: 6px 12px; }
+  #panel .spacer { flex: 1; padding: 12px; font-size: 13px; color: #6b5d52; }
+  #composer { margin: 12px; padding: 10px; font: 16px -apple-system, system-ui, sans-serif; border-radius: 12px; border: 1px solid #c9b9a8; min-height: 48px; resize: none; }
+  /* Fake bottom sheet: a plain portal-style div, not a dialog. */
+  #sheet { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-radius: 16px 16px 0 0; box-shadow: 0 -4px 20px rgba(0,0,0,.15); padding: 12px; display: none; z-index: 60; }
+  #sheet.open { display: block; }
+  #proxy { position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0; font-size: 16px; border: 0; padding: 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>iOS focus fixture</h1>
+  <p class="note">Each button opens a fake chat panel. Watch whether the keyboard comes up, and whether the right text is selected. Tap "Close" in the panel to reset. The log at the bottom shows what the page thinks happened.</p>
+
+  <button id="t1"><b>1</b> Sync focus in tap handler (the fix)</button>
+  <button id="t2"><b>2</b> Focus after 100ms setTimeout (today's code)</button>
+  <button id="t3"><b>3</b> Slot chip: "Scale this for 4", select "4"</button>
+  <button id="t4"><b>4</b> Open chip: "I want a recipe for", cursor at end</button>
+  <button id="t5"><b>5</b> Proxy input, then move focus 400ms later (fallback)</button>
+  <button id="t6"><b>6</b> Open fake sheet, tap chip inside it</button>
+  <button id="t7"><b>7</b> Same as 6, but sheet restores focus to opener on close (the hazard)</button>
+  <button id="t8"><b>8</b> Slot chip, selection set in setTimeout(0) after sync focus</button>
+
+  <div id="log"></div>
+</main>
+
+<input id="proxy" aria-hidden="true" tabindex="-1" autocomplete="off">
+
+<section id="panel" aria-label="Chat">
+  <header><strong>Chat</strong><button id="close">Close</button></header>
+  <div class="spacer">Fake messages area.</div>
+  <textarea id="composer" rows="1" placeholder="Message..." autocomplete="off"></textarea>
+</section>
+
+<div id="sheet" role="presentation">
+  <div style="font-size:13px;color:#6b5d52;margin-bottom:6px">Fake sheet</div>
+  <button id="sheetChat">Chat</button>
+  <button id="sheetSlot">Scale this for <u>4</u></button>
+  <button id="sheetOpen">I want a recipe for…</button>
+</div>
+
+<script>
+  var panel = document.getElementById('panel');
+  var composer = document.getElementById('composer');
+  var proxy = document.getElementById('proxy');
+  var sheet = document.getElementById('sheet');
+  var logEl = document.getElementById('log');
+  var restoreOnClose = false;
+  var sheetOpener = null;
+
+  function log(label) {
+    var a = document.activeElement;
+    var name = a ? (a.id || a.tagName.toLowerCase()) : 'none';
+    var sel = composer.selectionStart + '-' + composer.selectionEnd;
+    var line = label + ' | active=' + name + ' | sel=' + sel + ' | value="' + composer.value + '"';
+    logEl.textContent = line + '\n' + logEl.textContent;
+    window.__last = { label: label, active: name, start: composer.selectionStart, end: composer.selectionEnd, value: composer.value };
+  }
+
+  function openPanel() { panel.classList.add('open'); }
+
+  function prefill(text, start, end) {
+    composer.value = text;
+    composer.focus({ preventScroll: true });
+    composer.setSelectionRange(start, end);
+  }
+
+  function selectWord(text, word) {
+    var i = text.lastIndexOf(word);
+    return [i, i + word.length];
+  }
+
+  document.getElementById('close').addEventListener('click', function () {
+    composer.blur();
+    composer.value = '';
+    panel.classList.remove('open');
+    log('closed');
+  });
+
+  // 1. Synchronous: show panel and focus in the same handler.
+  document.getElementById('t1').addEventListener('click', function () {
+    openPanel();
+    composer.focus({ preventScroll: true });
+    log('1 sync focus');
+  });
+
+  // 2. Today's pattern: open, then focus 100ms later.
+  document.getElementById('t2').addEventListener('click', function () {
+    openPanel();
+    setTimeout(function () { composer.focus(); log('2 focus after 100ms'); }, 100);
+  });
+
+  // 3. Slot chip: prefill + select the guessed word, all synchronous.
+  document.getElementById('t3').addEventListener('click', function () {
+    var text = 'Scale this for 4';
+    var r = selectWord(text, '4');
+    openPanel();
+    prefill(text, r[0], r[1]);
+    log('3 slot sync');
+  });
+
+  // 4. Open chip: prefill, caret at end.
+  document.getElementById('t4').addEventListener('click', function () {
+    var text = 'I want a recipe for ';
+    openPanel();
+    prefill(text, text.length, text.length);
+    log('4 open sync');
+  });
+
+  // 5. Fallback: real composer "not mounted yet". Focus a proxy input now,
+  //    then move focus to the composer once it exists (400ms later).
+  document.getElementById('t5').addEventListener('click', function () {
+    proxy.focus({ preventScroll: true });
+    log('5a proxy focused');
+    setTimeout(function () {
+      var text = 'Scale this for 4';
+      var r = selectWord(text, '4');
+      openPanel();
+      prefill(text, r[0], r[1]);
+      log('5b moved to composer');
+    }, 400);
+  });
+
+  function openSheet(withRestore) {
+    return function (e) {
+      restoreOnClose = withRestore;
+      sheetOpener = e.currentTarget;
+      sheet.classList.add('open');
+      log(withRestore ? '7 sheet open (restores focus)' : '6 sheet open');
+    };
+  }
+  document.getElementById('t6').addEventListener('click', openSheet(false));
+  document.getElementById('t7').addEventListener('click', openSheet(true));
+
+  function closeSheet() {
+    sheet.classList.remove('open');
+    if (restoreOnClose && sheetOpener) {
+      // Mirrors a focus trap that restores focus in an effect cleanup after commit.
+      var opener = sheetOpener;
+      setTimeout(function () { opener.focus(); log('sheet restored focus to opener'); }, 0);
+    }
+  }
+
+  document.getElementById('sheetChat').addEventListener('click', function () {
+    closeSheet();
+    openPanel();
+    composer.focus({ preventScroll: true });
+    log('sheet Chat row');
+  });
+  document.getElementById('sheetSlot').addEventListener('click', function () {
+    var text = 'Scale this for 4';
+    var r = selectWord(text, '4');
+    closeSheet();
+    openPanel();
+    prefill(text, r[0], r[1]);
+    log('sheet slot chip');
+  });
+  document.getElementById('sheetOpen').addEventListener('click', function () {
+    var text = 'I want a recipe for ';
+    closeSheet();
+    openPanel();
+    prefill(text, text.length, text.length);
+    log('sheet open chip');
+  });
+
+  // 8. Belt and braces: sync focus, re-apply the selection after a tick.
+  document.getElementById('t8').addEventListener('click', function () {
+    var text = 'Scale this for 4';
+    var r = selectWord(text, '4');
+    openPanel();
+    prefill(text, r[0], r[1]);
+    setTimeout(function () { composer.setSelectionRange(r[0], r[1]); log('8 selection re-applied'); }, 0);
+    log('8 slot sync');
+  });
+
+  log('ready');
+</script>
+</body>
+</html>
