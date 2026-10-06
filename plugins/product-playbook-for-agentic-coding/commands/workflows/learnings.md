@@ -283,6 +283,21 @@ git log --format='%H %cI %s' <ref>
 git reflog --date=iso <ref>
 ```
 
+**For "broken since X" claims, the window is an intersection.** A regression that needs both a
+dependency version and a runtime configuration started when the **later** of the two landed.
+Check both histories, not just commits to the code you suspect:
+
+```bash
+# when did dependency D reach the suspect version? (run under bash: zsh reads `$c:path` as a modifier)
+bash -c 'for c in $(git log --format=%h -- <lockfile>); do echo "$(git show -s --format=%cs $c) $c $(git show "${c}:<lockfile>" | grep -A2 "\"node_modules/<D>\"" | grep -m1 version)"; done'
+# when did the deploy/start config change? (railway.toml, Procfile, Dockerfile CMD, package.json start)
+git log --format='%h %cs %s' -- <deploy-config files>
+```
+
+*(chef-chopsky, 2026-10-06: Sentry 10.38 had been in the lockfile since February, but the
+`--import` preload only reached the production start command on 2026-07-28. The window was
+7/28 onward, and that date tied the regression to the earlier fix that added the preload.)*
+
 If the timeline contradicts the remembered story, **say so in the addendum and correct the
 user if you already told them the wrong version.** If the timeline narrows the cause but
 does not pin it, record the verified part and mark the rest unresolved — an addendum that
