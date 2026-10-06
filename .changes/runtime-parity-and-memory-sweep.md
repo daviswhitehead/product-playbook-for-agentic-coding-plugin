@@ -1,0 +1,8 @@
+---
+plugin: product-playbook-for-agentic-coding
+bump: patch
+---
+
+### Improved
+- **debug: the execution context includes how the process is started.** Reproduce with the production start command, preloads/instrumentation and behavior-changing flags, not `tsx`/`next dev`/the test runner. A fix that changes how a process boots is a runtime change: re-verify primary behavior under it. Found when Sentry's `--import` preload silently broke chat streaming, usage and tracing in production for ten weeks while every local run and test was green (chef-chopsky, 2026-10-06).
+- **learnings: escalation audits also ask whether an earlier occurrence's fix caused this one**, since a guard that requires a configuration locks in its side effects. A new pre-promotion step sweeps the agent's private memory for team-relevant gotchas that would otherwise never reach shared docs.

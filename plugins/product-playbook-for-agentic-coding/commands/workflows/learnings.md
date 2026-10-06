@@ -249,6 +249,15 @@ Ask explicitly: *would the pre-registered escalation have caught this one?*
 - **No** → say so *in the addendum*, name the sub-species that escapes it, and design the fix for the mechanism actually seen. Then re-register a sharpened escalation.
 - **Worse than no — it would have *caused* this occurrence** → the most important answer, and the easiest to miss, because it looks like "no" until you actually simulate the fix. Do not merely skip it: **state that executing it would have produced this incident**, and re-register it with the missing guard built in. A pre-registered fix that generates the failure it was meant to catch will be muted within weeks of shipping and then ignored — strictly worse than never building it.
 
+**Also ask whether an earlier occurrence's *fix* caused this one.** A fix that adds a guard
+*requiring* some configuration (a preload, a flag, a start command) also locks in every side
+effect of that configuration. If this occurrence lives in what an earlier fix installed, say
+so explicitly. The guard is now enforcing the cause, and the new rule must cover verifying
+primary behavior under the configuration, not only the configuration's presence. *(chef-chopsky,
+2026-10-06: occurrence 3, "Sentry blind in prod", was fixed by restoring Sentry's `--import`
+preload and adding a test requiring it. That preload caused occurrence 7: chat streaming, token
+usage and tracing broken in production for ten weeks.)*
+
 Before writing "yes", **run the pre-registered fix against the current occurrence in your head and say what it would output.** "Would it have caught this?" is easy to answer optimistically in the abstract; "what exactly does it print on this input?" is not. That simulation is what separates the three branches.
 
 Answering "no" out loud is the high-value move: it's the difference between a fix aimed at the real cause and one aimed at the last three incidents. Note the family/mechanism split explicitly in the addendum so the next reader inherits the distinction rather than re-deriving it.
@@ -715,6 +724,24 @@ My recommendation: [option] because [rationale tying to finding severity + CLAUD
 The recipes retrospective (2026-03-16) and the memory-phase-2 2c.5–2c.8 close-out (2026-05-18) both hit this case. Silent choice in either direction loses information — surfacing it lets the user weigh CLAUDE.md hygiene against discoverability for the specific finding.
 
 ---
+
+#### Pre-Promotion: Sweep the Agent's Private Memory
+
+Gotchas found mid-session often go first into the agent's **private** memory (e.g. Claude Code's
+auto-memory directory), because that is the fast, in-flow place to write them. Private memory is
+invisible to teammates, other agents and other machines, so a team-relevant gotcha that only
+lives there will be re-learned by everyone else. Before promoting:
+
+1. List the memory files this session created or modified (check their `modified` dates, or
+   diff the memory index against its state at session start).
+2. For each entry ask: **would another person or agent working in this repo hit this?** If yes,
+   route it through Track 1 like any other finding, and keep the memory entry as a pointer.
+   If it is truly personal (user preferences, machine-local state), leave it.
+
+*(chef-chopsky, 2026-10-06: zsh word-splitting traps that produced a fake "Doppler 403", Doppler's
+`PORT` overriding the caller's, and CI passing unset secrets as empty strings were all saved only
+to private memory during the session. The retro promoted them to `agent-platform-quirks.md` and
+`ci-pr-workflow.md` only because this sweep was done by hand.)*
 
 #### Track 1: Codebase Promotion
 
