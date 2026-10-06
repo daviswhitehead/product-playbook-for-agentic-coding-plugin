@@ -140,6 +140,16 @@ If a solution exists, apply it. If not, continue with investigation.
      false-pass. A fix "verified" only in a simulation is unverified. (Found 2026-07:
      a Claude CLI keychain failure under cron passed every GUI-shell test for weeks;
      a real-cron test reproduced it in one minute.)
+   - **The execution context includes how the process is *started*.** Production's
+     start command, preloads and instrumentation (`node --import <apm>.js`, `-r dd-trace`,
+     OTel/Sentry agents), and behavior-changing env flags (tracing on, APM enabled) make it
+     a different program from `tsx`/`ts-node`, `next dev`/`vite`, or the test runner. Before
+     concluding "can't reproduce", boot the **built** artifact with the **exact** production
+     start command (read it from the deploy config, e.g. `railway.toml`/`Procfile`/the
+     `start` script) with the same flags enabled. (Found 2026-10-06, chef-chopsky: chat
+     streaming, token usage and tracing were broken in production for ten weeks and
+     correct in every local run and test. The cause was Sentry's `--import` preload,
+     which only the production start command loads.)
 
 2. **Verify It's Actually a Problem**:
    - Is this expected behavior?
@@ -285,6 +295,20 @@ and verify *that* against the pre-fix code too.
 
 This generalizes the negative-testing rule in the `autonomous-execution` skill (which covers
 guards and CI checks) to the far more common case: the regression test attached to a bug fix.
+
+#### A fix that changes how the process boots is a runtime change: verify primary behavior under it
+
+If the fix adds or changes instrumentation (APM/Sentry/OTel), a preload (`--import`, `-r`),
+or the start command, the risk is no longer the bug you fixed. It is every other behavior of
+the process under the new runtime. Verify the instrumentation works **and** re-verify the
+process's primary behavior (its main request path, end to end) under the production start
+command. Then add a guard that boots it that way (a smoke test against the built artifact).
+
+> Real incident (chef-chopsky). "Sentry is blind in production" was fixed by restoring the
+> `--import instrument.js` preload, verified by Sentry capturing errors, and guarded by a
+> test that *requires* the preload. That preload silently broke chat streaming, token-usage
+> capture and LangSmith tracing for ten weeks. The fix for one silent failure became the
+> next one, because only the instrumentation was verified, never chat under it.
 
 ### Step 9: Capture Learning
 

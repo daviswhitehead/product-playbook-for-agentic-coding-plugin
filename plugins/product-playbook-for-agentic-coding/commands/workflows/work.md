@@ -116,7 +116,7 @@ Multi-week projects almost always cross a session/compaction boundary. The agent
 
 This artifact is the single most effective intervention to combat cross-session context loss. Treat updates as part of the task, not as overhead.
 
-### Step 1.5: Scope Verification (Every 3-5 Tasks)
+### Step 1.5: Scope & Cost Verification (Every 3-5 Tasks, and Before Every Expansion)
 
 **From Engineering Manager perspective:**
 
@@ -141,7 +141,40 @@ Options:
 - Flag immediately to the user
 - Recommend re-prioritizing remaining tasks toward the primary goal
 
-**Skip this step** for the first 3 tasks of a project (too early to measure meaningfully).
+**Skip the periodic check** for the first 3 tasks of a project (too early to measure meaningfully).
+The cost checkpoint below is never skipped.
+
+#### Cost checkpoint: before opening a PR, marking one ready, or going past the original ask
+
+CI minutes, eval runs, and API spend are real money, and the user can't weigh what they can't
+see. Every extension can look reasonable on its own while the total quietly multiplies. So
+before any step that triggers full CI or evals, or expands beyond what the user originally
+asked for, state the cost and the running total, and let the user choose:
+
+```
+"Cost check: this adds [1 PR → full CI ≈ <N> min] [+ 1 full eval ≈ $<X>].
+So far this session: <P> PRs, <R> full CI runs, <E> eval runs (≈ $<total>).
+Original ask: <one line>. This step is [in scope | an extension].
+Proceed / fold into the open PR / defer?"
+```
+
+Default to the cheaper shape:
+- **Fold, don't fork.** Add follow-up fixes to the open PR before it merges instead of opening a
+  new one. Each PR pays full CI again.
+- **One expensive-path PR per change.** If a path triggers an expensive gate (an eval suite, a
+  long E2E), keep a single PR for that path. Iterating across several merged PRs pays the gate
+  each time.
+- **Bundle the cheap paths.** Test-only and docs-only changes can share one PR.
+- **Verify locally before going ready.** Reproduce the whole problem first, under production
+  conditions (see `debug.md` Step 3), so one PR carries the whole fix. Shipping one layer,
+  watching production, then shipping the next layer is the most expensive loop there is.
+- **Clean up as you merge.** Remove each PR's worktree when it merges. Dependency-heavy
+  worktrees fill disks, and a full disk takes down local services and hooks.
+
+*(Found 2026-10-06, chef-chopsky: a request to "close stale PRs and add a WIP limit" grew into
+11 PRs, 33 full CI runs and 4 full eval runs. A batched plan (fix fully reproduced before the
+first agent PR; test, docs and CI changes bundled) would have been about 4 PRs, 12 CI runs and
+1–2 evals. Each extension was approved, but the user never saw the running total.)*
 
 ### Step 2: Review Task Details
 
@@ -631,6 +664,8 @@ If matches are found, update the E2E tests in the same commit. Prefer migrating 
 - **Incremental Commits**: Commit after each meaningful milestone
 - **Commit Checkpoints Before Git-Touching Operations**: Before running any task that touches git state (worktrees, branch switching, publishing to other branches), commit all pending changes first. Uncommitted work + branch-switching = data loss. This is especially critical for delivery agents, deployment scripts, and anything that creates or enters git worktrees.
 - **Scope Awareness**: Periodically verify scope hasn't exceeded plan estimates (Step 1.5)
+- **Cost Awareness**: State cost and the running total before every PR, ready-mark or expansion, and prefer fold, bundle and verify-first (Step 1.5)
+- **Short Status Updates**: Report only when state changes or you're blocked, in about five lines: *what changed*, *what I need from you* (or "nothing"), *what's next*. No CI play-by-play or narrated polling. If the user has to ask "what do you need from me?" or "are we done?", the updates failed.
 
 ## Next Steps
 

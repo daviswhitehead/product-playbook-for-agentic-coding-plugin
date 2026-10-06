@@ -110,6 +110,12 @@ Use a concise diagram if helpful to visualize the system:
 - [Test environment setup requirements]
 - [Mock vs real service usage strategy]
 - [Test data management approach]
+- **Runtime parity**: [Which tests run the *built* artifact with the production start command,
+  preloads/instrumentation and flags? Dev servers (`tsx`, `next dev`) and test runners are
+  different programs. If this plan touches boot, instrumentation/APM, streaming or callbacks,
+  name the check that runs under the production start command.]
+- **Truth-surface acceptance**: [For anything measured/emitted: the consuming query or record
+  that must read a correct non-null value, in production, after deploy.]
 
 ## Technology Stack
 
