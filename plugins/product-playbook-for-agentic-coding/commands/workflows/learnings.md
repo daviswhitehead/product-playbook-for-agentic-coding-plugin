@@ -255,7 +255,7 @@ effect of that configuration. If this occurrence lives in what an earlier fix in
 so explicitly. The guard is now enforcing the cause, and the new rule must cover verifying
 primary behavior under the configuration, not only the configuration's presence. *(chef-chopsky,
 2026-10-06: occurrence 3, "Sentry blind in prod", was fixed by restoring Sentry's `--import`
-preload and adding a test requiring it. That preload caused occurrence 7: chat streaming, token
+preload and adding a test requiring it. That preload caused occurrence 8: chat streaming, token
 usage and tracing broken in production for ten weeks.)*
 
 Before writing "yes", **run the pre-registered fix against the current occurrence in your head and say what it would output.** "Would it have caught this?" is easy to answer optimistically in the abstract; "what exactly does it print on this input?" is not. That simulation is what separates the three branches.
