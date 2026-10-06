@@ -38,6 +38,8 @@ Check:
 - Whether branch is clean or has uncommitted changes
 - Recent commits to summarize
 
+**Create the PR from the branch that holds the commits.** `gh pr create` without `--head` targets the *current* branch. In worktree / Conductor flows, run it from the worktree whose branch has the commits, before any `git checkout` back to a workspace branch — or pass `--head <branch>`. Confirm `git log --oneline origin/<base>..HEAD` lists exactly the commits you mean to ship. (2026-10-05: a PR was opened from the workspace branch after a checkout back to it; closed and re-opened from the right branch — chef-chopsky #1226 → #1229.)
+
 ### Step 2: Get Target Branch
 
 Default to targeting `main` or `production` branch. Check which exists:
@@ -125,6 +127,7 @@ Brief overview of what this PR does.
 ## Key Principles
 
 - **Always push first**: Push the branch before creating the PR
+- **Right branch**: `gh pr create` uses the current branch — create from the worktree holding the commits, or pass `--head`
 - **Clear title**: Use conventional commit format when possible
 - **Descriptive body**: Include summary, changes, and testing checklist
 - **Share URL**: Always provide the PR URL as a clickable hyperlink

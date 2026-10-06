@@ -247,6 +247,26 @@ When executing via dispatched subagents (implementer-per-task patterns) — espe
 
 When task briefs are derived from a design doc, give per-task **reviewers the design doc reference, not just the brief**. Plans narrow designs; implementers faithfully transcribe the narrower version; only a reviewer holding the design catches the fidelity gap. (Two contract gaps in the same retro were caught exactly this way; briefs alone would have passed both.)
 
+### Conductor mode: resource budget (parallel subagents on one machine)
+
+One conductor session directing N subagents, each in its own worktree with full dependency installs, shares one disk, one CPU, one Docker daemon and one account session limit. Budget them:
+
+- **Pre-flight every wave**: `df -h` (each worktree with installed deps costs GBs) and the account's remaining session allowance. Don't launch into a near-full disk or a near-spent limit.
+- **Waves of ≤4** full-install subagents, or staggered starts. (2026-10-05: eight Opus agents at once filled a 98%-full disk → Docker wedged → every pre-commit hook that needs local services failed → load average 570 → account session limit exhausted by noon; two agents died mid-task.)
+- **One heavy step at a time, across all agents** — commit (runs hooks), push, `ci:local`, full suites, `npm ci`, dry-runs that spawn Claude. Shared mkdir lock, held for ONE command, never across a CI wait (this ended the load spikes immediately):
+  ```bash
+  L=<worktree-root>/.heavy-lock
+  until mkdir "$L" 2>/dev/null; do sleep 20; done
+  echo "<agent-name> $(date +%H:%M:%S)" > "$L/owner"
+  # ... your ONE heavy command ...
+  rm "$L/owner"; rmdir "$L"
+  ```
+  A lock dir older than ~25 min means its owner died: remove it and take it. Light work (reading, editing, one small test file, `gh` calls) takes no lock.
+- **Write the rules once** in a brief file every agent reads first (where to work, secrets, hooks, the lock, delivery steps); task prompts carry only the task. Rules repeated per prompt drift.
+- **Packets carry `pending manager review`.** Subagents write the review verdict as pending; the conductor flips it to approved only after its own review, and the merge step refuses while any verdict is pending. A subagent never self-approves.
+- **Proof runs are not side-effect free.** A unit test reached the real `gh`; a probe wrote a real PostHog insight; dry-runs mutated tracked runtime state files that were then committed, and the cron host's `git pull` refused. Block real external clients in test setup, and diff `git status` after any proof run before staging — runtime state never rides along in a commit.
+- **Open each PR from the worktree that holds its commits**, before any `git checkout` back to a workspace branch (`/playbook:git-pr` Step 1).
+
 ## Quality Gates
 
 ### Pre-Commit Gates

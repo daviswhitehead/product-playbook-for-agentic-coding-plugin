@@ -112,6 +112,8 @@ Present to user:
 
 ### Step 2: Execute Tasks in Sequence
 
+> **Dispatching tasks to parallel subagents instead?** Apply the `autonomous-execution` skill's *Conductor mode: resource budget* before the first wave — waves of ≤4, a shared heavy-step lock, rules in one brief file, `pending manager review` verdicts, proof runs treated as side-effecting.
+
 For each task:
 
 1. **Start Task**
