@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.29.0] - 2026-10-07
+
+### Fixed
+- **`/playbook:close` Phase 1 sorts uncommitted changes by author before offering to commit.** A parallel agent can edit files on the *same* branch, so the branch-switched check never fires. Changes that aren't this session's are now left as found (no commit, no stash: the stash stack is shared across worktrees) and named in the summary.
+- **`/playbook:close` hook-failure guidance covers local services.** A "unit" hook that reaches a local database fails with `ECONNREFUSED` or `fetch failed` when Docker is off. The fix is to start the service, never `--no-verify`, and never stop a shared one.
+- **`/playbook:learnings` refreshes a same-session checkpoint (new Step 9.6).** Close writes the handoff in Phase 3, then runs learnings in Phase 4, so the checkpoint always predated the retro's outputs.
+- **Shared-tree ownership, both directions.** `/playbook:close` Phase 1 adds a detection rule for the session whose files get taken: re-read `git log -1` and `git status` right before any commit or switch, and if HEAD moved without you, stop and message the peer. `/playbook:git:commit` and `/playbook:work` now stage only the paths this session wrote, instead of safety-committing the whole tree.
+
+### Added
+- **`ios-simulator-testing` skill, with a bundled harness** — agents can now drive real Safari on the iOS Simulator with real taps and read whether the on-screen keyboard came up (`ios-sim.sh doctor | setup | selftest | shot | run`). Before this, "does the keyboard appear on an iPhone?" needed a human with a phone, because desktop Chromium and Playwright WebKit have no on-screen keyboard. The harness has no project dependencies (Appium installs once into `~/.ios-sim-harness`), needs no sudo, and its selftest carries a negative control so a blind harness fails instead of reporting "keyboard down". The skill also records the one trap that hangs session start with no error: Appium writing the Simulator app's preferences triggers a macOS permission prompt an agent cannot answer.
+
+- **`video-evidence` skill.** Agents can now read videos and session replays. Encoded video (TikTok, YouTube, Loom, local recordings) goes through `/watch` (claude-video): timestamped frames plus a transcript, with guidance on choosing a detail level and pinning the local engine for private video. Session replays go through the analytics tool in a fixed order: metadata → event timeline → console logs → AI summary → pixels last. The skill also records the lesson that motivated it: a Replay Vision summary prompted about conversion left out a broken stream, five realtime errors and a 143s timeout, all sitting in that session's console log.
+- `/playbook:debug` Step 0, `/playbook:research-synthesis`, `insight-extractor-agent` and `user-journey-testing` now point to the skill when a video or replay is the evidence.
+
+### Changed
+- **`mobile-debugging` no longer says the iOS Simulator cannot reproduce keyboard behavior.** Measured on iOS 27.0, it does. The skill now points at `ios-simulator-testing` first and keeps physical devices for older iOS versions, installed web apps, Android, and performance.
+- **Instrumented-task gate: the non-null read must come from the path under change** (`autonomous-execution` skill, `close` Phase 2). A metric fed by several producer paths (header link, gate sheet, OAuth callback) is satisfiable in aggregate by a fixture from a path nobody touched — chef-chopsky's "≥1 attributed signup" guard stayed green for two months while the guest-first path attributed nothing. Slice the consuming query by path; standing guards assert per path. The read must also come from production's runtime (start command, preloads, flags): a chef-chopsky fix verified locally under `tsx` still returned `usage: null` under production's `node --import instrument.js`.
+
 ## [0.28.8] - 2026-10-07
 
 ### Added
