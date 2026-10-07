@@ -662,7 +662,7 @@ If matches are found, update the E2E tests in the same commit. Prefer migrating 
 - **Test-Driven When Appropriate**: Write tests as you build
 - **Incremental Progress**: Complete one task fully before moving to next
 - **Incremental Commits**: Commit after each meaningful milestone
-- **Commit Checkpoints Before Git-Touching Operations**: Before running any task that touches git state (worktrees, branch switching, publishing to other branches), commit all pending changes first. Uncommitted work + branch-switching = data loss. This is especially critical for delivery agents, deployment scripts, and anything that creates or enters git worktrees.
+- **Commit Checkpoints Before Git-Touching Operations**: Before running any task that touches git state (worktrees, branch switching, publishing to other branches), commit your own pending changes first, staged by explicit path. Uncommitted work + branch-switching = data loss. In a shared workspace, "commit everything" sweeps a peer agent's uncommitted files into your commit. Stage only the paths you wrote. This is especially critical for delivery agents, deployment scripts, and anything that creates or enters git worktrees.
 - **Scope Awareness**: Periodically verify scope hasn't exceeded plan estimates (Step 1.5)
 - **Cost Awareness**: State cost and the running total before every PR, ready-mark or expansion, and prefer fold, bundle and verify-first (Step 1.5)
 - **Short Status Updates**: Report only when state changes or you're blocked, in about five lines: *what changed*, *what I need from you* (or "nothing"), *what's next*. No CI play-by-play or narrated polling. If the user has to ask "what do you need from me?" or "are we done?", the updates failed.
