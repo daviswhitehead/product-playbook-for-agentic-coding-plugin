@@ -199,6 +199,7 @@ by many plugins in Anthropic's official marketplace.
 | `learning-capture` | Multi-trigger, dual-target learning capture |
 | `autonomous-execution` | Patterns for autonomous project execution |
 | `mobile-debugging` | Patterns for debugging mobile-specific issues on iOS Safari and Android Chrome |
+| `ios-simulator-testing` | Agent-runnable harness for real Safari on the iOS Simulator: real taps, keyboard detection, screenshots |
 | `stitch-integration` | Shared patterns and best practices for Google Stitch design pipeline |
 | `session-checkpoint` | Patterns for session checkpoint and context preservation |
 | `user-journey-testing` | Patterns for user journey testing and validation |
