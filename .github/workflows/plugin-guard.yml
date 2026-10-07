@@ -30,6 +30,9 @@ jobs:
       - name: Validate plugin structure + version consistency
         run: bash scripts/validate-plugin.sh
 
+      - name: Test content-landed.sh (merge-prs / learnings landedness checker)
+        run: bash scripts/test-content-landed.sh
+
       - name: Enforce version bump on plugin changes
         env:
           BASE_REF: ${{ github.base_ref || 'main' }}

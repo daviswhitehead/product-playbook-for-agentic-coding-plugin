@@ -662,3 +662,76 @@ alone, which is why the negative case was run.
 | **A PR looks like complete, unmerged new work** | **Confirm against `main` by content before queueing it. Metadata cannot see a squash-merged duplicate** |
 | **A changeset is the only file left in a PR's diff vs main** | **The content already landed. SKIP; do not close (ESCALATE)** |
 | **A tool reports a fix as "stranded" / "never merged"** | **Verify before acting. Measured false-positive rate of the ancestry form on this repo: 4 of 4** |
+
+---
+
+## 2026-10-07 eighth-incident addendum — the landedness checker was wrong both ways, and `--delete-branch` is optional
+
+Eighth `/playbook:merge-prs` run: 4 drafts plus 2 script fixes opened during the run (#115, #116),
+all merged, released as **0.29.0**. Main stayed green throughout. Two findings, and one finding
+that was drafted and then killed.
+
+### 1. `content-landed.sh` was wrong in both directions
+
+The seventh addendum's fix is the component that failed.
+
+- **False LANDED (#115).** It diffed only the **tip commit** (`diff-tree <ref>`, `<ref>~1..<ref>`).
+  #108 has two commits, and its tip only adds a changeset, so triage was told #108's content was
+  already on `main`. It was not. Trusting the verdict would have SKIPped real work.
+- **False UNIQUE, intermittently (#116).** `printf "$base" | grep -qF "$line"` under
+  `set -o pipefail`: `grep -q` exits on its first match, `printf` takes SIGPIPE, and exit 141 counts
+  as "missing". It only shows on base files bigger than the pipe buffer. `learnings.md` qualifies.
+  #98's fully-landed branch read UNIQUE on 5 of 8 runs.
+
+**Auditing the pre-registered escalation.** The seventh addendum registered: *"if a fourth
+operation asks 'has this landed?' by ancestry, promote to CLAUDE.md and grep command docs for
+ancestry idioms."* **Did it fire? No.** Nothing used ancestry today; everything used the script.
+**Would it have caught this? No.** The grep guard scans command docs for `--is-ancestor` and
+similar, prints nothing, and never looks at the script. **Did an earlier fix cause this? Yes.**
+The script *is* the seventh addendum's fix. It shipped with a negative test, but every fixture was
+a single-commit ref against a small base. That shape cannot reveal a tip-only diff or a
+pipe-buffer race.
+
+**The systemic fix:** `scripts/test-content-landed.sh`, now a step in `plugin-guard.yml`, builds
+the shapes that broke it: a changeset-only tip, squash-landed content, and an early match in a
+base over 64 KiB, run 15 times. It fails on both pre-fix versions (pre-#115: 2 failures; pre-#116:
+1) and passes on the current one.
+
+**Re-registered escalation:** the script's remaining weakness is *line presence anywhere in the
+file*. A branch whose added lines are all generic (` ```bash `, `---`) reads LANDED by
+coincidence. If a LANDED verdict is ever wrong again, stop patching the heuristic and switch to
+hunk-level matching: `git diff <fork> <ref> | git apply -R --check` against the base tree says
+directly whether the base already contains the change.
+
+### 2. With `deleteBranchOnMerge: true`, leave `--delete-branch` off
+
+Learning #3's failure family has five addenda: half-fails, async deletes, a rule scoped to the wrong
+axis, and a live PR's head deleted. All of it comes from the flag's **local** half (delete the
+local branch, check out the default branch, pull). The second addendum recommended
+`delete_branch_on_merge: true` to cover merges that skip the flag, and that setting has been on
+ever since. The commands kept passing the flag anyway, so the server's deletion never replaced
+gh's local cleanup.
+
+Today: 5 merges with `gh pr merge --squash` alone. The server reaped every remote branch
+(`ls-remote` = 0 each time), with no errors, no hand-deletes and no checkout switch. The
+2026-09-16 run passed the flag and half-failed on both of its merges. `merge-prs.md` 5.6 and
+`monitor-pr.md` now omit the flag when the setting is on. The verdict gate and `ls-remote` check
+stay.
+
+### Killed finding: "marking a draft ready triggers an extra CI run"
+
+Drafted to explain an 18-run cost figure. `plugin-guard.yml` uses `on: pull_request` with the
+default types (`opened`, `synchronize`, `reopened`). `ready_for_review` is not one of them, so
+the finding was false. The real error was the count: `gh run list --created ">=today"` included
+7 runs from other sessions' PRs (#113, #114). The session then "corrected" a correct earlier
+figure (11) to the wrong one. True figure: 12 runs, 1.3 job-min. `close.md` Phase 4.6 now says to
+count by the session's own SHAs, never by a date window.
+
+### Updated rule of thumb (additions)
+
+| Signal | Response |
+|---|---|
+| A checker's fixtures are all one shape (single commit, small file) | It is unverified for every other shape. Build the shapes that occur in real use, and run the test in CI |
+| `deleteBranchOnMerge: true` | Merge without `--delete-branch`; verify with `ls-remote` |
+| A PR is `CLEAN` and needs no push | Skip merging main in. `main`'s post-merge guard is the backstop |
+| Counting a session's CI cost | By its own head and merge SHAs. A date window counts other sessions |

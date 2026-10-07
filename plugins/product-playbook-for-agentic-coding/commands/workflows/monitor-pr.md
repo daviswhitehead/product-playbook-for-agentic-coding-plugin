@@ -241,6 +241,8 @@ Every PR — **especially autonomously merged ones** — gets a proof-of-complet
 
 Post it immediately before `gh pr merge`. If you find an already-merged PR missing one (e.g., during close-out), post it retroactively. Other workflows reference this section as "proof-of-completion comment (`/playbook:monitor-pr` Step 4)".
 
+> **If the repo has `deleteBranchOnMerge: true`** (`gh repo view --json deleteBranchOnMerge`), merge **without** `--delete-branch`. The server deletes the remote branch, and every failure mode below comes from the flag's local half. Still verify with `git ls-remote` after the `MERGED` verdict. The notes below apply when the flag is used.
+>
 > **Post-merge local state**: `gh pr merge --delete-branch` silently switches your local checkout to the default branch (and pulls) after deleting the PR branch. In a parallel-agent workspace this can strand your session on the wrong branch — re-checkout your working branch afterwards.
 >
 > **If anything blocks gh's post-merge local cleanup, `--delete-branch` half-fails — it deletes NEITHER branch.** The PR merges, then the local step fails, and the operation ends with the **remote branch still alive**. Because the merge itself succeeded, the message reads as cosmetic and is easy to walk past. At least two distinct triggers, both observed:
