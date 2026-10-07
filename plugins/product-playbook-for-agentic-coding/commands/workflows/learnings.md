@@ -441,6 +441,8 @@ B. **Standard retrospective** — ~15 minutes
 
 3. If no session files are found, fall back to standard retrospective automatically.
 
+**SpecStory thin, current session long → offer "standard, mined from this session".** When session files are missing or sparse but the session running this retro is long (a multi-day conductor run, many redirections), offer it as option C: you read your own transcript for redirections, recoveries and blind spots directly — no deep-analysis agent. Record `analysis-depth: standard` plus a "mined from this session" findings table. (2026-10-06 workforce-simplification retro: its three highest-value findings — an 8-agent wave cascading into disk/Docker/session-limit failures, proof runs committing runtime state, a merge gate stricter than its written policy — surfaced only this way. They were operational; a design-level retro never asks about them.)
+
 Set `deep_retrospective = true` if the user selects A (or accepts the default) and proceed to Step 3.5 after Step 3.
 
 ### Step 2: Locate or Create the Template
@@ -517,7 +519,7 @@ Targeted capture:
 .specstory/history/*.md
 ```
 
-Filter to files within the project's date range. If no session files are found, fall back to standard retrospective.
+Filter to files within the project's date range. If no session files are found, fall back to standard retrospective — or, for a long current session, the "mined from this session" variant (Step 1).
 
 **Git history** — Analyze commit patterns alongside session files:
 ```bash
@@ -1107,6 +1109,8 @@ be improved? For example:
 - Parts that felt redundant or too slow
 - Things we did that the skill didn't guide us to do"
 ```
+
+**A mid-turn question is Part B input.** If the user asks during the retro something like "what should I say about how this went?", that IS Part B — answer from the user's seat (what they had to redirect, wait on, or would want next time) and carry it into Part C. Don't bounce it back as a question.
 
 **Part C: Implement improvements**
 

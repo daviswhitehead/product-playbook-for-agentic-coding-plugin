@@ -38,6 +38,8 @@ Check:
 - Whether branch is clean or has uncommitted changes
 - Recent commits to summarize
 
+**Create the PR from the branch that holds the commits.** `gh pr create` without `--head` targets the *current* branch. In worktree / Conductor flows, run it from the worktree whose branch has the commits, before any `git checkout` back to a workspace branch — or pass `--head <branch>`. Confirm `git log --oneline origin/<base>..HEAD` lists exactly the commits you mean to ship. (2026-10-05: a PR was opened from the workspace branch after a checkout back to it; closed and re-opened from the right branch — chef-chopsky #1226 → #1229.)
+
 ### Step 2: Get Target Branch
 
 Default to targeting `main` or `production` branch. Check which exists:
@@ -72,6 +74,11 @@ git push -u origin HEAD
 ```
 
 ### Step 4: Create Pull Request
+
+**Opening a PR is a cost event.** Before `gh pr create`:
+1. **Fold first.** If an open PR in the same CI lane and review gate is still unmerged, add this change to it instead of opening another (one more push there is cheaper than a new PR's fast-CI run + preview builds + review packet). Open a new PR only when the lane or gate differs, or the open PR is already under founder review and this change would reset it.
+2. **State the cost** when the project's CLAUDE.md asks for a cost checkpoint: what this PR will cost per push (lane cost), the running total for the session, and the alternative (fold / bundle / wait). Let the user choose.
+3. **Prove once.** Everything deterministic is already proven locally (Step 2.5); the paid proof (real model, full suite, browser journey) runs once before "ready", not before every push.
 
 Create PR using GitHub CLI. **Default to draft** unless the user explicitly requests a ready PR:
 
@@ -125,6 +132,8 @@ Brief overview of what this PR does.
 ## Key Principles
 
 - **Always push first**: Push the branch before creating the PR
+- **Right branch**: `gh pr create` uses the current branch — create from the worktree holding the commits, or pass `--head`
+- **Fold before you open**: an open PR in the same lane and gate carries follow-up fixes; a new PR is a new CI run, preview build and review packet
 - **Clear title**: Use conventional commit format when possible
 - **Descriptive body**: Include summary, changes, and testing checklist
 - **Share URL**: Always provide the PR URL as a clickable hyperlink

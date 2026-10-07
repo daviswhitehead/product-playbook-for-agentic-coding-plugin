@@ -88,12 +88,22 @@ Use a concise diagram if helpful to visualize the system:
 
 **Estimated Scope**: [X files estimated]
 
-**PR Boundaries** (required for Medium/Large projects):
+**Budget** (stated here, before the first PR; `/playbook:close` reports actual against it):
+- PRs: [N] · CI minutes: [≈ PRs × pushes per PR × lane cost — lane costs come from the project's CLAUDE.md or its CI-cost report] · LLM / eval spend: [$N or "none"] · Founder-gated merges: [N]
 
-| PR | Phase/Milestone | Description | Est. Files |
-|----|----------------|-------------|------------|
-| 1  | [Phase name]   | [What ships] | ~N files  |
-| 2  | [Phase name]   | [What ships] | ~N files  |
+**PR Boundaries** (required for Medium/Large projects). Shape PRs by **CI lane** and **review gate**, not by task:
+
+| PR | Lane (what CI runs) | Gate (who merges) | Phase/Milestone | What ships | Est. Files |
+|----|---------------------|-------------------|-----------------|------------|------------|
+| 1  | [frontend / agent / workflows-only / docs-only / mixed] | [autonomous / founder] | [Phase name] | [What ships] | ~N files |
+| 2  | [lane] | [gate] | [Phase name] | [What ships] | ~N files |
+
+Rules:
+- **One PR per (lane, gate) cell per phase.** Two tasks that hit the same lane and the same gate ship in one PR unless one would block the other's review.
+- **Bundle prose with the code it describes** (docs, policy, README) unless it would drag the code PR to a slower gate.
+- **Stack only when a founder gate would otherwise block autonomous work.** Never delete the base branch of a stack when merging it.
+- **A mixed PR pays for every lane.** Split it only when the split saves more CI than the second PR costs (a second PR is at least one full fast-CI run plus any preview builds).
+- **Fewer, fuller PRs beat many small ones** when review is by a solo founder: each PR is a review packet, a CI run and a preview environment. Evidence: one session shipped 31 PRs where ~4 would have done; that repo's trailing-28-day read was 89.5 CI minutes per merged PR (chef-chopsky, 2026-10-06 retro).
 
 **Review Cadence**: [per-PR | per-phase | at merge]
 
