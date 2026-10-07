@@ -48,6 +48,8 @@ Rules that fall out of this hierarchy:
 - **NEVER push an empty commit to retrigger**. Use `gh run rerun --failed` — it's free and re-runs only the failed jobs.
 - **BATCH fixes** — if reading one failed log surfaces 3 root causes, fix all 3 in one commit, not three.
 - **Demote-and-re-promote** for test-only / docs-only / lint-only fixes: `gh pr ready <PR> --undo` first so the next push runs fast-CI only (~8 min instead of ~25 min). Re-promote when ready for the full pipeline.
+- **"Ready" is a cost event and usually one-shot.** It triggers the expensive suites, and on many repos a later push drops them to SKIP (a force-push or a draft→ready→label sequence seconds apart cancels them). Fold every known follow-up into the branch *before* marking ready; when the project's CLAUDE.md asks for a cost checkpoint, state what ready will cost and let the user choose.
+- **Update-branch only when it changes the answer**: the base conflicts, or production changed in paths this PR touches (`git diff --stat <merge-base>..origin/<base> -- <paths>`). Every `gh pr update-branch` is a full CI re-run on the new merge commit. A "merge-base must be < N hours old" policy is a reason to check, not a reason to re-run reflexively.
 - **Read CLAUDE.md** for the project's specific CI semantics — draft-vs-ready behavior, path filters, `ci:full` labels, validation script names. They vary per repo and are load-bearing for cost decisions.
 
 ## Available Tools

@@ -69,6 +69,10 @@
 
 **Estimated Effort**: [Time estimate]
 
+**Proof**: [unit test / replay dry-run / real-model run / browser journey / consuming query] — [cost: $0 · seconds | ~$N · N min]. Paid proof runs once at phase end unless this task says why not.
+
+**Ships in**: [PR N from the tech plan's PR Strategy table — lane: frontend/agent/workflows-only/docs-only/mixed · gate: autonomous/founder]
+
 **AI Tool Recommendations**:
 - **Model**: [e.g., Opus 4.5, Sonnet 4.5, Haiku 4.5]
 - **Platform**: [e.g., Claude Code, Cursor, Codex]

@@ -306,7 +306,7 @@ Ensure all sections are filled with complexity matching project size:
 - Integration Approach
 - Design System Architecture (if applicable)
 - Performance Considerations
-- PR Strategy (scope estimate, PR boundaries, review cadence)
+- PR Strategy (scope estimate, **budget**: PRs / CI minutes / LLM spend, PR boundaries by **CI lane and review gate**, review cadence)
 
 **For Large Projects Only**:
 - Architectural Decisions with rationale
@@ -317,6 +317,7 @@ Ensure all sections are filled with complexity matching project size:
 Review the document:
 - [ ] Technical architecture is clear and well-structured
 - [ ] Sequencing plan minimizes dependencies
+- [ ] PR Strategy states a budget (PRs, CI minutes, LLM spend) and groups work by CI lane and review gate — one PR per (lane, gate) cell per phase, not one per task
 - [ ] Technology stack is appropriate and justified
 - [ ] Integration points are identified
 - [ ] Technical risks are assessed with mitigation

@@ -104,6 +104,12 @@ Drawing from multiple role perspectives, guide the user through:
 **From Product Manager + QA Specialist perspectives:**
 - Define clear, testable acceptance criteria
 - Specify what "done" looks like for each task
+
+#### 6. Proof Method and Its Cost
+**From Engineering Manager + DevOps Engineer perspectives:**
+- Name how each task will be proven and what that proof costs: unit test ($0, seconds) · replay / fixture dry-run ($0, minutes) · real-model or eval run ($N, 10–20 min) · browser journey (minutes) · consuming query (instrumented tasks)
+- **Prove deterministic changes with the cheapest method that can fail; run the real model or the full suite once at the end of the phase**, not once per task. A task that can only be proven by a paid run says so, with the price.
+- Assign each task to a PR from the tech plan's PR Strategy table (by lane and gate). A task with no PR row is a sign the PR table is wrong, not that the task needs its own PR.
 - **Verify every schema/column reference**: if an acceptance criterion names a database column, file path, function, env var, or other concrete identifier, grep-verify it against the codebase (or a migration in the same PR or earlier) BEFORE finalizing the criterion. An acceptance criterion that names a non-existent identifier is unfalsifiable until implementation hits it — the implementer either silently drifts from spec or has to amend the spec retroactively, and the criterion was load-bearing for nothing in the meantime. One grep is cheaper than every downstream confusion combined. (Pattern observed: Chef Chopsky 2c.3 acceptance wrote `messages.created_at` but the column is `messages.timestamp`. See `docs/learnings/2026-05-18-2c3-session-learnings.md` in that repo.)
 
 #### 6. AI Tool Recommendations
@@ -174,6 +180,7 @@ Create tasks that are:
 - **Appropriately Sized**: Can be completed in a reasonable timeframe
 - **Easy to Understand**: A junior developer could follow them
 - **Testable**: Have clear acceptance criteria
+- **Cheaply proven**: Name the proof method and its cost; paid proof (real model, full CI) is batched at phase end
 
 ### Step 4: Complete the Document
 

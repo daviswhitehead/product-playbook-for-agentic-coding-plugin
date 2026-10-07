@@ -527,6 +527,22 @@ Session close-out is a natural moment to turn accumulated work into reusable ski
 
 `/lore` is interactive and user-driven — only point to it, never auto-invoke. If the user declines or there's nothing notable, skip silently.
 
+## Phase 4.6: Cost Line
+
+One line, computed, not guessed. For every PR this session opened or pushed to:
+
+```bash
+# Actions job-minutes consumed by a PR's heads (sum of completed, non-skipped jobs across all runs)
+for sha in $(gh pr view <N> --json commits -q '.commits[].oid'); do
+  for rid in $(gh run list --commit "$sha" --json databaseId -q '.[].databaseId'); do
+    gh api "repos/<owner>/<repo>/actions/runs/$rid/jobs?filter=all&per_page=100" \
+      --jq '[.jobs[] | select(.completed_at!=null and .conclusion!="skipped") | ((.completed_at|fromdateiso8601)-(.started_at|fromdateiso8601))] | add // 0'
+  done
+done | awk '{s+=$1} END {printf "%.0f job-min\n", s/60}'
+```
+
+If the repo has a CI-cost report (e.g. a `ci_minutes_per_merged_pr` metric), cite that instead. Add LLM/eval spend from the run logs or provider dashboard, and the count of PRs opened. Compare against the tech plan's **Budget** line; a miss of more than 2× is a learning candidate for Phase 4 (what shape of work would have fit the budget?), not a footnote.
+
 ## Phase 5: Summary
 
 Present a one-line status per phase:
@@ -540,6 +556,7 @@ Handoff: docs/checkpoints/latest.md [committed <sha> / left local — path is gi
          [archived prior checkpoint to <file>]
 Org deposit: [Edited growth/CHARTER.md / Founder-only on purpose / Not a workforce repo]
 Learnings: [Captured / Skipped]
+Cost: [N PRs opened · ≈N Actions job-min · $N LLM/eval · vs plan budget N PRs / N min / $N — or "no budget in plan"]
 Skills: [Suggested /lore / Not applicable]
 ```
 
