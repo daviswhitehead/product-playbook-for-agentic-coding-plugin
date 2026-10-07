@@ -1,45 +1,43 @@
 # Session Checkpoint
-**Date**: 2026-09-16 08:51 EDT
-**Branch**: `main` (close-out committed directly; the workspace branch `daviswhitehead/merge-prs-v1` has no upstream and no PR)
+**Date**: 2026-10-07 09:07 EDT
+**Branch**: `main` (close-out committed directly; workspace branch `daviswhitehead/agentic-coding-playbook-merge` has no upstream, no PR, and nothing ahead of main)
 
 ## Current Task
-`/playbook:merge-prs` sweep → `/playbook:close` → `/playbook:learnings`. The sweep and the
-release are **done**. Remaining: the learnings capture, and a founder decision on PR #104.
+`/playbook:merge-prs` sweep → release → install sync → stale-worktree cleanup → `/playbook:close`. All done.
 
 ## Status
 - **Done this session**:
-  - Swept all 3 open PRs. Merged **#105** (`bc6fbd7`) and **#106** (`43d84dc`); skipped **#104**.
-  - Ran `scripts/release.sh` → **0.28.3 → 0.28.4** (`175adee`), pushed; main's guard green.
-  - #106 arrived red for the predicted reason (no changeset); added `.changes/close-freshness-timezone.md` in one commit (`77e8b05`) — one push, one CI run.
-- **In progress**: nothing.
-- **Blocked on**: **#104 is open awaiting a founder call.** It is a duplicate of already-merged #101 (see Key Decisions). The sweep commented on it rather than closing it.
+  - Merged all 4 open drafts and 1 new PR: **#115** `40fcb3d`, **#108** `2124c68`, **#110** `6ce0f95`, **#109** `bea3404`, **#111** `387a8ae`.
+  - Before merging, folded the founder's own PR-comment suggestions in: #108 gained "the read must come from production's runtime" (`autonomous-execution`, `close`); #110 gained a peer-took-your-files detection rule (`close`) plus own-paths-only staging (`git:commit`, `work`).
+  - Released **0.28.8 → 0.29.0** (`6926cd5`), main guard green. Synced the local install to 0.29.0 (`claude plugin marketplace update` + `claude plugin update`). **Needs a restart to load.**
+  - Fixed two bugs in `scripts/content-landed.sh`: **#115** (it read only the tip commit, so it reported #108 as LANDED) and **#116** `5a018d7` (`printf | grep -q` under `pipefail` took SIGPIPE and reported found lines as missing, 5 of 8 runs).
+  - Removed 9 worktrees: 4 for today's merged PRs, and 5 stale ones whose PRs (#82, #98, #99, #105, #106) had merged weeks ago. Each was confirmed clean, no stash, content on main.
+- **In progress**: nothing. 0 open PRs.
+- **Blocked on**: nothing.
 
 ## Key Decisions
-- **#104 skipped, not merged, not closed.** After `git merge origin/main`, its effective diff against main was *only* the changeset file — `close.md` had become byte-identical to main's blob (`6505d99`), because the same content already shipped as **#101** (`bdfaa3d`) and its changeset body is already published verbatim at `CHANGELOG.md:38`. Merging would have added a second changeset duplicating a released CHANGELOG entry while changing no code. Closing a PR is an escalation even when it's your own, so it was left open with an explanatory comment.
-- **#105's first merge attempt was NOT retried blind.** `gh pr merge` died on a TLS handshake timeout; the verdict gate (`gh pr view --json state,mergeCommit`) read `OPEN NONE`, so the branch was left untouched and the merge simply retried. This is the exact shape that destroyed PR #99's head on 2026-09-11 — the gate earned its keep.
-- **Both merges hit the worktree-held `--delete-branch` half-fail**; server-side auto-delete reaped both remote branches. Verified `0` immediately *and* after an 8s settle, per the async-delete rule.
+- **Merged without the per-PR "merge main in + push" step.** Every PR was `CLEAN` against main and green on its head, so that step would only have burned CI runs. The rule: run it only when a PR goes non-`CLEAN` after a sibling lands. None did.
+- **Merged with `gh pr merge --squash`, no `--delete-branch`.** `deleteBranchOnMerge` is true and `main` is held by the primary checkout, so the local half of `--delete-branch` could only fail. Server auto-delete reaped every branch (`git ls-remote` = 0 each time).
+- **Script-only fixes ship without a changeset or release.** `scripts/` is outside `plugins/`, so the guard doesn't require one, and installs never see it.
 
 ## Open Questions
-- Should **#104** be closed? The fix it describes is live (shipped in #101); the PR now contributes nothing but a duplicate changeset.
-- Why did #104 exist at all? It was opened by a 2026-09-16 `/playbook:learnings` pre-check as a "stranded unpushed fix" — but the fix was not stranded, it had already merged as #101. The pre-check appears to have matched on a local branch's existence rather than on its content vs `main`. Worth a look if that pre-check runs again.
+- None blocking.
 
 ## Next Steps
-1. Review and merge **draft PR #107** — the content-vs-ancestry fix (below). Guard green.
-2. Decide on **#104** — close it, or explain what it still adds.
-3. After #107 merges, run `scripts/release.sh` (its changeset is pending; main's guard goes red until then).
+1. Restart Claude Code so 0.29.0 loads (new skills `video-evidence`, `ios-simulator-testing`).
+2. When `content-landed.sh` is next run in a triage, trust its verdicts. Before today it could be wrong in both directions.
 
 ## Hot Files (modified this session)
-- `.changes/close-freshness-timezone.md`: added then consumed — the missing changeset that unblocked #106's guard.
-- `CHANGELOG.md`, `.claude-plugin/marketplace.json`, `plugins/product-playbook-for-agentic-coding/.claude-plugin/plugin.json`: released 0.28.4.
-- `plugins/product-playbook-for-agentic-coding/commands/workflows/{close,design-critique,learnings}.md`: changed via #105/#106, not edited directly here.
+- `scripts/content-landed.sh`: merge-base diff instead of the tip commit (#115); here-string instead of a pipe (#116).
+- `plugins/product-playbook-for-agentic-coding/skills/autonomous-execution/SKILL.md`, `commands/workflows/close.md`: production-runtime clause (in #108).
+- `plugins/product-playbook-for-agentic-coding/commands/workflows/{close,work}.md`, `commands/git/commit.md`: shared-tree ownership rules (in #110).
+- `CHANGELOG.md`, both manifests: release 0.29.0.
 
 ## Out-of-Repo Changes
-- `$(git rev-parse --git-common-dir)/info/exclude` gained `docs/merge-plans/` so the plan file
-  never dirties the tree. Local and uncommitted; shared across all worktrees of this repo.
+- Local plugin install: `product-playbook-for-agentic-coding@product-playbook-marketplace` 0.28.8 → 0.29.0 (`~/.claude/plugins/installed_plugins.json`). Rollback: `claude plugin update` after reverting, or reinstall the earlier version.
+- Worktree directories deleted: `~/GitHub/plugin-worktrees/*`, `~/GitHub/ppfac-worktrees/close-org-deposit`, `~/GitHub/product-playbook-for-agentic-coding-plugin-worktrees/learnings-gate-sheet`, `~/GitHub/pp-wt-learnings-2026-09-18`, `~/plugin-wt-escalation`. Every branch was squash-merged first; SHAs are in the PRs.
+- `docs/merge-plans/2026-10-07-merge-plan.md`: local only (excluded via `info/exclude`).
 
 ## Context the Next Session Needs
-- **The #104 gap was root-caused and fixed in draft PR #107.** It was not a merge-prs bug alone: `/playbook:learnings` **Step A2** *manufactured* #104 using an ancestry test (`git log --not origin/main`), which squash-merge defeats — re-run on 2026-09-16 it returned 4 commits for `close.md`, **all 4 already in main by content** (4-of-4 false positives). `merge-prs` Step 2 then had no content check to catch it. #107 ships `scripts/content-landed.sh` plus fixes to both commands, and a 7th addendum to `docs/learnings/2026-07-17-merging-stacked-prs-across-worktrees.md`. The rule was already in that doc since 2026-07-27 — for *branch sweeps* — and had never propagated.
-- **The freshness rule shipped in #106 was exercised immediately**: this close-out compared the existing `latest.md` (2026-09-13) against a 2026-09-16 clock. Three days apart is unambiguous, so `latest.md` was claimed and the prior handoff archived to `2026-09-13-merge-prs-sweep-release-0283.md`.
-- `docs/checkpoints/` is **not** gitignored in this repo and 8 checkpoints are tracked — plain `git add` works; no force-add question to re-litigate.
-- **The workspace branch `daviswhitehead/merge-prs-v1` never had an upstream or a PR** and sits 3 behind / 0 ahead of `main`. Nothing is stranded on it; it is disposable. Close-out committed to `main` directly (no worktree held `main`).
-- Two stashes exist (`stash@{0}` on `daviswhitehead/git-cleanup`, `stash@{1}` on `main`), both predating this session and tagged to other branches. Left untouched — the stash stack is shared across all worktrees of this repo.
+- The primary checkout `~/GitHub/product-playbook-for-agentic-coding-plugin` is on `main` at `4053dbf`, behind origin. Pull before working there.
+- A Cursor window may still point at the deleted `~/plugin-wt-escalation`. Its SpecStory watchers had it open.
