@@ -26,6 +26,7 @@ git diff --stat
 ```
 
 Identify:
+- Files this session did **not** write. In a shared workspace a peer agent may have uncommitted edits in the same tree. Leave them out of every commit and name them in your summary.
 - Modified files
 - Deleted files
 - New/untracked files
