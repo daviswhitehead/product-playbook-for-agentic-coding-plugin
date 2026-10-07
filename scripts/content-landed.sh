@@ -96,7 +96,10 @@ while IFS= read -r f; do
     while IFS= read -r line; do
         [ -z "$line" ] && continue
         tot=$((tot + 1))
-        printf '%s\n' "$base_content" | grep -qF -- "$line" || miss=$((miss + 1))
+        # Here-string, not `printf | grep -q`: grep -q exits on the first match, printf
+        # can take SIGPIPE, and under pipefail that 141 reads as "missing" — intermittently,
+        # and only on files large enough to outlast the pipe buffer (learnings.md).
+        grep -qF -- "$line" <<< "$base_content" || miss=$((miss + 1))
     done <<< "$added"
 
     if [ "$miss" -eq 0 ]; then
