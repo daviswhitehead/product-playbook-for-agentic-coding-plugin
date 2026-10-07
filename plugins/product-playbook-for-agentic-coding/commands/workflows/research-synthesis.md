@@ -71,6 +71,8 @@ Search order:
 
 Use Glob → Grep → Read strategy. Classify each source as Quantitative, Qualitative, or Product Taste.
 
+**Video sources** (a YouTube/TikTok/Loom URL, a recorded interview, a session replay): convert them with the `video-evidence` skill before extracting, and cite `[MM:SS]` timestamps the way you'd cite line numbers.
+
 **Track your sources.** Create a sources index as you go.
 
 ### Step 3: Extract by Layer

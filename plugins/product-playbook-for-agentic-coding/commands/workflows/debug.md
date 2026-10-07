@@ -74,6 +74,7 @@ Check whichever of these are available for the project:
 3. **Deployment logs**: Railway, Vercel (`vercel logs`), CloudWatch — read the actual error output
 4. **CI/Actions history**: GitHub Actions run logs — check the actual failure output, not just the job name
 5. **Environment config**: Verify required env vars exist in the target environment (`vercel env ls`, `doppler secrets`, `railway variables`)
+6. **User-side evidence**: if the report comes with a session-replay link or a screen recording, follow the `video-evidence` skill. For a replay, pull the session's **console logs** yourself: an AI replay summary answers its own prompt and routinely leaves out the errors
 
 **Rule**: Never change code based on an unverified hypothesis. If you catch yourself thinking "it's probably X," stop and find evidence first. State what you checked and what you found before proposing any fix.
 
