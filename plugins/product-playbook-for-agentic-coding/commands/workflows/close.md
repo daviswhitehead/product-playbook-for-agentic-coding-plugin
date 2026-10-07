@@ -554,6 +554,8 @@ for sha in $(gh pr view <N> --json commits -q '.commits[].oid'); do
 done | awk '{s+=$1} END {printf "%.0f job-min\n", s/60}'
 ```
 
+**Count by the session's own SHAs, never by a date window.** `gh run list --created ">=<today>"` also counts every other session's runs in a shared repo. The loop above misses push-to-`main` runs for merges and releases you pushed. Add those by commit (`gh run list --commit <merge-or-release-sha>`). *(This plugin, 2026-10-07: a date-window count reported 18 runs, and the session "corrected" a correct earlier figure of 11 to it. 7 were other sessions' runs. The true figure was 12.)*
+
 If the repo has a CI-cost report (e.g. a `ci_minutes_per_merged_pr` metric), cite that instead. Add LLM/eval spend from the run logs or provider dashboard, and the count of PRs opened. Compare against the tech plan's **Budget** line; a miss of more than 2× is a learning candidate for Phase 4 (what shape of work would have fit the budget?), not a footnote.
 
 ## Phase 5: Summary

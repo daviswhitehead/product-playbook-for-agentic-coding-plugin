@@ -1152,7 +1152,7 @@ the same "documented but never decided" pattern this workflow exists to prevent.
 Step 10 Part B is where the highest-value improvements historically come from, and it is
 pure user input.
 
-When there is no human to ask:
+When there is no human to ask (or the user hands you the gates: "I trust your judgement"):
 
 1. **Answer the gate yourself, in writing, with the reasoning.** Don't skip it — state
    the choice and why. "Trigger: chat-session (passed as an argument). Output: both
@@ -1169,7 +1169,8 @@ When there is no human to ask:
    redirections are the same signal Part B fishes for, and they already happened. Mine
    the session, don't skip the step.
 5. **Say plainly in the final summary which gates were auto-answered**, so the human can
-   revisit any of them. An autonomous run that reads identically to a facilitated one is
+   revisit any of them. When the user delegated rather than being absent, they are still there to redirect, so
+   state the answered gates in your first message rather than only in the final one. An autonomous run that reads identically to a facilitated one is
    hiding the decisions it made on someone's behalf.
 
 ---

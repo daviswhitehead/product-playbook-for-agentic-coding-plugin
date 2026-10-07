@@ -276,6 +276,15 @@ run hit a conflict where a directory-level `git add -f docs/checkpoints/` would 
 force-committed everything the repo deliberately ignores; the fix was narrowing to the one
 explicit file.
 
+**Skip 5.2 when the PR is already `CLEAN` and needs no other fix.** Read
+`gh pr view <N> --json mergeStateStatus` right before merging. `CLEAN` means GitHub will merge
+it as-is (a repo that requires up-to-date branches reports `BEHIND` instead), so merging main in
+and pushing would only buy a CI run. The backstops are the post-merge guard on `main` (Step 6
+halts the queue if it goes red) and validation on `main` before the release in 5.9. Do 5.2 only
+when a PR is `CONFLICTING`/`BEHIND`/`UNSTABLE`, or when it needs a push anyway (a fix, a
+changeset). *(This repo, 2026-10-07: 5 PRs, all `CLEAN`, merged without 5.2, saving 2 CI runs,
+and main stayed green.)*
+
 **5.3 — Declare the version change** (only if Step 0.5 found release machinery).
 
 - **Changeset-style (a)**: confirm the PR carries a changeset; add one if it doesn't. Never
@@ -302,11 +311,22 @@ does *not* mean "the merge worked and only cleanup failed" — that is one of tw
 different outcomes, and they demand opposite responses:
 
 ```bash
-gh pr merge <N> --squash --delete-branch     # match the repo's merge-method policy
+gh pr merge <N> --squash                     # deleteBranchOnMerge=true (Step 0.6): no flag
+gh pr merge <N> --squash --delete-branch     # deleteBranchOnMerge=false; match merge-method policy
 
 # The gate. Never skip it, never infer it from the error text.
 gh pr view <N> --json state,mergeCommit -q '.state + " " + (.mergeCommit.oid // "NONE")'
 ```
+
+**When `deleteBranchOnMerge` is true, leave `--delete-branch` off.** GitHub deletes the remote
+branch on its own, so the flag adds only gh's *local* cleanup: delete the local branch, check out
+the default branch, pull. That half is the source of this section's failure modes. It fails
+when a worktree holds the branch or the tree is dirty (both observed), which is the normal
+state in a parallel-agent workspace. It also strands the session (5.7). Without the flag
+there is no local half to fail, and the verdict gate and `ls-remote` check below still apply.
+*(This repo, 2026-10-07: 5 merges without the flag, every remote branch reaped by the server,
+no errors, no hand-deletes, no checkout switch. The 2026-09-16 run passed the flag and
+half-failed on both of its merges.)*
 
 | Verdict | What happened | What to do |
 |---|---|---|
@@ -351,8 +371,8 @@ Verify with `gh pr view <N> --json state,headRefOid` that the head SHA matches w
 PR had before, then re-run the merge. Do this *before* moving on to the next PR in the
 queue — the longer you wait, the more likely the objects get garbage-collected.
 
-**5.7 — Return to your branch.** `gh pr merge --delete-branch` silently checks out the
-default branch and pulls. In a parallel-agent workspace this strands the session. Re-checkout
+**5.7 — Return to your branch.** If you passed `--delete-branch`, gh silently checked out the
+default branch and pulled. In a parallel-agent workspace this strands the session. Re-checkout
 the Step 0.2 branch, and delete `tmp/pr<N>` if you made one.
 
 **5.8 — Tick it off.** Update the plan file: status `merged`, record the new `main` SHA.

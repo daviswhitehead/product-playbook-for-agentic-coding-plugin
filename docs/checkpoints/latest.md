@@ -12,7 +12,9 @@
   - Released **0.28.8 → 0.29.0** (`6926cd5`), main guard green. Synced the local install to 0.29.0 (`claude plugin marketplace update` + `claude plugin update`). **Needs a restart to load.**
   - Fixed two bugs in `scripts/content-landed.sh`: **#115** (it read only the tip commit, so it reported #108 as LANDED) and **#116** `5a018d7` (`printf | grep -q` under `pipefail` took SIGPIPE and reported found lines as missing, 5 of 8 runs).
   - Removed 9 worktrees: 4 for today's merged PRs, and 5 stale ones whose PRs (#82, #98, #99, #105, #106) had merged weeks ago. Each was confirmed clean, no stash, content on main.
-- **In progress**: nothing. 0 open PRs.
+  - Retro (`/playbook:learnings`, run from close): opened the learnings PR on `improve/merge-prs-2026-10-07-learnings`. It adds a CI regression test for `content-landed.sh`, merges without `--delete-branch` when auto-delete is on, skips merging main into an already-`CLEAN` PR, fixes the cost-count rule in `close.md`, and adds the eighth addendum to `docs/learnings/2026-07-17-merging-stacked-prs-across-worktrees.md`.
+  - Session CI cost: **12 runs, 1.3 job-min**. An "18 runs" figure given mid-session was wrong: a date-window count that included other sessions' runs.
+- **In progress**: the learnings PR is open and unmerged. It carries a patch changeset, so `main` needs `scripts/release.sh` after it merges.
 - **Blocked on**: nothing.
 
 ## Key Decisions
@@ -24,8 +26,9 @@
 - None blocking.
 
 ## Next Steps
-1. Restart Claude Code so 0.29.0 loads (new skills `video-evidence`, `ios-simulator-testing`).
-2. When `content-landed.sh` is next run in a triage, trust its verdicts. Before today it could be wrong in both directions.
+1. Merge the learnings PR, then run `scripts/release.sh` (0.29.0 → 0.29.1) and sync the install.
+2. Restart Claude Code so 0.29.0 loads (new skills `video-evidence`, `ios-simulator-testing`).
+3. When `content-landed.sh` is next run in a triage, trust its verdicts. Before today it could be wrong in both directions.
 
 ## Hot Files (modified this session)
 - `scripts/content-landed.sh`: merge-base diff instead of the tip commit (#115); here-string instead of a pipe (#116).
