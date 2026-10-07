@@ -267,6 +267,8 @@ One conductor session directing N subagents, each in its own worktree with full 
 - **Proof runs are not side-effect free.** A unit test reached the real `gh`; a probe wrote a real PostHog insight; dry-runs mutated tracked runtime state files that were then committed, and the cron host's `git pull` refused. Block real external clients in test setup, and diff `git status` after any proof run before staging — runtime state never rides along in a commit.
 - **Open each PR from the worktree that holds its commits**, before any `git checkout` back to a workspace branch (`/playbook:git-pr` Step 1).
 
+- **Model tiering (2026-10-07):** the model that does judgment work stays the strongest available — anything that edits code or docs, reviews, triages, or writes a packet. Use a mid-tier model (e.g. Sonnet) only for mechanical work: CI watching, log reading, data gathering, running suites, building triage tables. Skip the smallest tier; its savings are small and its error rate is not. Fewer subagents (the waves rule above) saves more than cheaper ones — in the session that produced this rule, both Opus subagents were doing judgment work, so tiering would have saved nothing.
+
 ## Quality Gates
 
 ### Pre-Commit Gates
