@@ -28,6 +28,13 @@
 #   1  some added lines are missing from base       -> UNIQUE content remains
 #   2  usage / bad ref
 #
+# WHOLE BRANCH, NOT THE TIP COMMIT:
+#   The diff is taken from merge-base(base, ref) to ref, so every commit on the
+#   branch counts. An earlier version read only the tip commit (`diff-tree ref`,
+#   `ref~1..ref`) and reported a two-commit branch as LANDED because its last
+#   commit only added a changeset (PR #108, 2026-10-07) — the same false
+#   positive this script exists to prevent, from the other direction.
+#
 # NOTE ON .changes/:
 #   Changeset files are DELETED by scripts/release.sh once consumed, so their
 #   absence from the base branch means "already released", not "not landed yet".
@@ -48,11 +55,10 @@ fi
 git rev-parse --verify --quiet "$REF" >/dev/null   || { echo "bad ref: $REF" >&2; exit 2; }
 git rev-parse --verify --quiet "$BASE" >/dev/null  || { echo "bad base: $BASE" >&2; exit 2; }
 
-# Files the ref touches, relative to its own first parent. Using the ref's own
-# diff (not ref...base) is deliberate: we want what this work ADDED, then we ask
-# whether the base already says it.
-FILES="$(git diff-tree --no-commit-id --name-only -r "$REF")"
-[ -z "$FILES" ] && FILES="$(git diff --name-only "$BASE...$REF")"
+# Everything the branch added since it forked (or last merged base in): we want
+# what this work ADDED, then we ask whether the base already says it.
+FORK="$(git merge-base "$BASE" "$REF")" || { echo "no merge base between $REF and $BASE" >&2; exit 2; }
+FILES="$(git diff --name-only "$FORK" "$REF")"
 
 if [ -z "$FILES" ]; then
     echo -e "${GREEN}LANDED${NC}: $REF touches no files vs $BASE"
@@ -73,7 +79,7 @@ while IFS= read -r f; do
     esac
 
     # Added lines this ref introduced for this file.
-    added="$(git diff "$REF~1" "$REF" -- "$f" 2>/dev/null \
+    added="$(git diff "$FORK" "$REF" -- "$f" 2>/dev/null \
              | grep '^+' | grep -v '^+++' | sed 's/^+//' \
              | grep -v '^[[:space:]]*$')"
     [ -z "$added" ] && continue
