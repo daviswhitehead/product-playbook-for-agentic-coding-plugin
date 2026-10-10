@@ -27,6 +27,9 @@ Display all available commands and help the user find the right one for their ta
 **Have a plan, need actionable tasks?**
 → `/playbook:tasks` - Break down into specific tasks
 
+**Want the founder to approve the whole project in one sitting before autonomous delivery?**
+→ `/playbook:review` - One-page REVIEW.md (PRD · prototype · components · plan); approval here is the gate
+
 **Ready to implement?**
 → `/playbook:work` - Execute the next task
 → `/playbook:work-multiple` - Execute multiple tasks autonomously
@@ -96,6 +99,7 @@ Display all available commands and help the user find the right one for their ta
 | `/playbook:product-requirements` | Starting a new feature - define problem, users, success criteria |
 | `/playbook:tech-plan` | After requirements - design architecture, sequencing, approach |
 | `/playbook:tasks` | After tech plan - create specific, actionable tasks |
+| `/playbook:review` | Before autonomous delivery - one-page project review the founder approves |
 | `/playbook:work` | Execute one task from the tasks document |
 | `/playbook:work-multiple` | Execute multiple tasks autonomously |
 | `/playbook:emergent` | Mid-project bug or new requirement - capture as a micro-PRD first |
