@@ -14,6 +14,7 @@ Before starting autonomous work, verify:
 ### Project Readiness
 - [ ] **Tech Plan exists** - Architecture and sequencing documented
 - [ ] **Tasks Document exists** - Granular tasks with acceptance criteria
+- [ ] **REVIEW.md approved** - The one-page project review (`/playbook:review`) carries the founder's "approved"; without it, build only what the tasks doc marks as pre-approval work
 - [ ] **Success criteria defined** - Clear "done" definition
 - [ ] **Tests exist** - Automated validation available
 - [ ] **Quality gates configured** - Pre-commit hooks, CI checks
