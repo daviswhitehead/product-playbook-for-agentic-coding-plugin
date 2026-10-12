@@ -105,16 +105,12 @@ Before starting, ensure:
 
 Multi-week projects almost always cross a session/compaction boundary. The agent-activity-ux retro (2026-04-24) measured 50–110× re-reads of the same files because no rolling artifact survived between sessions. Maintain a single project-state file so a fresh session can pick up without re-deriving context.
 
-1. **Locate** `projects/[status]/[project-name]/project-state.md`. If it does not exist, create it.
-2. **Read it before doing anything else** when starting a new session. It must contain (at minimum):
-   - **Architecture decisions**: What patterns were chosen, what was rejected, and why (one line each — link to tech plan / critique for full reasoning).
-   - **Current state**: Which tasks are done, which is in flight, what's blocked.
-   - **Open contracts**: testIDs, SSE event names, file-path conventions, anything multiple files reference.
-   - **Outstanding decisions**: Open questions awaiting user input.
-3. **Update it as you go.** When you make a non-trivial decision, when a task closes, when scope shifts — write a 1–3 line entry. Don't write prose; write an index. The body lives in PRD/tech-plan/tasks/critique.
-4. **Keep it under ~200 lines.** This is an index, not a wiki. If a section grows past 20 lines, it belongs in its own dedicated doc.
+1. **Locate** `projects/[status]/[project-name]/project-state.md`. If it does not exist, create it from `resources/templates/project-state.md` (header with head sha, decision-rights link and budget; Now / Next / In flight / Waiting on / Decisions / Resume notes).
+2. **Read it before doing anything else** when starting or resuming a session, then verify every "In flight" PR and branch (`gh pr view`, `git status`) before acting. Architecture decisions, open contracts (testIDs, event names, path conventions) and outstanding founder questions all have a section.
+3. **Update and commit it at every state change**: task started, PR opened, check finished, decision recorded, scope shifted. A run can be stopped at any moment (usage limit, credits, crash), and a stop should lose at most one step. Write an index, not prose; the body lives in PRD/tech-plan/tasks/critique.
+4. **Keep it under ~200 lines.** If a section grows past 20 lines, it belongs in its own dedicated doc.
 
-This artifact is the single most effective intervention to combat cross-session context loss. Treat updates as part of the task, not as overhead.
+This artifact is the single most effective intervention against cross-session context loss, and it is what makes self-resume cheap (`autonomous-execution` skill, Self-Resume). Treat updates as part of the task, not as overhead.
 
 ### Step 1.5: Scope & Cost Verification (Every 3-5 Tasks, and Before Every Expansion)
 
@@ -157,6 +153,10 @@ So far this session: <P> PRs, <R> full CI runs, <E> eval runs (≈ $<total>).
 Original ask: <one line>. This step is [in scope | an extension].
 Proceed / fold into the open PR / defer?"
 ```
+
+Under an approved Decision Rights block with a budget, the founder already chose: put the cost line
+and running total in the daily packet (`decisions-queue.md`) and continue, and stop for a new choice
+only when a revised estimate exceeds the approved budget.
 
 Default to the cheaper shape:
 - **Fold, don't fork.** Add follow-up fixes to the open PR before it merges instead of opening a
@@ -462,6 +462,8 @@ If automated checks or manual walkthrough reveal issues:
 
 ### Step 5.6: Present to User for Review
 
+**Under an approved Decision Rights block, don't stop per task.** Record the result in `project-state.md`, put anything that needs the founder in `decisions-queue.md` (verified first, with your recommendation), and continue. The founder sees the work in the daily packet and on the integration branch's review and QA round. Present per task only when there is no delegation contract.
+
 After autonomous pre-review passes, present the work concisely:
 
 ```
@@ -509,24 +511,23 @@ Before marking task complete, verify:
 - [ ] Documentation updated
 - [ ] Tasks Document updated
 
-#### Step 7b: Pre-Merge Hard Gate (Required Before PR Goes Out of Draft)
+#### Step 7b: Pre-Merge Hard Gate (Required Before PRs Are Cut and Marked Ready)
 
-When the **last task in the project** is complete and you (or the user) are about to mark the PR ready for review, run the project's **full** validation suite — not just `ci:local`. The agent-activity-ux retro (2026-04-24) caught a 4-commit fix-forward cascade after a testID rename that `ci:local` did not catch but `test:verify` would have.
+When the **last task in the project** is complete, and before any PR is cut from the integration branch and marked ready:
+
+1. **QA round closed** on the integration branch (tasks template Task N.4, `resources/templates/qa-round.md`): agent rows passed with evidence, device-specific behaviour checked on a real device or simulator, no founder row left `open`.
+2. **Deterministic lane, locally, for what you touched**: the fast gate (`ci:local` or equivalent) plus every test the change can affect: specs for the changed surfaces, and any test referencing a changed selector, copy string or contract (Step 5.5 1b). The agent-activity-ux retro (2026-04-24) caught a 4-commit fix-forward cascade after a testID rename that the fast gate missed; the touched-test set exists to catch exactly that.
+3. **The full suite runs once, in CI, at ready.** Don't duplicate it on the laptop when CI runs it: local full runs compete for one machine across workspaces and double the wait. Run the full suite locally (under the machine's heavy lock) only when the project's CLAUDE.md requires it, when CI doesn't run that suite, or when reproducing a CI failure.
+4. **Live-model lane once per agent-behaviour change set** (evals at full tier), not per PR, and not for frontend-only PRs.
 
 ```bash
-# Discover the right command:
-#   1. Read CLAUDE.md / AGENTS.md / GEMINI.md for the project's pre-PR command
-#   2. Otherwise prefer test:verify > ci:local:full > test:full
-npm run test:verify    # runs lint + typecheck + unit + integration + E2E
-
-# If integration/E2E require services, the script should start them. If it
-# does not, start services explicitly first:
-npm run deploy:development:all &  # or the project-specific equivalent
+# Discover the right commands from CLAUDE.md / AGENTS.md / package.json:
+#   fast gate:      ci:local > test:pre-push > lint + typecheck + unit
+#   touched tests:  the runner's file/grep filter, e.g. npx playwright test <specs>  /  jest <paths>
+#   full (CI, or local only per rule 3): test:verify > ci:local:full > test:full
 ```
 
-**Do not push and rely on CI** to discover failures. CI failures arrive minutes-to-hours later and frequently mask each other (sharded E2E with `fail-fast: true` reports the first shard's failure and skips the rest, requiring multiple iterations to surface all problems). Local `test:verify` reports everything in one run.
-
-**If `test:verify` does not exist in this project**, propose adding it (see CLAUDE.md guidance) before marking the PR ready. Do not silently downgrade to `ci:local`.
+If CI's sharded suites use `fail-fast: true`, one shard's failure hides the rest; read every failed job before fixing any, and propose turning fail-fast off rather than compensating with local full runs. If the project has no CI for a suite that must pass, its full local run is the gate. Do not silently skip it.
 
 ## Task Execution Workflow
 

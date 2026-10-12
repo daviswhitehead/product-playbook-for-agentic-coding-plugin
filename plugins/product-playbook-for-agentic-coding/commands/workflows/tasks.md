@@ -109,12 +109,13 @@ Drawing from multiple role perspectives, guide the user through:
 **From Engineering Manager + DevOps Engineer perspectives:**
 - Name how each task will be proven and what that proof costs: unit test ($0, seconds) · replay / fixture dry-run ($0, minutes) · real-model or eval run ($N, 10–20 min) · browser journey (minutes) · consuming query (instrumented tasks)
 - **Prove deterministic changes with the cheapest method that can fail; run the real model or the full suite once at the end of the phase**, not once per task. A task that can only be proven by a paid run says so, with the price.
-- Assign each task to a PR from the tech plan's PR Strategy table (by lane and gate). A task with no PR row is a sign the PR table is wrong, not that the task needs its own PR.
+- Assign each task to a PR from the tech plan's PR Strategy table (by risk class: lane × gate). A task with no PR row is a sign the PR table is wrong, not that the task needs its own PR.
+- **List the PRs in the tasks doc's PR Map** with risk class, gate and cost (full CI cycles × minutes, eval runs × $), plus the total. Tasks land as commits on the project's integration branch; PRs are cut from it after the review and QA round. No stacked PRs.
 - **Verify every schema/column reference**: if an acceptance criterion names a database column, file path, function, env var, or other concrete identifier, grep-verify it against the codebase (or a migration in the same PR or earlier) BEFORE finalizing the criterion. An acceptance criterion that names a non-existent identifier is unfalsifiable until implementation hits it — the implementer either silently drifts from spec or has to amend the spec retroactively, and the criterion was load-bearing for nothing in the meantime. One grep is cheaper than every downstream confusion combined. (Pattern observed: Chef Chopsky 2c.3 acceptance wrote `messages.created_at` but the column is `messages.timestamp`. See `docs/learnings/2026-05-18-2c3-session-learnings.md` in that repo.)
 
 #### 6. AI Tool Recommendations
 For each task, recommend:
-- **Model**: Which AI model is best suited (Opus for complex, Sonnet for standard, Haiku for simple)
+- **Model**: the **role** from the project's model registry (e.g. `docs/guides/model-strategy.md`: role → model alias) and the alias it maps to today, which is what the Agent tool's `model` parameter takes. Without a registry: strongest model for anything that edits code/docs or judges; mid-tier for mechanical work; no agent at all for waiting (CI, deploys, humans).
 - **Platform**: Which platform to use (Claude Code, Cursor, etc.)
 - **Tools**: Relevant MCP servers, plugins, or other tools
 - **Rationale**: Brief explanation of why
@@ -190,6 +191,8 @@ Ensure all sections are filled:
 - AI Tool Recommendations for each task
 - Task Dependencies (critical path and parallel opportunities)
 - Task-by-Task Summary Table
+- PR Map (risk class, gate, cost per PR, total) and the integration branch
+- QA round task on the integration branch, before PRs open (Phase N)
 - Progress Tracking (current status)
 - Project Reconciliation section (pre-populated from template — completed at project end)
 
@@ -201,7 +204,8 @@ Review the document:
 - [ ] Dependencies are identified and sequenced
 - [ ] Effort estimates are reasonable
 - [ ] Tasks are organized into logical categories
-- [ ] AI tool recommendations included
+- [ ] AI tool recommendations included (model by registry role)
+- [ ] PR Map lists every PR with risk class and cost; no task without a PR, no stacks
 - [ ] Ready to begin implementation
 
 ## Key Principles

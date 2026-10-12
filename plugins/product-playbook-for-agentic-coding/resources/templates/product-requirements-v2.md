@@ -315,6 +315,18 @@ matters more than template completeness.
 | [Decision 1] | [Options] | [Choice] | [Why] | [Date] |
 | [Decision 2] | [Options] | [Choice] | [Why] | [Date] |
 
+### Decision Rights
+
+<!-- Filled once, at approval. If the project uses a REVIEW.md (/playbook:review), the block lives there
+     and this section links to it. Without it, every merge and reversible pick becomes a blocking question.
+     A project's own merge policy overrides these defaults where stricter. -->
+
+- **Agents may merge without asking:** everything in the PR map except data-writing or destructive migrations, auth/session code, secrets and permissions, and spend.
+- **New user-facing surfaces ship dark** behind a default-off flag; the founder's gate is the flag flip.
+- **Reversible picks** take the recommendation after 48 h of founder silence ("approved by default"); irreversible and founder-only items never default.
+- **One channel:** `decisions-queue.md`, sent as one daily packet; live interrupts only for production or spend outages.
+- **Verify before asking:** the agent checks a claim itself before it reaches the founder.
+
 ---
 
 ## Open Questions

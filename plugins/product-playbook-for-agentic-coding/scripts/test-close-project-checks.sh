@@ -32,6 +32,7 @@ fixture() {
     && git config user.email t@t && git config user.name t \
     && mkdir -p "projects/done/${name}" \
     && echo "# diff" > "projects/done/${name}/planned-vs-implemented.md" \
+    && echo "# ledger" > "projects/done/${name}/delivery-ledger.md" \
     && if [ -n "$tray" ]; then mkdir -p "projects/${tray}/${name}"; echo x > "projects/${tray}/${name}/tasks.md"; fi \
     && git add -A && git commit -qm "fixture" ) >/dev/null 2>&1
   printf '%s' "$d"
@@ -71,6 +72,37 @@ d=$(fixture epsilon "")
 rm "$d/projects/done/epsilon/planned-vs-implemented.md"
 rc=$(run_in "$d" epsilon)
 [ "$rc" != "0" ] && ok "missing planned-vs-implemented.md FAILS" || bad "missing artifact must fail"
+rm -rf "$d"
+
+# Missing delivery ledger.
+d=$(fixture epsilon2 "")
+rm "$d/projects/done/epsilon2/delivery-ledger.md"
+rc=$(run_in "$d" epsilon2)
+[ "$rc" != "0" ] && ok "missing delivery-ledger.md FAILS" || bad "missing ledger must fail"
+rm -rf "$d"
+
+# QA round: an open founder row blocks the close (the days-long wait).
+qa_header='| # | Check | Owner | Device / surface | Status | Opened | Evidence / decision |
+|---|-------|-------|------------------|--------|--------|---------------------|'
+d=$(fixture qa1 "")
+printf '%s\n| 1 | sheet feels right | founder | iPhone | open | 2026-10-01 | see shots |\n' "$qa_header" \
+  > "$d/projects/done/qa1/qa-round-1.md"
+rc=$(run_in "$d" qa1)
+[ "$rc" != "0" ] && ok "open founder QA row FAILS" || bad "open founder QA row must fail, got rc=$rc"
+rm -rf "$d"
+
+d=$(fixture qa2 "")
+printf '%s\n| 1 | sheet feels right | `founder` | iPhone | `decided` | 2026-10-01 | default applied 2026-10-03 |\n| 2 | keyboard | agent | sim | pass | 2026-10-01 | check.mjs |\n' "$qa_header" \
+  > "$d/projects/done/qa2/qa-round-1.md"
+rc=$(run_in "$d" qa2)
+[ "$rc" = "0" ] && ok "decided founder row + passed agent row passes" || bad "closed QA round should pass, got rc=$rc"
+rm -rf "$d"
+
+d=$(fixture qa3 "")
+printf '%s\n| 1 | founder copy reads open-ended | agent | web | open | 2026-10-01 | wip |\n' "$qa_header" \
+  > "$d/projects/done/qa3/qa-round-2.md"
+rc=$(run_in "$d" qa3)
+[ "$rc" = "0" ] && ok "words inside a cell don't trip the check (agent row)" || bad "only bare founder/open cells should count, got rc=$rc"
 rm -rf "$d"
 
 # A stale reference in a living doc.

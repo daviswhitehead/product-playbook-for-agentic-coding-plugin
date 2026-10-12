@@ -108,11 +108,11 @@ Present to user:
 
 **Why this matters**: A single verified task catches prompt misunderstandings, wrong patterns, and misread acceptance criteria before they compound across N tasks. Fixing one task is cheap; fixing 8 is expensive.
 
-**Skip when**: The user explicitly says "run all tasks without stopping" or passes a `--no-dry-run` flag.
+**Skip when**: The user explicitly says "run all tasks without stopping", passes a `--no-dry-run` flag, or the project has an approved Decision Rights block (REVIEW.md or PRD). Under the block, run the dry-run task anyway, validate it yourself, record the result in `project-state.md`, and continue. The founder sees it in the daily packet, not as a blocking question.
 
 ### Step 2: Execute Tasks in Sequence
 
-> **Dispatching tasks to parallel subagents instead?** Apply the `autonomous-execution` skill's *Conductor mode: resource budget* before the first wave — waves of ≤4, a shared heavy-step lock, rules in one brief file, `pending manager review` verdicts, proof runs treated as side-effecting.
+> **Dispatching tasks to parallel subagents instead?** Apply the `autonomous-execution` skill's *Conductor mode: resource budget* before the first wave — waves of ≤4, ≤3 heavy workspaces per machine, one machine-wide heavy-step lock, rules in one brief file, models picked from the registry, no sub-agent that waits on CI (it ends with `NEXT:` and you arm a watcher), `pending manager review` verdicts, proof runs treated as side-effecting. For runs longer than one sitting, also apply its *Self-Resume* section.
 
 For each task:
 
@@ -126,7 +126,7 @@ For each task:
    - Keep changes focused
 
 3. **Validate** (before committing):
-   - Run project validation: check CLAUDE.md / package.json for `ci:local` or `test:verify`
+   - Run the fast gate (CLAUDE.md / package.json: `ci:local` or equivalent) plus the tests this task touches; the full suite runs once in CI at ready (`work.md` Step 7b)
    - At minimum: `npm run lint && npm run typecheck && npm test`
    - Check acceptance criteria
    - Verify no regressions
@@ -164,10 +164,12 @@ For each task:
 
 If you encounter a blocker:
 
-1. **Document the blocker** in task notes
-2. **Set status** to "Blocked"
-3. **Move to next task** - don't get stuck
-4. **Note for summary** - user needs to know
+1. **Verify it is real**: check the claim yourself (tools installed, limits, prior answers) before calling it a blocker
+2. **Document the blocker** in task notes and under "Waiting on" in `project-state.md`
+3. **If it needs the founder**, add it to `decisions-queue.md` with your recommendation; reversible items take the recommendation after 48 h
+4. **Set status** to "Blocked"
+5. **Move to next task** - don't get stuck
+6. **Note for summary** - user needs to know
 
 ### Step 3.5: Reconcile All Tasks (Before Stopping)
 

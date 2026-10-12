@@ -91,19 +91,22 @@ Use a concise diagram if helpful to visualize the system:
 **Budget** (stated here, before the first PR; `/playbook:close` reports actual against it):
 - PRs: [N] · CI minutes: [≈ PRs × pushes per PR × lane cost — lane costs come from the project's CLAUDE.md or its CI-cost report] · LLM / eval spend: [$N or "none"] · Founder-gated merges: [N]
 
-**PR Boundaries** (required for Medium/Large projects). Shape PRs by **CI lane** and **review gate**, not by task:
+**Integration branch**: `[project]/integration`. Small slices land here locally (commits, not PRs); the project is reviewed **once** on it (REVIEW.md + a QA round), then ships as one PR per risk class cut from it.
 
-| PR | Lane (what CI runs) | Gate (who merges) | Phase/Milestone | What ships | Est. Files |
-|----|---------------------|-------------------|-----------------|------------|------------|
-| 1  | [frontend / agent / workflows-only / docs-only / mixed] | [autonomous / founder] | [Phase name] | [What ships] | ~N files |
-| 2  | [lane] | [gate] | [Phase name] | [What ships] | ~N files |
+**PR Boundaries** (required for Medium/Large projects). One PR per **risk class**, where the risk class is the pair (CI lane, merge gate). Not one per task:
+
+| PR | Risk class: lane (what CI runs) | Gate (who merges, per Decision Rights) | What ships | Cost (CI cycles × min, eval runs) | Est. Files |
+|----|---------------------------------|----------------------------------------|------------|-----------------------------------|------------|
+| 1  | [frontend / agent behaviour / migration / workflows-only / docs-only] | [agent / founder] | [What ships] | [e.g. 1 full CI ≈ 45 min, 0 evals] | ~N files |
+| 2  | [lane] | [gate] | [What ships] | [e.g. 1 full CI + 1 full eval ≈ $2] | ~N files |
 
 Rules:
-- **One PR per (lane, gate) cell per phase.** Two tasks that hit the same lane and the same gate ship in one PR unless one would block the other's review.
+- **One PR per risk class.** Typical classes: agent/model behaviour (pays the eval gate), data migration (founder gate), frontend, workflows/scripts, docs. Two tasks in the same class ship in one PR.
+- **No stacked PRs.** A stack multiplies CI cycles and freshness re-runs and breaks on squash merges. Sequence through the integration branch instead: if PR 2 needs PR 1's code, merge PR 1 first, then cut PR 2 from the updated integration branch.
 - **Bundle prose with the code it describes** (docs, policy, README) unless it would drag the code PR to a slower gate.
-- **Stack only when a founder gate would otherwise block autonomous work.** Never delete the base branch of a stack when merging it.
 - **A mixed PR pays for every lane.** Split it only when the split saves more CI than the second PR costs (a second PR is at least one full fast-CI run plus any preview builds).
-- **Fewer, fuller PRs beat many small ones** when review is by a solo founder: each PR is a review packet, a CI run and a preview environment. Evidence: one session shipped 31 PRs where ~4 would have done; that repo's trailing-28-day read was 89.5 CI minutes per merged PR (chef-chopsky, 2026-10-06 retro).
+- **Split hot files first.** If every feature appends to the same registry or CI config, plan the split in this phase so parallel projects stop colliding on it.
+- **Fewer, fuller PRs beat many small ones** when review is by a solo founder: each PR is a review packet, a CI run and a preview environment. Evidence: one 11-day project planned 11 PRs and shipped 32, with stacks that collapsed on squash merges; its one PR built on a local integration branch and reviewed once was the cheapest per change. Projected for that project with this shape: 6–10 PRs (chef-chopsky shipping-velocity retro, 2026-10-12).
 
 **Review Cadence**: [per-PR | per-phase | at merge]
 
@@ -111,10 +114,28 @@ Rules:
 
 ## Testing Strategy
 
+### Lanes (each test lives in exactly one)
+If the project has a test-portfolio policy, follow it and cite it here; these are the defaults.
+
+| Lane | Contents | Runs when | Blocks merge? | Budget |
+|------|----------|-----------|---------------|--------|
+| **Deterministic gate** | lint, typecheck, unit, deterministic integration, stubbed E2E | every head: touched tests first, full suite once at ready (CI) | yes | [≤ N min wall, e.g. 15] |
+| **Live-model** | evals, live-model integration/E2E | once per agent-behaviour change set, plus nightly | only agent-behaviour PRs | [$N / month] |
+| **Health** | quota/billing probes, tracing caps, prod smoke | preflight (seconds) before live jobs; cron | no — opens an issue | – |
+
+A health failure (dead key, exhausted quota) must never cost a full deterministic run: live jobs probe dependencies first and fail in seconds with "billing, not code".
+
 ### Test Types and Coverage
 - **Unit Tests**: [Coverage approach]
 - **Integration Tests**: [Coverage approach]
 - **End-to-End Tests**: [Coverage approach]
+
+### New tests (each names the risk it protects)
+| Test | Lane | Layer (lowest that can fail for this bug) | Risk / journey it protects | Why not a lower layer |
+|------|------|-------------------------------------------|----------------------------|-----------------------|
+| [name] | [lane] | [unit / integration / E2E / eval] | [risk] | [only for E2E and live-model tests] |
+
+A test that can't name its risk is cost without coverage: each E2E test adds wall time to every future run. A new eval scenario or guard is seen failing once before it is trusted.
 
 ### Test Environment Requirements
 - [Test environment setup requirements]

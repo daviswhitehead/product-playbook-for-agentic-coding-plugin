@@ -74,6 +74,51 @@ else
   fail "planned-vs-implemented.md missing from projects/done/${NAME}/"
 fi
 
+# --- 4b. The delivery ledger exists -------------------------------------------
+# Without it, what the project cost (calendar buckets, founder turns, PRs, CI
+# minutes, dollars, re-runs) is invisible and the next project can't compare.
+if [ -f "projects/done/${NAME}/delivery-ledger.md" ]; then
+  pass "delivery-ledger.md present"
+else
+  fail "delivery-ledger.md missing from projects/done/${NAME}/ — see /playbook:close-project Step 2b"
+fi
+
+# --- 4c. No QA round has a founder row still open -----------------------------
+# A founder-only QA row that waits indefinitely held one project's close-out for
+# days. Rows are markdown table lines with a bare 'founder' owner cell and a bare
+# 'open' status cell (resources/templates/qa-round.md). Past 48 h the agent
+# applies its recommendation and records the row as 'decided'.
+qa_files=$(find "projects/done/${NAME}" -type f -iname '*qa-round*.md' 2>/dev/null | sort || true)
+if [ -z "$qa_files" ]; then
+  skip "QA round check (no qa-round*.md in the project)"
+else
+  open_rows=""
+  while IFS= read -r f; do
+    [ -n "$f" ] || continue
+    rows=$(awk -F'|' '
+      /^[[:space:]]*\|/ {
+        founder = 0; open = 0
+        for (i = 2; i < NF; i++) {
+          c = tolower($i)
+          gsub(/^[[:space:]`*]+|[[:space:]`*]+$/, "", c)
+          if (c == "founder") founder = 1
+          if (c == "open") open = 1
+        }
+        if (founder && open) printf "%s:%d\n", FILENAME, FNR
+      }' "$f")
+    [ -n "$rows" ] && open_rows="${open_rows}${rows}"$'\n'
+  done <<< "$qa_files"
+  if [ -n "$open_rows" ]; then
+    fail "QA round has founder row(s) still open:"
+    while IFS= read -r r; do
+      [ -n "$r" ] && printf '           %s\n' "$r"
+    done <<< "$open_rows"
+    echo "           Record the founder's answer, or (past 48 h) set Status to 'decided' with \"default applied <date>: <what>\"."
+  else
+    pass "no QA round has an open founder row"
+  fi
+fi
+
 # --- 5. Merged PRs carry a proof-of-completion comment -----------------------
 # Autonomous merge authority is granted in exchange for a reviewable audit
 # trail; green CI is not that trail. Best-effort: needs gh, auth, and a remote.

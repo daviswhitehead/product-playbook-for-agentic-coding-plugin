@@ -4,6 +4,17 @@
 
 **Version:** [vN — aligned with PRD vX, prototype vY, the Storybook board and tech plan vZ (date)] · **Status:** [awaiting approval | APPROVED by <who> <date>: "<quote>"]
 
+### <a id="decision-rights"></a>Decision rights (the founder fills this once; approval of the page approves it)
+
+Without this block, every merge, migration and reversible pick becomes a question at the moment it blocks; in one measured project that waiting was 55% of the calendar. Defaults are pre-filled; edit what you disagree with. A project's own merge policy (e.g. `MERGE-POLICY.md`) overrides these defaults where stricter.
+
+- **Agents may merge without asking:** every PR in this project's PR map **except** data-writing or destructive migrations, auth/session code, secrets and permissions, and anything that spends money. [edit]
+- **New user-facing surfaces ship dark** behind a default-off feature flag. The founder's gate is the **flag flip**, not the merge. [edit]
+- **Reversible picks** (copy, defaults, sequencing within this spec, which of two approved options) take the agent's recommendation after **48 hours** of founder silence, logged as "approved by default". Irreversible and founder-only items never default. [edit]
+- **One channel:** questions go into [`decisions-queue.md`](./decisions-queue.md), sent as **one daily packet** (morning). Live interrupts only for a production or spend outage. [edit]
+- **Verify before asking:** the agent checks a claim itself (installed tools, current limits, prior answers) before it reaches the founder.
+- **Budget:** [N PRs · ≈ N CI minutes · $N evals / LLM spend · $N agent tokens]. Cost per PR and the running total go in each daily packet; the agent stops for a new choice only when a revised estimate exceeds this budget [default: by more than 50%].
+
 | # | Asset | Open it | Read time |
 |---|---|---|---|
 | 1 | [Product (PRD)](#1-product) | [`product-requirements.md`](./product-requirements.md) vX | ~15 min |

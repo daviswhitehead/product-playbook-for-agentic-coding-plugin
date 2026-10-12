@@ -16,6 +16,7 @@ Use when **all of the following are true**:
 - All planned tasks are at a final disposition (done / blocked / deferred / cancelled)
 - The gate task (if any) has closed (with explicit GO, NO-GO, or Conditional GO + named follow-ups)
 - The work has shipped or is committed/merged
+- Every QA round is closed: no founder row left `open` (answered, or past the 48-hour default with the applied default recorded as `decided`)
 - The project still lives in `projects/in-progress/` or `projects/to-do/`
 
 If any of those is false, this is not closing time. Use `/playbook:work` to finish the work, or `/playbook:critique` if the gate isn't ready to close.
@@ -48,7 +49,28 @@ Write the diff to `projects/[in-progress|to-do]/[name]/planned-vs-implemented.md
 - Any task whose row in the summary table disagrees with reality (the most common drift)
 - Any acceptance criteria that closed but were never actually verified (e.g., a gate metric that read `null`)
 
-This file becomes input to the retrospective in Step 5.
+This file becomes input to the retrospective in Step 6.
+
+### Step 2b: Produce `delivery-ledger.md` (what the project cost)
+
+Without a per-project ledger, how a project spent founder attention, calendar time and money is invisible until someone runs a forensic retro, and nothing gets compared. Emit one at every close.
+
+1. **Use the project's generator if it has one.** Look in CLAUDE.md, `package.json` scripts and `scripts/` / `workflows/` for a ledger or delivery-metrics command (`grep -ril ledger`) and run it for this project's date range and PRs.
+2. **Otherwise assemble it** from `gh pr list --search` (the project's PRs, opened → merged), `gh run list` / the check-runs API (runner minutes, re-runs and their causes), `git log`, billing/usage pages, and the session transcripts (founder turns, usage-limit stops).
+3. **Write `projects/[...]/[name]/delivery-ledger.md`** with this table, and the same columns for the **previous closed project** (the most recent `projects/done/*/delivery-ledger.md`) so the change is visible:
+
+| Metric | This project | Previous: [name] | Note |
+|---|---|---|---|
+| Calendar (first ask → last merge) | [days] | | |
+| Calendar buckets: agents working / CI only / waiting on founder / usage-limit stop / idle | [% each] | | |
+| Founder turns (of which pure unblocks: "continue", raise a cap, restart a tool) | [N (N)] | | |
+| PRs (planned → shipped) | [N → N] | | |
+| CI runner minutes (share not on a final head's first run) | [N (N%)] | | |
+| Dollars: agent tokens / LLM + evals / CI / infra | [$ each] | | |
+| Re-runs by cause: code / flaky / infra / external quota | [N each] | | |
+| Production incidents caused by the project's own work or spend | [N] | | |
+
+Mark each value **M** (measured) or **E** (estimated). Write `unknown`, never `0`, for a value you couldn't read: a zero reads as healthy. The retrospective (Step 6) reads this table.
 
 ### Step 3: Reconcile Planning Docs
 
@@ -86,7 +108,7 @@ Any cross-references in CLAUDE.md, README, or learnings docs need their paths up
 ### Step 6: Trigger the Retrospective
 
 Confirm with the user whether to run the retrospective inline:
-- **Yes (recommended for projects ≥ 2 weeks)** — invoke `/playbook:learnings` with trigger type "project completion" and depth "deep." The `planned-vs-implemented.md` produced in Step 2 becomes Pre-Check A input.
+- **Yes (recommended for projects ≥ 2 weeks)** — invoke `/playbook:learnings` with trigger type "project completion" and depth "deep." The `planned-vs-implemented.md` produced in Step 2 becomes Pre-Check A input, and `delivery-ledger.md` (Step 2b) feeds its delivery-ledger comparison.
 - **No (defer)** — leave a `RETROSPECTIVE-PENDING.md` placeholder in the project dir and a tracked task elsewhere. **Do not skip retrospectives for projects ≥ 2 weeks** — every retro to date has surfaced patterns the standard development pass missed.
 
 ### Step 7: Final Sanity Check
@@ -105,6 +127,8 @@ It asserts, and exits non-zero on any failure:
 | **`projects/{in-progress,to-do}/<name>/` are GONE** | The assertion whose absence cost 3.7 months. A copy leaves both, and every prose checkbox still passes |
 | No living references to the old path | Excludes `done/` — historical references there are fine |
 | `planned-vs-implemented.md` present | The close-out artifact exists |
+| `delivery-ledger.md` present | The project's cost is recorded and comparable (Step 2b) |
+| **No QA round has a founder row still `open`** | A founder-only QA row that waits indefinitely held one project's close for days. Past 48 h the agent applies its recommendation and records `decided`; only a row younger than that can be open, and then the project is not ready to close |
 | Merged PRs carry a proof-of-completion comment | Best-effort; skipped cleanly without `gh` or auth |
 
 Paste its output into the close-out summary. The agent answering a checklist is the same one that just did the move, which is exactly why this is a script.
