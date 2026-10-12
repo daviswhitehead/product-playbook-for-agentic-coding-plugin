@@ -215,12 +215,12 @@ Some things shouldn't depend on an agent remembering to do them. These run in th
 | Component | Kind | What it does |
 |---|---|---|
 | `hooks/hooks.json` → `scripts/session-orientation.sh` | `SessionStart` hook | Gathers branch/tracking state, uncommitted count, active `projects/in-progress/` dirs, latest checkpoint, last 3 commits, and stashes tagged to this branch — with no tool round-trips. Silent outside a git repo or in a repo without the playbook layout. Opt out with `PLAYBOOK_NO_ORIENTATION=1`. |
-| `scripts/verify-close-project.sh <name>` | Executable check | Asserts a close-out actually completed — above all that the **source directory is gone**, not merely that `done/` exists. |
+| `scripts/verify-close-project.sh <name>` | Executable check | Asserts a close-out actually completed — above all that the **source directory is gone**, not merely that `done/` exists — and that the delivery ledger exists and no QA round has a founder row still open. |
 | `scripts/check-version-bump.sh` | CI guard (PR + push) | On a PR: the changed plugin must declare a changeset. On `main`: fails while changesets sit unreleased, and fails if plugin content changed without the version increasing. |
 | `scripts/release.sh` | Release step | Consumes `.changes/*`, computes each plugin's new version, updates both manifests + `CHANGELOG.md`, deletes the changesets. `--dry-run` to preview. |
 
-Run `scripts/test-close-project-checks.sh` after changing either close-project piece (14
-cases, both directions), and `scripts/test-version-checks.sh` after touching the version
+Run `scripts/test-close-project-checks.sh` after changing either close-project piece (18
+cases, both directions; CI runs it too), and `scripts/test-version-checks.sh` after touching the version
 scripts (20 cases across both).
 
 **Why changesets**: the version is a single monotonic counter on `main`, but PRs are

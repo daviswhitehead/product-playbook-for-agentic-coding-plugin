@@ -216,8 +216,10 @@ Drawing from multiple role perspectives, guide the user through technical planni
 Define when code review should happen based on project size:
 
 - **Small projects**: Review at PR time (single PR at the end)
-- **Medium projects**: One intermediate review at the midpoint, plus final PR review
-- **Large projects**: Review at each phase/milestone boundary — do not accumulate >100 files without review
+- **Medium projects**: One intermediate review at the midpoint, plus one review of the integration branch (REVIEW.md + QA round) before PRs open
+- **Large projects**: Review at each phase/milestone boundary on the integration branch — do not accumulate >100 files without review
+
+Review happens on the integration branch, not per PR: the founder reviews once, then the risk-class PRs merge under the project's Decision Rights.
 
 Include review points in the sequencing plan. For Medium and Large projects, specify PR boundaries (see PR Strategy section below).
 
@@ -306,7 +308,8 @@ Ensure all sections are filled with complexity matching project size:
 - Integration Approach
 - Design System Architecture (if applicable)
 - Performance Considerations
-- PR Strategy (scope estimate, **budget**: PRs / CI minutes / LLM spend, PR boundaries by **CI lane and review gate**, review cadence)
+- PR Strategy (scope estimate, **budget**: PRs / CI minutes / LLM spend, one **integration branch**, PR boundaries by **risk class** (CI lane × merge gate) with each PR's cost, no stacked PRs, review cadence)
+- Testing Strategy in **three lanes** (deterministic gate with a wall-time budget, live-model lane, health lane), with the risk each new test protects
 
 **For Large Projects Only**:
 - Architectural Decisions with rationale
@@ -317,7 +320,8 @@ Ensure all sections are filled with complexity matching project size:
 Review the document:
 - [ ] Technical architecture is clear and well-structured
 - [ ] Sequencing plan minimizes dependencies
-- [ ] PR Strategy states a budget (PRs, CI minutes, LLM spend) and groups work by CI lane and review gate — one PR per (lane, gate) cell per phase, not one per task
+- [ ] PR Strategy states a budget (PRs, CI minutes, LLM spend), names the integration branch, and ships one PR per risk class (CI lane × merge gate) with its cost — not one per task, no stacks
+- [ ] Testing Strategy places every new test in a lane (deterministic / live-model / health) and names the risk it protects; the deterministic gate has a wall-time budget
 - [ ] Technology stack is appropriate and justified
 - [ ] Integration points are identified
 - [ ] Technical risks are assessed with mitigation

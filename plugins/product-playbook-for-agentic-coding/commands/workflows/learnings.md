@@ -468,6 +468,8 @@ If work will continue in a future session, also capture:
 
 #### For Project Completion Learnings
 
+**Start from the delivery ledger.** Read `delivery-ledger.md` in the project dir (written by `/playbook:close-project` Step 2b). If it's missing, produce it now: run the project's ledger generator if it has one (check CLAUDE.md, `package.json`, `scripts/`, `workflows/` for "ledger"), otherwise assemble the same table by hand (calendar buckets: agents / CI only / founder wait / usage-limit stop / idle; founder turns; PRs planned → shipped; CI minutes; dollars by category; re-runs by cause; values marked M or E, `unknown` rather than `0`). Put it next to the **previous closed project's** ledger and ask, for the biggest bucket and every metric that got worse: *what caused it, and which upstream decision would have prevented it?* The answers usually trace to a few root causes (decision rights decided per PR, state that lived only in a chat, shared budgets, re-proving everything on every head, PR shape, QA after merge) and belong in Step 9.1b. Copy the comparison table into the learnings doc.
+
 **If a gap analysis was produced in Pre-Check A**, use it to generate specific, targeted questions instead of generic ones. The gap analysis transforms vague retrospective prompts into concrete questions grounded in what actually happened.
 
 **Gap-analysis-informed questions** (preferred):
@@ -492,6 +494,7 @@ Based on the planned-vs-implemented analysis:
 
 **Generic fallback** (use only if no gap analysis exists):
 - **Project Summary**: What was built and outcomes
+- **Delivery Ledger**: This project vs the previous one (see above)
 - **What Went Well**: Successes and effective practices
 - **What Could Be Improved**: Challenges and pain points
 - **Process Improvements**: Suggested changes

@@ -61,6 +61,19 @@ module: "[affected_module_name]"
 
 **Comparison to Goals**: [How results compare to Product Requirements success criteria]
 
+### Delivery Ledger (project-completion trigger)
+<!-- From delivery-ledger.md (/playbook:close-project Step 2b, or the project's ledger generator).
+     M = measured, E = estimated; write "unknown", never 0, for a value you couldn't read. -->
+
+| Metric | This project | Previous: [name] | Why it moved |
+|---|---|---|---|
+| Calendar days (buckets: agents / CI only / founder wait / usage-limit stop / idle) | | | |
+| Founder turns (pure unblocks) | | | |
+| PRs planned → shipped | | | |
+| CI runner minutes (re-runs by cause: code / flaky / infra / external) | | | |
+| Dollars (agent tokens / LLM + evals / CI / infra) | | | |
+| Production incidents from the project's own work or spend | | | |
+
 ---
 
 ## What Went Well

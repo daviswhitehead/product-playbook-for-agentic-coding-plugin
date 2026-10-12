@@ -216,6 +216,7 @@ Present the draft to the user with:
 - **Key decisions made** (with rationale, from the Decision Log)
 - **Confidence assessment**: What's solid vs. needs validation
 - **Items marked incomplete** or needing validation
+- **Decision Rights** pre-filled with the defaults (template "Decision Rights"), for the founder to edit once at approval
 - **Recommended next steps**
 
 ---
@@ -395,7 +396,7 @@ Create the PRD at an appropriate location:
 
 Once the PRD is complete, guide the user to:
 1. **Review the Quality Guidelines** — verify key items are addressed
-2. **Resolve Open Questions** — these are blockers for autonomous work
+2. **Resolve Open Questions** — these are blockers for autonomous work. **Set Decision Rights at approval** (what agents may merge, dark launch behind flags, the 48-hour default, one daily packet, verify-before-asking). Decided once per project, they replace per-PR asks; if the project will get a `REVIEW.md` (`/playbook:review`), the block lives there.
 3. **Run a stakeholder critique** — use `/playbook:critique` to get multi-persona feedback on the PRD before proceeding. Critiques at document stages are the highest-ROI workflow step — catching issues here is 10x cheaper than during implementation.
 4. **Proceed to Tech Planning** — use `/playbook:tech-plan` for the next phase
 5. **If project involves significant UI** (new pages, visual redesign, new component patterns):

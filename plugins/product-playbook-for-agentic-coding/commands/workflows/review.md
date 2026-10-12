@@ -23,15 +23,16 @@ A multi-document review packet took too long to review and still missed decision
 
 ## Process
 
-1. **Start from the template** `resources/templates/review.md`. Four assets, in this order: Product, Design, Components, Engineering.
+1. **Start from the template** `resources/templates/review.md`. Four assets, in this order: Product, Design, Components, Engineering. Keep the **Decision rights** block at the top with its defaults filled in (what agents may merge, dark launch behind flags, the 48-hour default, the daily packet, verify-before-asking, the budget). It is the delegation contract; approving the page approves it.
 2. **Write "How it works" per asset** as the user experiences the product — never a description of the document. Link each sentence or bullet to the requirement/ledger row it summarizes. Anchors live **inside heading lines** in the target docs (`### <a id="r3"></a>R3 — …`); add them where missing.
 3. **List ≤10 judgment calls per asset.** For each: name the best-in-class answer, what you chose and why, what you cut, and the link. Lead Engineering with decisions that have long-term implications (schema, storage, public surfaces, recurring cost).
 4. **Make everything clickable.** Live prototype URL, Storybook story id, screenshot folder, anchors. Start the servers and state at the top that they are running. Verify every anchor resolves (grep targets) before each round.
 5. **Iterate locally.** Commit, but do not push, until approval. Each founder round: apply the feedback to **every** asset it touches (a design decision changes the PRD, the prototype, the board and the plan), strike through decided calls with the decision and date, and append an "Applied from round N" block quoting the feedback verbatim.
-6. **On "approved":** record the approval and any conditions at the top, apply the conditions across all assets, mark PRD/plan/tasks approved, push, and start building per the tasks document. Founder-gated items stay gated (migrations/RLS, auth, spend, secrets, flag flips).
+6. **On "approved":** record the approval and any conditions at the top, apply the conditions across all assets, mark PRD/plan/tasks approved, push, and start building per the tasks document. Create `project-state.md` (template `resources/templates/project-state.md`) with its `decision-rights:` line linking the approved block, and `decisions-queue.md` (template `resources/templates/decisions-queue.md`). From here on, questions go to the queue, not to a blocking ask. Founder-gated items stay gated (data-writing migrations, auth, spend, secrets, flag flips).
 
 ## Quality bar (check before each round)
 
+- [ ] Decision rights block present, defaults filled, budget stated
 - [ ] Every "How it works" describes behaviour, not artefacts
 - [ ] ≤10 calls per asset; each names the best-in-class option and what was cut
 - [ ] Every link and anchor resolves; servers are running

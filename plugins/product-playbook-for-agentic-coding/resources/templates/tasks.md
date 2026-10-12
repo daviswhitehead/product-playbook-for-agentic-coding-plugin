@@ -279,13 +279,24 @@
 
 ## Task Summary
 
-| Task | Description | Model | Platform | Est. Time |
-|------|-------------|-------|----------|-----------|
-| 1.1 | [Description] | [Model] | [Platform] | [Time] |
-| 1.2 | [Description] | [Model] | [Platform] | [Time] |
-| 2.1 | [Description] | [Model] | [Platform] | [Time] |
+| Task | Description | Model (registry role → alias) | PR | Est. Time |
+|------|-------------|-------------------------------|----|-----------|
+| 1.1 | [Description] | [implementation → opus] | [PR 1] | [Time] |
+| 1.2 | [Description] | [mechanical → sonnet] | [PR 1] | [Time] |
+| 2.1 | [Description] | [Role → alias] | [PR 2] | [Time] |
 
 **Total Estimated Time**: [X hours]
+
+## PR Map
+
+**Integration branch**: `[project]/integration`. Tasks land here as commits; PRs are cut from it after the review and the QA round (Phase N). No stacked PRs.
+
+| PR | Risk class (lane) | Gate (per Decision Rights) | Tasks | Cost (full CI cycles × min · eval runs × $) |
+|----|-------------------|----------------------------|-------|---------------------------------------------|
+| 1 | [frontend / agent behaviour / migration / workflows / docs] | [agent / founder] | [1.1, 1.2] | [1 × 45 min · 0] |
+| 2 | [lane] | [gate] | [2.1] | [1 × 45 min · 1 × $2] |
+
+**Total**: [N PRs · ≈ N CI minutes · $N evals] (matches the tech plan's PR Strategy budget, or says why not)
 
 ## Progress Tracking
 
@@ -306,6 +317,8 @@
 ## Phase N: Validation & QA (MANDATORY)
 
 > **This phase is mandatory for ALL projects**, not just UI projects. Backend-only projects still need E2E critical path testing, webhook verification, and boundary condition validation. Skipping this phase leads to bugs discovered only during manual testing — which is expensive and often happens right before launch.
+>
+> **It runs on the integration branch, before any PR opens.** QA after merge turns every finding into another PR and another CI cycle; in one measured project 44% of the calendar came after the last planned PR, mostly QA rounds waiting on founder-only rows.
 
 ### Task N.0: Agent Smoke Testing (Before Human Review)
 **Description**: Before handing off for human testing, the agent exhaustively tests its own work via browser automation (Playwright, Agent Browser CLI, or equivalent). Define 3-5 end-to-end user journeys, walk through each, and fix any issues found. Document the journeys in a `smoke-test-journeys.md` file. Only hand off to the human after autonomous testing passes.
@@ -358,6 +371,19 @@
 - [ ] No invisible text, wrong backgrounds, or broken layouts
 
 **Status**: [ ] Not Started | [ ] In Progress | [ ] Complete | [ ] N/A (no UI changes)
+
+---
+
+### Task N.4: QA Round (before PRs open)
+**Description**: Run a QA round on the integration branch using `resources/templates/qa-round.md`. Agents pass every row they can first, including real-device or simulator checks where behaviour differs by device (touch, keyboard, viewport). Only rows needing irreducible taste go to the founder, batched in the daily packet. After 48 h without an answer, the agent applies its recommendation and records it.
+
+**Acceptance Criteria**:
+- [ ] `qa-round-<N>.md` exists; every agent row is pass / fixed with evidence
+- [ ] Device-specific behaviour checked on a real device or simulator (not only a desktop browser at phone size)
+- [ ] No founder row left `open`: each is answered or `decided` with "default applied <date>"
+- [ ] PRs are cut from the integration branch only after this task closes
+
+**Status**: [ ] Not Started | [ ] In Progress | [ ] Complete
 
 ---
 
