@@ -31,6 +31,7 @@ Not every project needs every step. A small feature might start at PRD. A new pr
 | **Product Requirements** | `/playbook:product-requirements` | Agent-ready PRD | Before building any feature |
 | **Tech Plan** | `/playbook:tech-plan` | Architecture, sequencing, technology decisions | Before implementation |
 | **Tasks** | `/playbook:tasks` | Specific, actionable tasks with acceptance criteria | Before starting work |
+| **Review (gate)** | `/playbook:review` | One-page `REVIEW.md`: PRD + prototype + components + plan, each as "how it works" + ≤10 judgment calls, every item clickable | Before autonomous delivery; founder approval here is the gate |
 | **Delivery** | `/playbook:work` | Implemented features | During implementation |
 | **Learnings** | `/playbook:learnings` | Documented insights that improve future work | After any work session |
 
@@ -107,6 +108,7 @@ by many plugins in Anthropic's official marketplace.
 | `/playbook:product-requirements` | Draft agent-ready PRDs with autonomous or interview modes |
 | `/playbook:tech-plan` | Create technical plan with architecture and sequencing |
 | `/playbook:tasks` | Break down work into specific, actionable tasks |
+| `/playbook:review` | Build/iterate the one-page project review that gates autonomous delivery |
 | `/playbook:work` | Execute the next task from the tasks document |
 | `/playbook:work-multiple` | Work autonomously on multiple tasks without interruption |
 | `/playbook:emergent` | Capture emergent in-flight scope as a micro-PRD before implementing |
