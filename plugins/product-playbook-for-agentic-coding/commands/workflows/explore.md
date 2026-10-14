@@ -86,7 +86,7 @@ Unattended runs one stage and stops. Interactive runs may continue to the next s
 
 ### Stage 3: `prototype` → `discovery/03-prototype/` and `prototype/index.html`
 
-1. **A single-file clickable prototype** of the chosen direction at `<project>/prototype/index.html` (start from `resources/templates/prototype/index.html`: a control bar for states and widths, and an event log). Real copy, real-shaped data, no lorem ipsum.
+1. **A single-file clickable prototype** of the chosen direction at `<project>/prototype/index.html` (start from `resources/templates/prototype/index.html`: a control bar for states and widths, and an event log). Real copy, real-shaped data, no lorem ipsum: write sample content as labelled fixtures shaped like the schema, never text copied from real users.
 2. **Every stated behavior rule is a rendered state.** For each rule in the brief, the decisions or the founder's notes ("never show only X", "disabled at the limit"), add a state that shows its edge, reachable from the control bar. A rule left in prose is not reviewed.
 3. **Verify it in a real browser**: drive every state with browser automation, zero console errors, one screenshot per state into `shots/`. Read the screenshots yourself.
 4. A short `proposal.md` beside it for markup rounds: what the prototype does, the rules it draws, the open calls. Founder-persona review, pre-flight, queue.
