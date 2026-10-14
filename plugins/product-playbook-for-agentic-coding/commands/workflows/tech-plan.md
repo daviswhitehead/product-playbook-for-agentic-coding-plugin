@@ -121,8 +121,9 @@ Review any relevant learnings before making architectural decisions. Prior solut
 ## Prerequisites (Hard Gate)
 
 Before starting, ensure:
-- Product Requirements Document exists and is reviewed
+- Product Requirements Document exists and is reviewed. **A PRD written from an approved prototype** (`/playbook:product-requirements --from-prototype`, usually via `/playbook:explore`) qualifies once its combined prototype + PRD critique has run; read the prototype alongside it, because the prototype is the spec for flows and states and the PRD links each requirement to a state.
 - User understands the high-level solution vision from Product Requirements
+- **Spikes are done for what the plan must not assume.** List the questions whose wrong answer would change the architecture (does that field exist, are those tabs real routes, does iOS allow that focus), and answer each with a spike first (template `resources/templates/spike.md`, `projects/<state>/<project>/spikes/`). In the founding prototype-first project, three spikes found that "tabs" were scroll links, settled an iOS focus rule, and found recipes had no servings field, each of which would have been a wrong plan.
 
 **CRITICAL — Sequential Pipeline Enforcement:**
 The planning pipeline is strictly sequential: **PRD → Tech Plan → Tasks**. Each document must be fully drafted and reviewed before the next one begins.
@@ -135,7 +136,7 @@ The planning pipeline is strictly sequential: **PRD → Tech Plan → Tasks**. E
 
 ### Step 1: Review Product Requirements
 
-1. Locate and read the Product Requirements Document for this project
+1. Locate and read the Product Requirements Document for this project (and, if it was written from a prototype, open the prototype and walk its states; read the grounding brief and the spikes)
 2. Understand the problem, users, success criteria, and solution vision
 3. **Identify the project size** (Small, Medium, Large) from the Project Overview
 4. Identify key technical components needed to deliver the solution
@@ -290,6 +291,18 @@ Rules for that table:
 
 **4. Carry it into sequencing.** If the plan does propose new shared components, build them *before* the surfaces that consume them, not extracted afterwards — the same rule as Shared Pattern Alignment below.
 
+### Step 3.6: Review Board (any plan with a UI surface)
+
+The component inventory says what the plan will use; the review board **shows** it. Build one page the founder can scan in minutes (a Storybook story, or a static HTML page if the project has no Storybook) with **every component the plan touches, in every planned state**, rendered from real components where they exist. In the founding project his sharpest feedback (remove a container, cut the hovers, "a page must never show only the overflow button") came from this board, not from the docs or the prototype.
+
+1. **Tag every component** on the board: **new**, **extended**, **reused** (unchanged) or **replaced**, matching the Step 3.5 tables. Tag planned versus reproduced-from-code versus shipped once delivery starts.
+2. **Draw every stated behavior rule's edge state.** For each rule in the PRD or the decisions ("disabled at the limit says why", "never only one action", "empty state"), the board shows the state where the rule bites. A rule that is only written down is not reviewed: one survived three prose rounds and was rejected the moment it was drawn.
+3. **Render open problems as options A to D**, side by side on the board, with a recommendation; each becomes a row in `decisions-queue.md` (or a judgment call in `REVIEW.md`). Do not describe an open visual problem in prose.
+4. **Widths**: render at 320, 390, 768 and 1280 px (or the project's breakpoints) wherever layout is in play.
+5. **Review it locally.** The founder opens the board from a local server or file path, never from a PR opened to show it. Link it from `REVIEW.md` §3 (`/playbook:review`) and from the tech plan's Component Inventory.
+
+Checklist before handing it over: every touched component present and tagged; every rule has a drawn edge state; every open problem is drawn as options; screenshots at the widths saved beside the plan.
+
 ### Step 4: Complete the Document
 
 Ensure all sections are filled with complexity matching project size:
@@ -303,6 +316,7 @@ Ensure all sections are filled with complexity matching project size:
 
 **Required for any project with a UI surface**:
 - Component Inventory (existing components/tokens per surface, plus the new-components table — empty is the good default; see Step 3.5)
+- Review board link (Step 3.6): every touched component tagged new / extended / reused / replaced, every rule's edge state drawn, open problems as options A–D
 
 **For Medium and Large Projects**:
 - Integration Approach
@@ -326,6 +340,8 @@ Review the document:
 - [ ] Integration points are identified
 - [ ] Technical risks are assessed with mitigation
 - [ ] **UI surfaces**: Component Inventory done — existing components/tokens named per surface, and every proposed new component has a rationale an existing one couldn't satisfy (Step 3.5)
+- [ ] **UI surfaces**: Review board built (Step 3.6) — every touched component tagged, every stated rule has a drawn edge state, open problems rendered as options A–D
+- [ ] Spikes answered for every question the plan would otherwise assume (template `spike.md`)
 - [ ] Supersession protocol followed (see below)
 - [ ] Shared patterns identified for multi-consumer systems (see below)
 - [ ] Ready for Delivery phase

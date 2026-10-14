@@ -1087,6 +1087,18 @@ If a checkpoint from this session exists, append this retro's outputs to its **D
 
 > **Why mandatory**: In the recipes project retrospective (2026-03-16), the agent skipped this step entirely. The user had to prompt twice — first to "think bigger" about solutions, then to reflect on the learnings phase itself. Both prompts produced the most impactful improvements of the session. Skipping this step means leaving the highest-value learnings on the table.
 
+**Part A0: Founder agreement tally (project retros with founder decisions; mandatory then)**
+
+"Where did the user redirect you?" (Part A, question 2) is the most important signal in this workflow, and as a list it never compounds. Count it, and feed the count into the project's taste ledger.
+
+1. **List every founder decision** of the project from the record, not from memory: `decisions-queue.md` (Decided), `discovery/decisions.jsonl`, the PRD's "Decisions for the founder", `decision-log.md`, `REVIEW.md` struck-through calls, and QA rounds' `needs-founder.md` answers.
+2. **Mark each one** with the ledger's `agreement` value: `match` (he picked your recommendation), `override`, `founder-idea`, `accepted` (approved in a batch; never count it as `match`), `unreviewed`, `no-recommendation`, `dropped`. Add `category`, `reversibility` and `shown_as` (rendered or prose). Be honest; the ledger is only worth its misses.
+3. **Report the rate by category**: matches over explicit picks (`match` + `override`), next to the project's previous baseline from the taste file. Name the categories where the agent should render options instead of predicting.
+4. **Emit ledger rows.** Find the ledger path the way `resources/personas/founder.md` finds taste sources (a `ledger:` path in CLAUDE.md/AGENTS.md or the taste file; default `docs/foundations/taste-ledger.jsonl`; schema in `resources/templates/founder-taste.md`). Append one row per decision, never editing earlier rows, and run the ledger's guard if the project has one. If a scheduler already emitted rows for these decisions (for example a stand-in scorer), append only the missing ids.
+5. **Propose principle edits** in the taste file when a row supports or contradicts a principle, with the row ids as receipts. The founder merges profile edits.
+
+When the project had no founder decisions (a solo refactor), say so in one line and skip.
+
 **Part A: Agent self-reflection (do this BEFORE asking the user)**
 
 Compare what the skill prescribed vs what actually happened:
@@ -1096,9 +1108,11 @@ Compare what the skill prescribed vs what actually happened:
 4. Did you search prior learnings? Did you propose systemic solutions or just incremental fixes?
 5. Did you batch approvals or fragment them?
 
-Present your self-assessment honestly:
+Present your self-assessment honestly (lead with the Part A0 tally when there is one):
 ```
 "Here's my honest assessment of how this learnings session went:
+
+**Founder agreement**: [n of m explicit picks matched; by category: ...; ledger rows appended: <ids>]
 
 **Steps I followed well**: [list]
 **Steps I skipped or rushed**: [list]

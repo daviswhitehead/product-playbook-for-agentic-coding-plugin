@@ -180,6 +180,18 @@ When introducing something entirely new:
 3. Create cross-references to related concepts
 4. Update any indexes or summaries
 
+## Markup Rounds (inline founder feedback)
+
+Founders often review a draft by writing straight into it: `<-- NOTE: ... -->` (an instruction) and `<-- QUESTION: ... -->` (something he wants answered). Treat each pass as a **round**. When `<new-context>` is "apply the markup" or the docs contain markers:
+
+1. **Find every marker** across the doc set, not just the file he mentioned: `grep -rnE '<-- (NOTE|QUESTION)' <docs>`.
+2. **Apply each NOTE everywhere it bears.** A NOTE on one option sheet usually changes the prototype, the PRD, the board and the plan too. Edit all of them in the same round, then delete the NOTE marker from where he wrote it and record it in the log. A NOTE applied in one place and stale in three is the common failure.
+3. **Answer each QUESTION in place**, directly under it: `<-- ANSWER (YYYY-MM-DD): ... -->`, in plain words, with the evidence (file:line, a screenshot path). **Keep the QUESTION open until he confirms** the answer; never delete it on your own. If the answer changes a decision, it becomes a queue row or a "Decision for the founder", not a silent edit.
+4. **Date the round** in the project's decision log (template `resources/templates/decision-log.md`): his words verbatim, what changed where, which decisions it settled. Never rewrite an earlier round.
+5. **Report** in five lines: NOTEs applied (and where), QUESTIONs answered and still open, decisions settled, anything you could not apply and why.
+
+`/playbook:explore` runs this at the start of every stage; `/playbook:qa-round` runs it on the founder's testing guide and needs-founder answers.
+
 ## Consistency Checking
 
 When `--check-consistency` is specified, run these checks:
@@ -266,6 +278,8 @@ After refinement, provide:
 | Massive refactors | Keep changes focused on the new context |
 | Skipping the plan step | Always present plan before executing |
 | Assuming consistency | Verify with actual searches |
+| Applying a NOTE in only the file it was written in | Apply it in every doc and artifact it bears on, same round |
+| Deleting a QUESTION once you've answered it | Answer in place; keep it open until he confirms |
 
 ---
 

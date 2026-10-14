@@ -220,6 +220,7 @@ These rules come from the `stitch-integration` skill and are non-negotiable:
 5. **DESIGN.md injection** — if DESIGN.md exists, its relevant sections must be included in every prompt. Stitch has no memory between calls.
 6. **Realistic content** — use plausible names, prices, copy. Never "Lorem ipsum" or "John Doe".
 7. **Specify viewport** — every prompt must include target dimensions (e.g., `Desktop viewport: 1440x900`).
+8. **Review options locally, never as a PR.** Hand the founder local file paths (screenshots, the manifest, Stitch links); commit only the chosen option, inside the real change PR. A PR opened just to show options buys CI for a decision that needed none (founder rule, 2026-10-13).
 
 ## Next Steps
 

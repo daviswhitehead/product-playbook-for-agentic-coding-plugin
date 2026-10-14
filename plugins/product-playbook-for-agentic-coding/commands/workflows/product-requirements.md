@@ -1,7 +1,7 @@
 ---
 name: playbook:product-requirements
 description: Draft product requirements with multi-persona discovery process. Supports autonomous and interview modes. Don't use when requirements already exist and you want to plan implementation (use /playbook:tech-plan instead), or for ad-hoc feature requests that don't need a full PRD.
-argument-hint: "[--autonomous] [--context <path>] [brief project description]"
+argument-hint: "[--autonomous] [--context <path>] [--from-prototype <path>] [brief project description]"
 recommended-mode: edit
 thinking-depth: think-harder
 ---
@@ -14,6 +14,8 @@ You are facilitating the Product Discovery phase. Your goal is to create a compr
 
 **Before starting discovery**, determine what type of work this is. Different work types need different workflow depth.
 
+**Prototype first is the default for UI work and for "not sure yet".** When the work has a user-facing surface whose look or behavior is still open, or nobody can yet say what to build, route it to `/playbook:explore` before writing a PRD: ground in the code, render options, converge on a clickable prototype, then come back here with `--from-prototype`. In the project that set this default, the founder agreed with the agent's recommendation on 7 of 7 scope calls but 3 of 11 visual ones; drawn options made those misses cost minutes. Skip this routing only when `--from-prototype` is given or the founder asks for a PRD first.
+
 Ask the user:
 ```
 What type of work is this?
@@ -21,7 +23,7 @@ What type of work is this?
 1. **New feature / major addition** — Needs full discovery, planning, and task breakdown
    Examples: new page, new integration, new data model, new user flow
    → Full pipeline: PRD → Tech Plan → Tasks → Work → Learnings
-   → **If UI-heavy**: PRD → Design System → Design Spec → Mockups → Design Critique → Tech Plan → Tasks → Work → Design Verify → Learnings
+   → **If UI-heavy or the look/behavior is still open**: `/playbook:explore` first (frame → options → prototype), then this command with `--from-prototype`, then Tech Plan → Tasks → Review → Work → QA round → Learnings
    → **CRITICAL**: Each planning doc must be written SEQUENTIALLY (PRD, then tech plan, then tasks). Never write tech plan and tasks in parallel — tasks must derive from the tech plan's decisions.
 
 2. **UI polish / iteration** — Known scope, feedback-driven, just needs execution
@@ -37,17 +39,22 @@ What type of work is this?
    → Lightweight with tech context: Quick scope → Work → Learnings
 
 5. **Not sure yet** — Need to explore before deciding
-   → Start with discovery questions, then route
+   → `/playbook:explore` (grounding brief, rendered options, clickable prototype); the PRD is written from the approved prototype
 ```
 
 ### Routing Logic
+
+**Route to `/playbook:explore`** (stop here and hand over) if ANY of:
+- User selects option 5
+- User selects option 1 and the work has a user-facing surface whose look or behavior is not yet settled
+- (Skip when `--from-prototype` is given: that is the return trip from explore.)
 
 **Route to Full Pipeline** (continue with this command) if ANY of:
 - Work requires new data models or API endpoints
 - Work touches 3+ systems or services
 - Work needs architectural decisions not yet made
 - Estimated scope is >20 files
-- User selects option 1 or 5
+- User selects option 1 and the surface is settled (or there is none), or `--from-prototype` is given
 
 **Route to Lightweight Path** if ALL of:
 - Solution approach is already known
@@ -113,7 +120,17 @@ Generate a complete PRD draft from available context. Use when:
 - User wants a first draft to react to
 - Time is limited
 
+### From-Prototype Mode (`--from-prototype <path>`)
+Write the PRD from an approved clickable prototype (usually `<project>/prototype/index.html`, from `/playbook:explore`). Combine with `--autonomous` for unattended runs. The prototype is the spec for flows and states; the PRD names what it does and why, and what it leaves open.
+
+1. **Read the discovery record first**: the prototype (open it in a browser and walk every state in its control bar), `discovery/*/stage-summary.md`, the grounding brief, `decision-log.md`, and the Decided rows of `decisions-queue.md`. Skip clarification questions these already answer.
+2. **One requirement per behavior the prototype shows.** Each requirement links the prototype state or screenshot that shows it (`prototype/index.html?state=limit`, `discovery/03-prototype/shots/limit.png`). Each rule drawn as a state becomes an acceptance criterion.
+3. **Anything the prototype does not show** (error paths, data rules, analytics, limits, copy not yet written) is a **Decision for the founder** with status `assumed`, never silently decided.
+4. **Facts come from the grounding brief** (file:line). An action or field not in the brief is either labeled NEW or removed.
+5. **Status honesty**: a decision is `confirmed` only with his quoted words and a date from the decision log or queue. A batch "sounds good" confirms the batch, not each default inside it: those stay `assumed` and are listed for the approval packet.
+
 Parse the arguments to determine mode:
+- If `--from-prototype <path>` is provided → From-Prototype Mode (Autonomous if `--autonomous` is also present)
 - If `--autonomous` flag is present → Autonomous Mode
 - If `--context <path>` is provided → Use that path for context gathering
 - Otherwise → Interview Mode (default)
@@ -198,7 +215,7 @@ Use the template at `resources/templates/product-requirements-v2.md` as a starti
 - Document all integration points and data requirements
 - Capture decisions with rationale in Decision Log
 - Include forecast confidence assessments where projections appear
-- Mark any unresolved questions as Open Questions
+- Put every open call in **Decisions for the founder** (default, alternative, consequence, status `confirmed` with his quoted words, or `assumed`)
 
 ### Step 4: Validate Completeness
 
@@ -206,7 +223,7 @@ Run through the Quality Guidelines at the end of the template. These are quality
 
 For any items that cannot be checked:
 - Mark them explicitly as incomplete
-- Add corresponding Open Questions
+- Add corresponding Decisions for the founder (status `assumed`)
 - Recommend follow-up actions
 
 ### Step 5: Present for Review
@@ -347,13 +364,13 @@ Review against the Quality Guidelines:
 - [ ] Edge cases covered in scenarios
 
 **Decision Completeness**
-- [ ] No open blockers
-- [ ] Key decisions logged with rationale
+- [ ] Every Decision for the founder has a default, an alternative, a consequence and a status (`confirmed` with quoted words and a date, or `assumed`)
+- [ ] Key decisions logged with rationale, dated per round
 - [ ] Assumptions have validation methods
 
 These are quality targets, not rigid gates. For any unchecked items, either:
 1. Ask follow-up questions to fill the gap
-2. Mark as Open Questions in the document
+2. Add them to Decisions for the founder with status `assumed`
 
 ---
 
@@ -396,10 +413,12 @@ Create the PRD at an appropriate location:
 
 Once the PRD is complete, guide the user to:
 1. **Review the Quality Guidelines** — verify key items are addressed
-2. **Resolve Open Questions** — these are blockers for autonomous work. **Set Decision Rights at approval** (what agents may merge, dark launch behind flags, the 48-hour default, one daily packet, verify-before-asking). Decided once per project, they replace per-PR asks; if the project will get a `REVIEW.md` (`/playbook:review`), the block lives there.
+2. **Resolve Decisions for the founder** — `assumed` decisions that block are blockers for autonomous work; list every `assumed` one in the approval packet so a batch approval is an informed one. **Set Decision Rights at approval** (what agents may merge, dark launch behind flags, the 48-hour default, one daily packet, verify-before-asking). Decided once per project, they replace per-PR asks; if the project will get a `REVIEW.md` (`/playbook:review`), the block lives there.
 3. **Run a stakeholder critique** — use `/playbook:critique` to get multi-persona feedback on the PRD before proceeding. Critiques at document stages are the highest-ROI workflow step — catching issues here is 10x cheaper than during implementation.
+   - **PRD written from a prototype (`--from-prototype`): run ONE combined critique of the prototype and the PRD** (attach the state screenshots), before the tech plan, instead of a separate PRD critique. The prototype already settled the shape through founder rounds; what is left to catch is the gap between what it draws and what the PRD promises, plus whatever neither covers. *(Decision B9, taken 2026-10-13 by the lead under the founder's delegation: in the founding project no PRD critique ran at all, only the tech plan's; one combined pass closes that gap without adding a round. Reversible: if combined critiques start missing PRD-only issues, split them again.)*
 4. **Proceed to Tech Planning** — use `/playbook:tech-plan` for the next phase
-5. **If project involves significant UI** (new pages, visual redesign, new component patterns):
+5. **If the look or behavior is still open and no prototype exists**, go back to `/playbook:explore`; don't plan from prose.
+6. **If project involves significant UI** (new pages, visual redesign, new component patterns) and the team uses Stitch mockups:
    - Run `/playbook:design-system` to extract or create DESIGN.md
    - Then `/playbook:design-spec` to generate engineering spec + Stitch prompts
    - Then `/playbook:mockups` to batch-generate screens

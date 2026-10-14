@@ -108,6 +108,7 @@ Work stops when a session stops: a usage-limit window, exhausted credits, a cras
 
 - **Verify before asking.** Before any question reaches the founder, check the claim yourself: installed tools, current limits and quotas, prior answers in the transcript and project docs. *(A lead once asked the founder to install a tool he had confirmed installed six days earlier; five PRs waited about ten hours.)*
 - **Queue, don't block.** Questions go into `decisions-queue.md` (template `resources/templates/decisions-queue.md`) with your recommendation, whether it is reversible, and what it blocks. Then keep working on unblocked items. The queue goes out as **one daily packet**; a live interrupt is only for a production or spend outage.
+- **Unattended runs may advance discovery to the next founder gate, and no further.** For a project in discovery (a `discovery:` line in `project-state.md`), run one stage of `/playbook:explore <project-dir> --unattended`; it ingests answers, stops at once if a blocking row is still open, and otherwise runs one stage, leaves its questions in `decisions-queue.md` (plus `discovery/decisions.jsonl`) and ends with `NEXT:`. Taste picks are never defaulted by an agent before 48 h, and costly or founder-only ones never; discovery is committed locally, never pushed or opened as a PR.
 - **Apply the 48-hour default.** A reversible item takes your recommendation after 48 h of founder silence, recorded as "approved by default" in the queue and the owning artifact. Irreversible and founder-only items (per the Decision Rights) never default.
 - **Merge within the Decision Rights.** PRs the block lets agents merge, merge once their checks have run green on the current head, with a proof-of-completion comment. Don't ask "may I merge?" for something already delegated.
 
@@ -291,6 +292,8 @@ One conductor session directing N subagents, each in its own worktree with full 
   A lock dir older than ~25 min means its owner died: remove it and take it. Light work (reading, editing, one small test file, `gh` calls) takes no lock.
 - **Local runs only the tests a change touches** when CI runs the full suite; the laptop is not a second CI. Review servers run from their own worktree, never one a suite is rebuilding.
 - **Write the rules once** in a brief file every agent reads first (where to work, secrets, hooks, the lock, delivery steps); task prompts carry only the task. Rules repeated per prompt drift.
+- **Delegate building from the first mockup round, and verify it yourself.** Option sheets, renders, prototypes and components are built by sub-agents with a written brief; the conductor holds the plan, opens every screenshot itself before anything reaches the founder, and banks judgment calls in `decisions-queue.md` instead of asking mid-task. In one project the mockups and prototype were built in the main agent, and the cost of discovery could never be measured.
+- **Record main-agent and sub-agent tokens per stage** in `project-state.md` (its cost table): sub-agent tokens from each sub-agent result's usage, main-agent tokens from the harness (`/cost`, or the scheduler's measured run cost). Mark each figure measured or estimated, and write `unknown`, never `0`.
 - **Packets carry `pending manager review`.** Subagents write the review verdict as pending; the conductor flips it to approved only after its own review, and the merge step refuses while any verdict is pending. A subagent never self-approves.
 - **Proof runs are not side-effect free.** A unit test reached the real `gh`; a probe wrote a real PostHog insight; dry-runs mutated tracked runtime state files that were then committed, and the cron host's `git pull` refused. Block real external clients in test setup, and diff `git status` after any proof run before staging — runtime state never rides along in a commit.
 - **Open each PR from the worktree that holds its commits**, before any `git checkout` back to a workspace branch (`/playbook:git-pr` Step 1).
@@ -393,6 +396,7 @@ Before marking project complete:
 ## Integration with Playbook
 
 This skill supports:
+- `/playbook:explore --unattended` - Discovery, one stage per run, to the next founder gate
 - `/playbook:work` - Primary execution command
 - `/playbook:tasks` - Task document management
 - `/playbook:learnings` - Post-execution capture
