@@ -105,6 +105,78 @@ rc=$(run_in "$d" qa3)
 [ "$rc" = "0" ] && ok "words inside a cell don't trip the check (agent row)" || bad "only bare founder/open cells should count, got rc=$rc"
 rm -rf "$d"
 
+# QA round folders (qa/round-<n>/, written by /playbook:qa-round): the LATEST
+# round must be closed — no open/fail rows, close-out lines filled, and the
+# after-deploy guide's "Production, after deploy" line filled.
+# usage: qa_round <project-dir> <n> <status> <ledger> <corrections> <after-deploy line | NONE>
+qa_round() {
+  local p="$1/qa/round-$2"; mkdir -p "$p"
+  { printf '%s\n' "$qa_header"
+    printf '| 1 | keyboard keeps header | agent | iPad sim | %s | 2026-10-01 | kv.png |\n' "$3"
+    printf '| 2 | chip copy | founder | iPad | decided | 2026-10-01 | "B" |\n\n## Close-out\n\n'
+    printf -- '- **Findings:** every row above is pass, fixed, filed or decided.\n'
+    printf -- '- **Taste ledger:** %s\n' "$4"
+    printf -- '- **Repeated corrections → rules:** %s\n' "$5"
+  } > "$p/findings.md"
+  if [ "$6" != "NONE" ]; then
+    printf '# After the deploy\n\n**Production, after deploy:** %s\n' "$6" > "$p/testing-guide-after-deploy.md"
+  fi
+}
+LEDGER='rows abc-001 to abc-004 appended to docs/foundations/taste-ledger.jsonl'
+RULES='none: no correction repeated'
+AFTER='2026-10-12 · abc1234 · re-run by agent · 3 of 3 passed'
+
+d=$(fixture qa4 ""); qa_round "$d/projects/done/qa4" 1 fixed "$LEDGER" "$RULES" "$AFTER"
+rc=$(run_in "$d" qa4)
+[ "$rc" = "0" ] && ok "closed QA round folder passes" || bad "closed QA round folder should pass, got rc=$rc"
+rm -rf "$d"
+
+# THE C15 case: the after-deploy line still holds its template placeholder.
+d=$(fixture qa5 ""); qa_round "$d/projects/done/qa5" 1 fixed "$LEDGER" "$RULES" "[YYYY-MM-DD · deployed sha or version · re-run by <agent> · result: n of n steps passed]"
+rc=$(run_in "$d" qa5)
+[ "$rc" != "0" ] && ok "unfilled 'Production, after deploy' line FAILS" || bad "placeholder after-deploy line must fail, got rc=$rc"
+rm -rf "$d"
+
+d=$(fixture qa6 ""); qa_round "$d/projects/done/qa6" 1 fixed "$LEDGER" "$RULES" NONE
+rc=$(run_in "$d" qa6)
+[ "$rc" != "0" ] && ok "missing testing-guide-after-deploy.md FAILS" || bad "missing after-deploy guide must fail, got rc=$rc"
+rm -rf "$d"
+
+d=$(fixture qa7 ""); qa_round "$d/projects/done/qa7" 1 open "$LEDGER" "$RULES" "$AFTER"
+rc=$(run_in "$d" qa7)
+[ "$rc" != "0" ] && ok "open finding (any owner) in the latest round FAILS" || bad "open finding must fail, got rc=$rc"
+rm -rf "$d"
+
+d=$(fixture qa8 ""); qa_round "$d/projects/done/qa8" 1 fail "$LEDGER" "$RULES" "$AFTER"
+rc=$(run_in "$d" qa8)
+[ "$rc" != "0" ] && ok "failed finding in the latest round FAILS" || bad "fail status must fail, got rc=$rc"
+rm -rf "$d"
+
+d=$(fixture qa9 ""); qa_round "$d/projects/done/qa9" 1 fixed "[rows <ids> appended to <ledger path>, or \"none: <why>\"]" "$RULES" "$AFTER"
+rc=$(run_in "$d" qa9)
+[ "$rc" != "0" ] && ok "unfilled taste-ledger close-out line FAILS" || bad "placeholder ledger line must fail, got rc=$rc"
+rm -rf "$d"
+
+d=$(fixture qa10 ""); qa_round "$d/projects/done/qa10" 1 fixed "$LEDGER" "" "$AFTER"
+rc=$(run_in "$d" qa10)
+[ "$rc" != "0" ] && ok "empty repeated-corrections close-out line FAILS" || bad "empty corrections line must fail, got rc=$rc"
+rm -rf "$d"
+
+# Only the latest round counts, and "latest" is numeric (round-10 > round-2).
+d=$(fixture qa11 "")
+qa_round "$d/projects/done/qa11" 2 open "$LEDGER" "$RULES" NONE
+qa_round "$d/projects/done/qa11" 10 pass "$LEDGER" "$RULES" "$AFTER"
+rc=$(run_in "$d" qa11)
+[ "$rc" = "0" ] && ok "latest round (numeric: round-10) closed passes despite an older open round" || bad "only round-10 should count, got rc=$rc"
+rm -rf "$d"
+
+d=$(fixture qa12 "")
+qa_round "$d/projects/done/qa12" 10 open "$LEDGER" "$RULES" "$AFTER"
+qa_round "$d/projects/done/qa12" 2 pass "$LEDGER" "$RULES" "$AFTER"
+rc=$(run_in "$d" qa12)
+[ "$rc" != "0" ] && ok "open round-10 FAILS even when round-2 is closed" || bad "round-10 is latest and open, must fail, got rc=$rc"
+rm -rf "$d"
+
 # A stale reference in a living doc.
 d=$(fixture zeta "")
 echo "see projects/in-progress/zeta/tasks.md" > "$d/README.md"
@@ -143,6 +215,36 @@ out=$( cd "$d" && "$ORIENT" 2>/dev/null )
 printf '%s' "$out" | grep -q "Session orientation" && ok "emits in a playbook repo" || bad "should emit with projects/"
 lines=$(printf '%s\n' "$out" | wc -l | tr -d ' ')
 [ "$lines" -le 12 ] && ok "output bounded (${lines} lines)" || bad "output too long: ${lines} lines"
+rm -rf "$d"
+
+# Stale uncommitted work: warn when the oldest uncommitted change is > 24 h old.
+# (A project once sat uncommitted for four days; staged-file guards and other
+# sessions could not see any of it.)
+d=$(fixture lambda "in-progress")
+mkdir -p "$d/projects/in-progress/lambda/discovery"
+echo "draft" > "$d/projects/in-progress/lambda/discovery/old.md"
+touch -t 202001010000 "$d/projects/in-progress/lambda/discovery/old.md" "$d/projects/in-progress/lambda/discovery"
+echo "new" > "$d/fresh.md"
+out=$( cd "$d" && "$ORIENT" 2>/dev/null )
+printf '%s' "$out" | grep -q "Uncommitted work is" && ok "warns on uncommitted work older than 24 h" || bad "should warn on a 2020-dated uncommitted file"
+printf '%s' "$out" | grep -q "old.md\|discovery" && ok "warning names the oldest path" || bad "warning should name the oldest path"
+rm -rf "$d"
+
+d=$(fixture mu "in-progress")
+echo "new" > "$d/fresh.md"
+out=$( cd "$d" && "$ORIENT" 2>/dev/null )
+printf '%s' "$out" | grep -q "Uncommitted work is" && bad "fresh uncommitted work must not warn" || ok "silent on fresh uncommitted work"
+rm -rf "$d"
+
+d=$(fixture nu "in-progress")
+out=$( cd "$d" && "$ORIENT" 2>/dev/null )
+printf '%s' "$out" | grep -q "Uncommitted work is" && bad "clean tree must not warn" || ok "silent on a clean tree"
+rm -rf "$d"
+
+d=$(fixture xi "in-progress")
+echo "x" > "$d/a.md"; touch -t 202001010000 "$d/a.md"
+out=$( cd "$d" && PLAYBOOK_STALE_UNCOMMITTED_HOURS=1000000 "$ORIENT" 2>/dev/null )
+printf '%s' "$out" | grep -q "Uncommitted work is" && bad "threshold override not honored" || ok "PLAYBOOK_STALE_UNCOMMITTED_HOURS overrides the threshold"
 rm -rf "$d"
 
 # Opt-out honored.
