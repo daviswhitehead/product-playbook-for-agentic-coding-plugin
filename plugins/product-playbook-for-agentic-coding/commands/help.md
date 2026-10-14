@@ -18,8 +18,11 @@ Display all available commands and help the user find the right one for their ta
 → `/playbook:foundations` - Mission, Vision, Personas, Engagement frameworks
 → `/playbook:research-synthesis` - Turn research into ranked strategic opportunities
 
-**Starting a new feature or project?**
-→ `/playbook:product-requirements` - Define WHAT to build and WHY
+**Starting a feature with a UI, or not sure yet what to build?** (the default)
+→ `/playbook:explore` - Prototype first: grounding brief, rendered options, clickable prototype, then PRD and plan from it; one stage per run, founder picks from a decision queue
+
+**Starting a feature whose shape is already settled (or returning from explore)?**
+→ `/playbook:product-requirements` - Define WHAT to build and WHY (`--from-prototype` after explore)
 
 **Know what to build, need to plan HOW?**
 → `/playbook:tech-plan` - Design architecture and approach
@@ -33,6 +36,9 @@ Display all available commands and help the user find the right one for their ta
 **Ready to implement?**
 → `/playbook:work` - Execute the next task
 → `/playbook:work-multiple` - Execute multiple tasks autonomously
+
+**Built it, and the founder needs to check it?**
+→ `/playbook:qa-round` - Three agent passes first (journeys, adversarial, real device), then a short pre-tested guide and only the taste calls
 
 **Scope changed mid-project?**
 → `/playbook:emergent` - Capture a mid-flight bug or new requirement as a micro-PRD
@@ -96,12 +102,14 @@ Display all available commands and help the user find the right one for their ta
 ### Core Workflow (4-Phase)
 | Command | When to Use |
 |---------|-------------|
-| `/playbook:product-requirements` | Starting a new feature - define problem, users, success criteria |
+| `/playbook:explore` | Default start for UI or unclear work - ground, render options, clickable prototype, then PRD and plan; runs unattended one stage per night |
+| `/playbook:product-requirements` | Starting a new feature - define problem, users, success criteria (`--from-prototype` after explore) |
 | `/playbook:tech-plan` | After requirements - design architecture, sequencing, approach |
 | `/playbook:tasks` | After tech plan - create specific, actionable tasks |
 | `/playbook:review` | Before autonomous delivery - one-page project review the founder approves |
 | `/playbook:work` | Execute one task from the tasks document |
 | `/playbook:work-multiple` | Execute multiple tasks autonomously |
+| `/playbook:qa-round` | Built work - agent passes first, then a pre-tested founder guide; answers feed the taste ledger |
 | `/playbook:emergent` | Mid-project bug or new requirement - capture as a micro-PRD first |
 | `/playbook:learnings` | After completing work - capture insights for future |
 
@@ -176,7 +184,23 @@ Display all available commands and help the user find the right one for their ta
 
 ## Typical Workflows
 
-### New Feature Development
+### Prototype-First Feature (the default for UI or unclear work)
+```
+1. /playbook:explore <project>     → frame: grounding brief (every action with file:line), framing questions
+   (founder picks)                 → answers in decisions-queue.md, a reply, or inline NOTE/QUESTION markup
+2. /playbook:explore <project>     → options: 4-6 rendered options incl. wild ones; real components at 320/390/768/1280
+3. /playbook:explore <project>     → prototype: single-file clickable prototype, every rule drawn as a state
+4. /playbook:explore <project>     → prd: PRD from the prototype + one combined critique
+5. /playbook:explore <project>     → plan: spikes, tech plan + review board, critique, tasks, REVIEW.md
+   (founder approves REVIEW.md)    → the project leaves discovery
+6. /playbook:work-multiple         → build on the integration branch
+7. /playbook:qa-round <project>    → agent passes, then the founder's short guide
+8. /playbook:git-pr, /playbook:monitor-pr → ship (one PR per risk class)
+9. /playbook:close-project         → requires a closed QA round; then the retro (/playbook:learnings)
+```
+Add `--unattended` to run explore overnight from a scheduler: one stage per run, stopping at the founder gate. Everything in discovery stays local (no pushes, no PRs).
+
+### New Feature Development (shape already settled)
 ```
 1. /playbook:product-requirements  → Define the feature
 2. /playbook:tech-plan             → Plan the implementation

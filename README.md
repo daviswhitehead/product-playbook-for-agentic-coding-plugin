@@ -7,10 +7,12 @@ A Claude Code plugin that provides a structured workflow for product-driven agen
 This plugin implements a systematic approach to building software with AI assistance. The full evidence pipeline:
 
 ```
-Foundations → Research → Synthesis → Prioritization → PRD → Tech Plan → Tasks → Delivery → Learnings
-     ↑                                                                                        |
-     └────────────────────────── learnings feed back ─────────────────────────────────────────┘
+Foundations → Research → Synthesis → Prioritization → Explore → PRD → Tech Plan → Tasks → Review → Delivery → QA round → Learnings
+     ↑                                                 (prototype first)                                                    |
+     └──────────────────────────────────────── learnings (and founder taste) feed back ─────────────────────────────────────┘
 ```
+
+**Prototype first is the default for UI or unclear work:** `/playbook:explore` grounds in the code, renders options, and converges on a clickable prototype before any PRD; the PRD and plan are written from it. One stage per run, so it can run unattended overnight and stop at a founder gate with a decision queue.
 
 ### The Four Phases
 
@@ -28,11 +30,13 @@ Not every project needs every step. A small feature might start at PRD. A new pr
 | **Foundations** | `/playbook:foundations` | Mission, Vision, Personas, Engagement Framework | New product or strategy work |
 | **Research Synthesis** | `/playbook:research-synthesis` | Opportunities narrative from quant + qual + taste research | After conducting research |
 | **Prioritization** | Use `resources/templates/prioritization.md` | Ranked ideas with transparent scoring | When choosing between multiple opportunities |
-| **Product Requirements** | `/playbook:product-requirements` | Agent-ready PRD | Before building any feature |
+| **Explore (prototype first)** | `/playbook:explore` | Grounding brief, rendered options, a clickable prototype, then PRD + plan + REVIEW.md from it; a decision queue at every founder gate | Default start for UI or unclear work; runs unattended one stage per run |
+| **Product Requirements** | `/playbook:product-requirements` | Agent-ready PRD (`--from-prototype` after explore) | Before building any feature |
 | **Tech Plan** | `/playbook:tech-plan` | Architecture, sequencing, technology decisions | Before implementation |
 | **Tasks** | `/playbook:tasks` | Specific, actionable tasks with acceptance criteria | Before starting work |
 | **Review (gate)** | `/playbook:review` | One-page `REVIEW.md`: PRD + prototype + components + plan, each as "how it works" + ≤10 judgment calls, every item clickable | Before autonomous delivery; founder approval here is the gate |
 | **Delivery** | `/playbook:work` | Implemented features | During implementation |
+| **QA round** | `/playbook:qa-round` | Findings, a ≤10-step pre-tested founder guide, taste-ledger rows | After building, before close-out |
 | **Learnings** | `/playbook:learnings` | Documented insights that improve future work | After any work session |
 
 ## Installation
@@ -105,12 +109,14 @@ by many plugins in Anthropic's official marketplace.
 |---------|-------------|
 | `/playbook:foundations` | Build strategy foundations (Mission, Vision, Personas, Engagement Framework) |
 | `/playbook:research-synthesis` | Synthesize research into strategic opportunities (quant + qual + taste) |
-| `/playbook:product-requirements` | Draft agent-ready PRDs with autonomous or interview modes |
+| `/playbook:explore` | Prototype-first discovery: grounding brief, rendered options, clickable prototype, then PRD and plan; one stage per run, interactive or unattended |
+| `/playbook:product-requirements` | Draft agent-ready PRDs with autonomous, interview or from-prototype modes |
 | `/playbook:tech-plan` | Create technical plan with architecture and sequencing |
 | `/playbook:tasks` | Break down work into specific, actionable tasks |
 | `/playbook:review` | Build/iterate the one-page project review that gates autonomous delivery |
 | `/playbook:work` | Execute the next task from the tasks document |
 | `/playbook:work-multiple` | Work autonomously on multiple tasks without interruption |
+| `/playbook:qa-round` | Founder-facing QA: three agent passes, a pre-tested testing guide, taste-ledger rows, the learn step |
 | `/playbook:emergent` | Capture emergent in-flight scope as a micro-PRD before implementing |
 | `/playbook:learnings` | Capture learnings to improve docs and plugin |
 | `/playbook:close` | Session close-out — uncommitted work check, task cleanup, handoff context, learnings |
@@ -214,13 +220,15 @@ Some things shouldn't depend on an agent remembering to do them. These run in th
 
 | Component | Kind | What it does |
 |---|---|---|
-| `hooks/hooks.json` → `scripts/session-orientation.sh` | `SessionStart` hook | Gathers branch/tracking state, uncommitted count, active `projects/in-progress/` dirs, latest checkpoint, last 3 commits, and stashes tagged to this branch — with no tool round-trips. Silent outside a git repo or in a repo without the playbook layout. Opt out with `PLAYBOOK_NO_ORIENTATION=1`. |
-| `scripts/verify-close-project.sh <name>` | Executable check | Asserts a close-out actually completed — above all that the **source directory is gone**, not merely that `done/` exists — and that the delivery ledger exists and no QA round has a founder row still open. |
+| `hooks/hooks.json` → `scripts/session-orientation.sh` | `SessionStart` hook | Gathers branch/tracking state, uncommitted count, active `projects/in-progress/` dirs, latest checkpoint, last 3 commits, and stashes tagged to this branch — with no tool round-trips — and **warns when the oldest uncommitted change is more than 24 h old** (`PLAYBOOK_STALE_UNCOMMITTED_HOURS`). Silent outside a git repo or in a repo without the playbook layout. Opt out with `PLAYBOOK_NO_ORIENTATION=1`. |
+| `scripts/verify-close-project.sh <name>` | Executable check | Asserts a close-out actually completed — above all that the **source directory is gone**, not merely that `done/` exists — and that the delivery ledger exists, no QA round has a founder row still open, and the latest `qa/round-<n>/` is closed (findings settled, ledger and repeated-corrections lines filled, "Production, after deploy" filled). |
+| `scripts/check-testing-guide.sh [files or dirs]` | Executable check | `/playbook:qa-round`'s guide guard: every step table has `Expect` and `Agent test` columns and every step was agent-tested first (or says "Nobody: <why>"); no after-deploy step in a pre-deploy guide; warns above 10 steps. |
 | `scripts/check-version-bump.sh` | CI guard (PR + push) | On a PR: the changed plugin must declare a changeset. On `main`: fails while changesets sit unreleased, and fails if plugin content changed without the version increasing. |
 | `scripts/release.sh` | Release step | Consumes `.changes/*`, computes each plugin's new version, updates both manifests + `CHANGELOG.md`, deletes the changesets. `--dry-run` to preview. |
 
-Run `scripts/test-close-project-checks.sh` after changing either close-project piece (18
-cases, both directions; CI runs it too), and `scripts/test-version-checks.sh` after touching the version
+Run `scripts/test-close-project-checks.sh` after changing either close-project piece (32
+cases, both directions; CI runs it too), `scripts/test-check-testing-guide.sh` after touching the guide
+guard (13 cases; CI runs it), and `scripts/test-version-checks.sh` after touching the version
 scripts (20 cases across both).
 
 **Why changesets**: the version is a single monotonic counter on `main`, but PRs are
