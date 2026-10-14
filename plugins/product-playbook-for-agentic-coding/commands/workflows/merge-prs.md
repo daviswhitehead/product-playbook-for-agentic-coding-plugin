@@ -247,7 +247,8 @@ The plan contains, per PR: number, title, verdict + reason, assigned version (if
 required fix (if FIX-THEN-MERGE), and a status column starting at `pending`.
 
 **Present it and stop.** Show the queue in order, the SKIP/ESCALATE list with reasons, and
-the version range. Ask once:
+the version range. Each ESCALATE decision is a `P<pr>-<n>` decision line, appended before you
+present (`resources/templates/decision-line.md`); fill its `answer` when he rules. Ask once:
 
 > Approve this queue? I'll merge all N in order without further questions.
 

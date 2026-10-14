@@ -464,7 +464,7 @@ If automated checks or manual walkthrough reveal issues:
 
 ### Step 5.6: Present to User for Review
 
-**Under an approved Decision Rights block, don't stop per task.** Record the result in `project-state.md`, put anything that needs the founder in `decisions-queue.md` (verified first, with your recommendation), and continue. The founder sees the work in the daily packet and on the integration branch's review and QA round. Present per task only when there is no delegation contract.
+**Under an approved Decision Rights block, don't stop per task.** Record the result in `project-state.md`, put anything that needs the founder in `decisions-queue.md` (verified first, with your recommendation, as a `W-<n>` row with its decision line in `<project>/decisions.jsonl`; shape and stand-in hook in `resources/templates/decision-line.md`), and continue. When he answers, fill the line's `answer`; a short reason after the pick ("B, simpler") is its `why` (`why_basis: stated`). Never ask him for one. The founder sees the work in the daily packet and on the integration branch's review and QA round. Present per task only when there is no delegation contract.
 
 After autonomous pre-review passes, present the work concisely:
 

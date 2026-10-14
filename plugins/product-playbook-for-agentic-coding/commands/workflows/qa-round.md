@@ -38,7 +38,7 @@ Fix what is clearly a bug on the branch as you go (status `fixed`, commit linked
 
 ## Step 2: Outputs for the founder
 
-1. **`needs-founder.md`**: only questions that need his judgment or hands. Each: the question in plain words, options with consequences, a recommendation, the consequence of the recommendation, and a screenshot for anything visual. Each is also a row in `decisions-queue.md` (reversible rows default after 48 h; founder-only rows never).
+1. **`needs-founder.md`**: only questions that need his judgment or hands. Each: the question in plain words, options with consequences, a recommendation, the consequence of the recommendation, and a screenshot for anything visual. Each is also a row in `decisions-queue.md` (reversible rows default after 48 h; founder-only rows never) and a decision line in `<project>/decisions.jsonl`: id `Q<round>-<n>` (item `n` of this round), `stage: qa-round`, the screenshots in `images` (`resources/templates/decision-line.md`, which also has the stand-in hook).
 2. **`testing-guide.md`**: at most 10 concrete steps, each with the page, the exact control label, the screen to expect, and how an agent already tested it ("Nobody: <why>" when no agent could). **No after-deploy steps.** List the steps an agent fully covered under "Not in this guide, and why".
 3. **The pre-tested rule is enforced.** Run the guard and fix every FAIL before sending:
    ```bash
@@ -52,7 +52,7 @@ Fix what is clearly a bug on the branch as you go (status `fixed`, commit linked
 When he answers (inline `<-- NOTE: -->` / `<-- QUESTION: -->` in the guide or `needs-founder.md`, queue answers, or a reply):
 
 1. **Apply NOTEs everywhere, answer QUESTIONs in place** and keep them open until he confirms (`/playbook:refine-doc`, "Markup rounds"). Date the round in the project's decision log.
-2. **Mark each ruling in `findings.md`** (`decided`, with his words) and move queue rows to Decided.
+2. **Mark each ruling in `findings.md`** (`decided`, with his words), move queue rows to Decided, and fill `answer` and `answered` on each `Q<round>-<n>` line. A short reason after a pick ("1B, simpler") goes in `why` with `why_basis: stated`; never ask him for one.
 3. **Append every ruling to the taste ledger**, with `agreement` marked honestly: a recommendation he took is `match`; a change he made to shipped design that nobody recommended is `override` of what shipped; his own idea is `founder-idea`. Schema and ledger path: `resources/templates/founder-taste.md`. Propose principle edits with the row ids as receipts.
 
 ## Step 4: Learn step (same round, not later)

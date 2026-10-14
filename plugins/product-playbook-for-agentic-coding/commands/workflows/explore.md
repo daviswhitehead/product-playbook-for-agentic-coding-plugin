@@ -36,13 +36,7 @@ The `discovery:` line is machine-parsed by a single regex. Keep the key order an
 discovery: stage=options next=prototype gate=waiting-founder round=2 budget_spent_usd=7.40
 ```
 
-Each decisions.jsonl line:
-
-```json
-{"id":"D02-3","stage":"options","question":"…","options":["A: …","B: …"],"recommended":"A","category":"<category>","reversibility":"<reversibility>","shown_as":"<shown_as>","blocking":true,"asked":"YYYY-MM-DD","answer":null,"answered":null}
-```
-
-Enums are the project's taste-ledger enums (the ledger README, or the defaults in `resources/templates/founder-taste.md`): `category` is one of `visual-taste`, `interaction-design`, `copy-naming`, `product-scope`, `information-architecture`, `technical`, `process`, `risk-safety`; `reversibility` is `cheap`, `moderate` or `costly`; `shown_as` is `rendered` or `prose`. `blocking: true` means the next stage cannot start without it. When a decision settles, set `answer` (the founder's words, or exactly `default after 48 h`) and `answered` (date) on its line; rewrite the file, it is small.
+Each decisions.jsonl line follows `resources/templates/decision-line.md` (shape, enums, ids, settling, stand-in hook), with ids `D<NN>-<n>` and `stage` = this stage's name. `blocking: true` means the next stage cannot start. List the screenshots of every rendered option in `images`.
 
 **Never read or write `discovery/.stand-in/`.** A scheduler may run a shadow stand-in that predicts the founder's picks there. If your recommendation saw its prediction, the packet would anchor him and the score would mean nothing.
 
@@ -51,7 +45,7 @@ Enums are the project's taste-ledger enums (the ledger README, or the defaults i
 1. Read the `discovery:` line, `decisions-queue.md` and `decisions.jsonl`. No `discovery:` line yet: create `project-state.md` and `decisions-queue.md` from their templates, add `discovery: stage=none next=frame gate=open round=0 budget_spent_usd=0.00`, create an empty `discovery/decisions.jsonl`.
 2. Refuse to run on the default branch. Interactive: create the local branch `discovery/<slug>`. Unattended: end with `NEXT: blocked: explore needs the local discovery/<slug> branch` (the scheduler owns branches and worktrees).
 3. **Ingest founder answers**, from any of:
-   - **The queue.** A row moved to Decided (by him, or transcribed from a Slack reply by the scheduler). Copy his words into the jsonl `answer`, the date into `answered`.
+   - **The queue.** A row moved to Decided (by him, or transcribed from a Slack reply by the scheduler). Copy his words into the jsonl `answer`, the date into `answered`, and any short reason after the pick ("B, simpler") into `why` (`why_basis: stated`). Never ask him for one.
    - **Inline markup** in any doc under the project: `<-- NOTE: ... -->` and `<-- QUESTION: ... -->`. Follow the markup-rounds rules in `/playbook:refine-doc`: apply each NOTE everywhere it bears (every option sheet, the prototype, the PRD), answer each QUESTION in place directly under it and keep it open until he confirms. A NOTE that names a decision id or sits in its section and picks an option answers that row. When you answer a QUESTION about an open row, set the row's `Default on` to today + 48 h; the default is for silence, not for a question.
    - Log the round in `decision-log.md` (date, his words verbatim, what changed where).
 4. **Apply 48-hour defaults.** A row is reversible when its `reversibility` is `cheap` or `moderate` and it is not founder-only (spend, data-writing migrations, auth, secrets, the project's scope itself, or anything the project's decision rights reserve). A reversible row is past default when today is on or after its `Default on` date (asked + 2 days). Move it to Decided with How = `approved by default after 48 h`; set the jsonl `answer` to `default after 48 h`. `costly` and founder-only rows never default (`Default on: never`).

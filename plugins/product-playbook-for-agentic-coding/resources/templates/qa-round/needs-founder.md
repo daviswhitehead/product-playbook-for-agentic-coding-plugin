@@ -4,11 +4,14 @@
      judgment or his hands. One short answer per item ("1B, 3A") should be enough. Each item is also a
      row in decisions-queue.md (reversible items default after 48 h; founder-only items never do).
      Show it rendered (a screenshot path) whenever the question is about how something looks or feels:
-     he decides visual questions from pictures, not prose. Plain words, no jargon. Delete this comment. -->
+     he decides visual questions from pictures, not prose. Item n is decision Q<N>-n: one line in the project's
+     decisions.jsonl (playbook resources/templates/decision-line.md), screenshots in `images`. He may add a
+     reason after a pick ("1B, simpler"): record it as `why`; never ask for one. Plain words, no jargon.
+     Delete this comment. -->
 
 *[date]. [n] decisions. Answer by replying with the numbers and letters, or write `<-- NOTE: -->` under any item.*
 
-### 1. [Short title] ([finding ids])
+### 1. [Short title] (Q[N]-1; [finding ids])
 
 **Question.** [One or two sentences, in plain words, with what he would see.]
 
