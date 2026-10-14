@@ -36,6 +36,9 @@ jobs:
       - name: Test close-project checks (verify-close-project.sh, session-orientation.sh)
         run: bash plugins/product-playbook-for-agentic-coding/scripts/test-close-project-checks.sh
 
+      - name: Test the QA-round testing-guide guard (check-testing-guide.sh)
+        run: bash plugins/product-playbook-for-agentic-coding/scripts/test-check-testing-guide.sh
+
       - name: Enforce version bump on plugin changes
         env:
           BASE_REF: ${{ github.base_ref || 'main' }}

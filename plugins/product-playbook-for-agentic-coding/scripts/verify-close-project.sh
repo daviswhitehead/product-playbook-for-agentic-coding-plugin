@@ -86,12 +86,13 @@ fi
 # --- 4c. No QA round has a founder row still open -----------------------------
 # A founder-only QA row that waits indefinitely held one project's close-out for
 # days. Rows are markdown table lines with a bare 'founder' owner cell and a bare
-# 'open' status cell (resources/templates/qa-round.md). Past 48 h the agent
+# 'open' status cell (legacy qa-round-<N>.md files). Past 48 h the agent
 # applies its recommendation and records the row as 'decided'.
 qa_files=$(find "projects/done/${NAME}" -type f -iname '*qa-round*.md' 2>/dev/null | sort || true)
-if [ -z "$qa_files" ]; then
-  skip "QA round check (no qa-round*.md in the project)"
-else
+qa_round_dirs=$(find "projects/done/${NAME}/qa" -mindepth 1 -maxdepth 1 -type d -name 'round-*' 2>/dev/null || true)
+if [ -z "$qa_files" ] && [ -z "$qa_round_dirs" ]; then
+  skip "QA round check (no qa/round-<n>/ or qa-round*.md in the project)"
+elif [ -n "$qa_files" ]; then
   open_rows=""
   while IFS= read -r f; do
     [ -n "$f" ] || continue
@@ -116,6 +117,53 @@ else
     echo "           Record the founder's answer, or (past 48 h) set Status to 'decided' with \"default applied <date>: <what>\"."
   else
     pass "no QA round has an open founder row"
+  fi
+fi
+
+# --- 4d. The latest QA round folder is closed (/playbook:qa-round) ------------
+# A round is closed when every finding is fixed, filed or decided; the founder's
+# answers went to the taste ledger; any correction he made twice became a rule,
+# check or guard; and the after-deploy guide's "Production, after deploy" line is
+# filled. An unfilled line still starts with the template's "[" placeholder.
+# Only the latest round counts (numeric: round-10 is after round-2).
+filled() { # filled <file> <label-regex>: the value after the bold label is non-empty and not "[..."
+  local v
+  v=$(grep -m1 -E "^[[:space:]-]*\*\*${2}[^*]*:\*\*" "$1" 2>/dev/null | sed -E 's/^[^*]*\*\*[^*]*\*\*[[:space:]]*//')
+  [ -n "$v" ] && [ "${v#\[}" = "$v" ]
+}
+if [ -n "$qa_round_dirs" ]; then
+  latest=$(printf '%s\n' "$qa_round_dirs" | sed -n 's#^\(.*/round-\([0-9][0-9]*\)\)$#\2 \1#p' | sort -n | tail -1 | cut -d' ' -f2-)
+  if [ -z "$latest" ]; then
+    fail "QA round folders found but none named round-<number>: ${qa_round_dirs}"
+  else
+    rname="${latest#projects/done/${NAME}/}"
+    rfails=0
+    f="${latest}/findings.md"
+    if [ ! -f "$f" ]; then
+      fail "${rname}/findings.md missing — see /playbook:qa-round"; rfails=1
+    else
+      open_rows=$(awk -F'|' '
+        /^[[:space:]]*\|/ {
+          for (i = 2; i < NF; i++) {
+            c = tolower($i); gsub(/^[[:space:]`*]+|[[:space:]`*]+$/, "", c)
+            if (c == "open" || c == "fail") { printf "%s:%d\n", FILENAME, FNR; break }
+          }
+        }' "$f")
+      if [ -n "$open_rows" ]; then
+        fail "${rname} has finding(s) still open or failing (fix, file, or get a decision):"
+        printf '%s\n' "$open_rows" | sed 's/^/           /'
+        rfails=1
+      fi
+      filled "$f" "Taste ledger" || { fail "${rname}/findings.md Close-out: 'Taste ledger' line not filled (rows appended, or \"none: <why>\")"; rfails=1; }
+      filled "$f" "Repeated corrections" || { fail "${rname}/findings.md Close-out: 'Repeated corrections' line not filled (rule/check/guard made, or \"none: <why>\")"; rfails=1; }
+    fi
+    g="${latest}/testing-guide-after-deploy.md"
+    if [ ! -f "$g" ]; then
+      fail "${rname}/testing-guide-after-deploy.md missing — the after-deploy pass never ran (/playbook:qa-round --after-deploy)"; rfails=1
+    elif ! filled "$g" "Production, after deploy"; then
+      fail "${rname}/testing-guide-after-deploy.md: 'Production, after deploy' line not filled (date · sha · who re-ran · result)"; rfails=1
+    fi
+    [ "$rfails" -eq 0 ] && pass "latest QA round (${rname}) is closed"
   fi
 fi
 

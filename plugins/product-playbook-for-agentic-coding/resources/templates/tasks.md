@@ -375,10 +375,11 @@
 ---
 
 ### Task N.4: QA Round (before PRs open)
-**Description**: Run a QA round on the integration branch using `resources/templates/qa-round.md`. Agents pass every row they can first, including real-device or simulator checks where behaviour differs by device (touch, keyboard, viewport). Only rows needing irreducible taste go to the founder, batched in the daily packet. After 48 h without an answer, the agent applies its recommendation and records it.
+**Description**: Run a QA round on the integration branch with `/playbook:qa-round` (templates in `resources/templates/qa-round/`). Agents pass every row they can first, including real-device or simulator checks where behaviour differs by device (touch, keyboard, viewport). Only rows needing irreducible taste go to the founder, batched in the daily packet. After 48 h without an answer, the agent applies its recommendation and records it.
 
 **Acceptance Criteria**:
-- [ ] `qa-round-<N>.md` exists; every agent row is pass / fixed with evidence
+- [ ] `qa/round-<N>/findings.md` exists; every agent row is pass / fixed / filed with evidence
+- [ ] The founder's `testing-guide.md` passes `check-testing-guide.sh` (every step agent-tested first, no after-deploy steps)
 - [ ] Device-specific behaviour checked on a real device or simulator (not only a desktop browser at phone size)
 - [ ] No founder row left `open`: each is answered or `decided` with "default applied <date>"
 - [ ] PRs are cut from the integration branch only after this task closes
