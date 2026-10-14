@@ -166,7 +166,7 @@ If you encounter a blocker:
 
 1. **Verify it is real**: check the claim yourself (tools installed, limits, prior answers) before calling it a blocker
 2. **Document the blocker** in task notes and under "Waiting on" in `project-state.md`
-3. **If it needs the founder**, add it to `decisions-queue.md` with your recommendation; reversible items take the recommendation after 48 h
+3. **If it needs the founder**, add it to `decisions-queue.md` with your recommendation, as a `W-<n>` row with its decision line in `<project>/decisions.jsonl` (`resources/templates/decision-line.md`); reversible items take the recommendation after 48 h
 4. **Set status** to "Blocked"
 5. **Move to next task** - don't get stuck
 6. **Note for summary** - user needs to know

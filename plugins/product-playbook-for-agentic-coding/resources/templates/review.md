@@ -32,9 +32,9 @@ Servers must be running for the live links (prototype: `python3 -m http.server P
 [Plain prose describing how the *product* works for the user — not what the document contains. 1–2 short paragraphs or ≤8 bullets. Each bullet links to the requirement it summarizes: → [R3](./product-requirements.md#r3).]
 
 ### Judgment calls (≤10)
-[Numbered. Each: the call, the default you chose and why, the alternative you rejected, the link. Strike through (~~…~~) calls once the founder decides them and record the decision inline with the date.]
+[Numbered. Each: its decision id (`R-<n>`, unique across the page; one line each in `decisions.jsonl`, shape in the playbook's `resources/templates/decision-line.md`), the call, the default you chose and why, the alternative you rejected, the link. Strike through (~~…~~) calls once the founder decides them and record the decision inline with the date.]
 
-1. **[Call]** — [default + why; what was cut]. → [R…](./product-requirements.md#r…)
+1. **R-1 [Call]** — [default + why; what was cut]. → [R…](./product-requirements.md#r…)
 
 ### Drill-down
 [Where the detail lives: sections, appendices (string ids, failure reasons), acceptance criteria. Links only.]
