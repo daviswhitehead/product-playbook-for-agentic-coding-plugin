@@ -78,32 +78,41 @@ printf '\n'
 # staged-file guards (they no-op on untracked files) and to every other session;
 # one project went four days with nothing committed while each report flagged it
 # and waited. Bounded: at most 300 status entries, 50 files per untracked dir.
+#
+# Hostile names: this output lands in the agent's context, so it prints only a
+# count and an age, never a file name (a name can carry instructions or a fake
+# orientation line). Paths are read NUL-separated and passed as "./<path>", so a
+# name with a newline can't split and a leading dash can't become an option.
 if [ "$dirty" -gt 0 ]; then
   hours="${PLAYBOOK_STALE_UNCOMMITTED_HOURS:-24}"
+  case "$hours" in ''|*[!0-9]*) hours=24 ;; esac
   if stat -c %Y . >/dev/null 2>&1; then mtime() { stat -c %Y "$1" 2>/dev/null; }
   else mtime() { stat -f %m "$1" 2>/dev/null; }; fi
-  now=$(date +%s); oldest=""; oldest_path=""; n=0; skip_next=0
+  now=$(date +%s); oldest=""; n=0; skip_next=0
+  consider() { # consider <./path>: keep the oldest mtime seen
+    local t; t=$(mtime "$1") || return 0
+    case "$t" in ''|*[!0-9]*) return 0 ;; esac
+    if [ -z "$oldest" ] || [ "$t" -lt "$oldest" ]; then oldest="$t"; fi
+  }
   while IFS= read -r -d '' entry; do
     if [ "$skip_next" -eq 1 ]; then skip_next=0; continue; fi   # rename/copy source path
     n=$((n + 1)); [ "$n" -gt 300 ] && break
-    code="${entry:0:2}"; path="${entry:3}"
+    code="${entry:0:2}"; path="./${entry:3}"
     case "$code" in R*|C*) skip_next=1 ;; esac
     case "$code" in *D*) continue ;; esac                        # deleted: nothing to stat
     if [ -d "$path" ]; then
-      cands=$(find "$path" -type f 2>/dev/null | head -50)
+      k=0
+      while IFS= read -r -d '' f; do
+        k=$((k + 1)); [ "$k" -gt 50 ] && break
+        consider "$f"
+      done < <(find "$path" -type f -print0 2>/dev/null)
     else
-      cands="$path"
+      consider "$path"
     fi
-    while IFS= read -r c; do
-      [ -n "$c" ] || continue
-      t=$(mtime "$c") || continue
-      [ -n "$t" ] || continue
-      if [ -z "$oldest" ] || [ "$t" -lt "$oldest" ]; then oldest="$t"; oldest_path="$c"; fi
-    done <<< "$cands"
   done < <(git status --porcelain -z 2>/dev/null)
   if [ -n "$oldest" ] && [ $((now - oldest)) -gt $((hours * 3600)) ]; then
     age=$(( (now - oldest) / 3600 ))
-    printf -- '- ⚠️ **Uncommitted work is %sh old** (oldest: `%s`) — commit it now (a WIP commit on a non-default branch is fine); uncommitted files are invisible to staged-file guards and to other sessions.\n' "$age" "$oldest_path"
+    printf -- '- ⚠️ **Uncommitted work is %sh old** (%s uncommitted file(s); `git status` to see them) — commit it now (a WIP commit on a non-default branch is fine); uncommitted files are invisible to staged-file guards and to other sessions.\n' "$age" "$dirty"
   fi
 fi
 

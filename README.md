@@ -226,7 +226,7 @@ Some things shouldn't depend on an agent remembering to do them. These run in th
 | `scripts/check-version-bump.sh` | CI guard (PR + push) | On a PR: the changed plugin must declare a changeset. On `main`: fails while changesets sit unreleased, and fails if plugin content changed without the version increasing. |
 | `scripts/release.sh` | Release step | Consumes `.changes/*`, computes each plugin's new version, updates both manifests + `CHANGELOG.md`, deletes the changesets. `--dry-run` to preview. |
 
-Run `scripts/test-close-project-checks.sh` after changing either close-project piece (32
+Run `scripts/test-close-project-checks.sh` after changing either close-project piece (37
 cases, both directions; CI runs it too), `scripts/test-check-testing-guide.sh` after touching the guide
 guard (13 cases; CI runs it), and `scripts/test-version-checks.sh` after touching the version
 scripts (20 cases across both).
