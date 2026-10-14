@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.31.1] - 2026-10-13
+
+### Changed
+- **`/playbook:explore` grounding uses aggregate usage data only** (counts, rates, funnels), never raw user-generated text. An unattended discovery run has a shell, so user-written text is a prompt-injection path into it.
+
 ## [0.31.0] - 2026-10-13
 
 ### Added
