@@ -33,8 +33,12 @@ computed once, on `main`:
 
 ```bash
 scripts/release.sh          # consumes .changes/*, bumps both manifests, writes CHANGELOG
-git add -A && git commit -m "chore: release" && git push
+git status --short            # expect only .changes/, CHANGELOG.md and the two manifests
+git add .changes CHANGELOG.md .claude-plugin plugins/*/.claude-plugin
+git commit -m "release: <plugin> <version>" && git push
 ```
+
+Stage explicit paths, never `git add -A`: run from a checkout with agent worktrees under `.worktrees/`, `add -A` committed one as an embedded repository (gitlink) to `main` (2026-10-14, 0.31.0 release; `.worktrees/` is now ignored).
 
 Also update **`README.md`** if component counts/tables changed.
 

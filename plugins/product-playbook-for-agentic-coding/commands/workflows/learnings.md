@@ -1099,6 +1099,8 @@ If a checkpoint from this session exists, append this retro's outputs to its **D
 
 When the project had no founder decisions (a solo refactor), say so in one line and skip.
 
+**Chat-session retros run A0 too when the founder made calls that session.** A taste ledger's main limit is how many rows it has, and a session's calls are lost if only project retros record them. Use the light form: list the session's explicit picks, mark agreement, append the rows (with answer-key entries if the ledger has a blind test), and report the tally in one line. (2026-10-14: six calls in one build session became rows `pfd-009` to `pfd-014`; both misses were the same call, which a project retro weeks later would have flattened.)
+
 **Part A: Agent self-reflection (do this BEFORE asking the user)**
 
 Compare what the skill prescribed vs what actually happened:
