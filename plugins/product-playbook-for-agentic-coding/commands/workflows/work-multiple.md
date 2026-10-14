@@ -171,6 +171,10 @@ If you encounter a blocker:
 5. **Move to next task** - don't get stuck
 6. **Note for summary** - user needs to know
 
+### Step 3.1: Projects still in discovery
+
+A project whose `project-state.md` has a `discovery:` line with `next=` other than `done` has no tasks to execute yet. Don't invent them. An unattended run may advance its discovery **to the next founder gate**: run `/playbook:explore <project-dir> --unattended` (exactly one stage), which leaves its open decisions in `decisions-queue.md` and ends with `NEXT:`. If its gate is still waiting on the founder, it stops at once and costs nearly nothing. Then move on to other tasks; never answer a founder row yourself. Discovery work stays local: commit, don't push or open a PR.
+
 ### Step 3.5: Reconcile All Tasks (Before Stopping)
 
 **CRITICAL**: Before producing the completion summary, sweep EVERY task in the Tasks Document — not just the ones you worked on. For each task, assign a final disposition:

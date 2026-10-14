@@ -16,7 +16,7 @@ Use when **all of the following are true**:
 - All planned tasks are at a final disposition (done / blocked / deferred / cancelled)
 - The gate task (if any) has closed (with explicit GO, NO-GO, or Conditional GO + named follow-ups)
 - The work has shipped or is committed/merged
-- Every QA round is closed: no founder row left `open` (answered, or past the 48-hour default with the applied default recorded as `decided`)
+- Every QA round is closed: no founder row left `open` (answered, or past the 48-hour default with the applied default recorded as `decided`), and the **latest** `qa/round-<n>/` (from `/playbook:qa-round`) is closed (Step 0)
 - The project still lives in `projects/in-progress/` or `projects/to-do/`
 
 If any of those is false, this is not closing time. Use `/playbook:work` to finish the work, or `/playbook:critique` if the gate isn't ready to close.
@@ -26,6 +26,16 @@ If any of those is false, this is not closing time. Use `/playbook:work` to fini
 Produce a clean handoff: the project moves out of the active tray, the planning docs reflect what shipped, loose artifacts have a canonical home, and a retrospective is queued (or completed) to extract durable learnings.
 
 ## Process
+
+### Step 0: Pre-flight — the latest QA round is closed
+
+Before any other step, open the project's latest `qa/round-<n>/` (highest `n`). It must have:
+1. **Every finding fixed, filed or decided** in `findings.md` (no row `open` or `fail`).
+2. **The founder's answers appended to the taste ledger** (`findings.md` Close-out: "Taste ledger" filled, or `none: <why>`).
+3. **Any correction he made twice turned into a rule, check or guard** (Close-out: "Repeated corrections → rules" filled, or `none: <why>`).
+4. **The after-deploy guide's "Production, after deploy" line filled** (`testing-guide-after-deploy.md`: date, deployed sha, who re-ran it, result).
+
+Missing any one: **stop the close** and report the list; finish it with `/playbook:qa-round <project> --apply-markup` or `--after-deploy`. A project with no QA round folder (no user-facing change) skips this step and says so. Step 7's script asserts the same four things after the move.
 
 ### Step 1: Locate the Project
 
@@ -129,6 +139,7 @@ It asserts, and exits non-zero on any failure:
 | `planned-vs-implemented.md` present | The close-out artifact exists |
 | `delivery-ledger.md` present | The project's cost is recorded and comparable (Step 2b) |
 | **No QA round has a founder row still `open`** | A founder-only QA row that waits indefinitely held one project's close for days. Past 48 h the agent applies its recommendation and records `decided`; only a row younger than that can be open, and then the project is not ready to close |
+| **The latest `qa/round-<n>/` is closed** | No finding `open` or `fail`; the Taste ledger and Repeated corrections close-out lines filled; `testing-guide-after-deploy.md` exists with its "Production, after deploy" line filled. Founder answers that never reach the ledger, and after-deploy steps nobody ran, are invisible to every other check (Step 0) |
 | Merged PRs carry a proof-of-completion comment | Best-effort; skipped cleanly without `gh` or auth |
 
 Paste its output into the close-out summary. The agent answering a checklist is the same one that just did the move, which is exactly why this is a script.

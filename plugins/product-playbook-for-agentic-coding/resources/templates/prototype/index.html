@@ -1,0 +1,123 @@
+<!doctype html>
+<!--
+  Prototype kit for /playbook:explore (stage 3). Copy to <project>/prototype/index.html.
+  One file, no dependencies, works from file:// or `python3 -m http.server`.
+
+  What it gives you:
+    - A control bar: pick a STATE and a WIDTH (320 / 390 / 768 / 1280). Both are also URL params,
+      so browser automation can screenshot every state directly: index.html?state=limit&w=390
+    - An event log: call log('event_name', {props}) from any interaction; it shows what the real
+      product would track, and lets the founder see that a tap did something.
+    - States: every <section data-state="..."> is one state. Add one per behavior rule, including
+      each rule's edge ("at the limit", "only one action", "empty"). A rule with no state is not reviewed.
+
+  Replace the example screen with the real direction. Keep real copy and real-shaped data.
+  Delete this comment block when you start.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[Project] prototype v1</title>
+<link rel="icon" href="data:,">
+<style>
+  :root { --bar: #1f2328; --bg: #f6f7f9; --frame: #fff; --line: #d0d7de; --ink: #1f2328; --muted: #57606a; --accent: #b4532a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); }
+  #kit-bar { position: sticky; top: 0; z-index: 10; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 12px; background: var(--bar); color: #fff; font-size: 13px; }
+  #kit-bar label { display: flex; gap: 6px; align-items: center; }
+  #kit-bar select, #kit-bar button { font: inherit; padding: 4px 8px; border-radius: 6px; border: 1px solid #57606a; background: #2d333b; color: #fff; }
+  #kit-bar button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); }
+  #kit-bar .rule { color: #c9d1d9; flex-basis: 100%; }
+  #kit-stage { display: flex; gap: 16px; padding: 16px; align-items: flex-start; }
+  #kit-frame { width: 390px; min-height: 640px; background: var(--frame); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; flex: none; }
+  #kit-log { flex: 1; min-width: 220px; max-height: 640px; overflow: auto; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; font: 12px/1.5 ui-monospace, Menlo, monospace; }
+  #kit-log h2 { font: 600 12px -apple-system, sans-serif; color: var(--muted); margin: 4px 0 8px; }
+  [data-state] { display: none; padding: 16px; }
+  [data-state].is-active { display: block; }
+  .btn { display: inline-block; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--line); background: #fff; font: inherit; cursor: pointer; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .reason { color: var(--muted); font-size: 13px; margin-top: 6px; }
+  @media (max-width: 700px) { #kit-stage { flex-direction: column; } #kit-log { width: 100%; } }
+</style>
+</head>
+<body>
+  <div id="kit-bar" role="toolbar" aria-label="Prototype controls">
+    <strong>[Project] v1</strong>
+    <label>State <select id="kit-state" aria-label="State"></select></label>
+    <span role="group" aria-label="Width" id="kit-widths"></span>
+    <button type="button" id="kit-clear">Clear log</button>
+    <span class="rule" id="kit-rule" aria-live="polite"></span>
+  </div>
+
+  <main id="kit-stage">
+    <div id="kit-frame">
+      <!-- One section per state. data-rule says which behavior rule the state draws (shown in the bar). -->
+      <section data-state="default" data-label="Default" data-rule="Every action that exists is shown, in one stable order.">
+        <h1>[Screen title]</h1>
+        <p>[Real copy, real-shaped data.]</p>
+        <button class="btn" type="button" onclick="log('primary_tapped', {from: 'default'})">[Primary action]</button>
+      </section>
+      <section data-state="limit" data-label="At the limit" data-rule="A disabled control says why.">
+        <h1>[Screen title]</h1>
+        <button class="btn" type="button" disabled aria-describedby="limit-reason">[Primary action]</button>
+        <p class="reason" id="limit-reason">[Why it is disabled, in plain words]</p>
+      </section>
+      <section data-state="empty" data-label="Empty" data-rule="[The rule this state draws]">
+        <h1>[Screen title]</h1>
+        <p>[What a first-time user sees]</p>
+      </section>
+    </div>
+    <aside id="kit-log" aria-label="Event log"><h2>Event log</h2><ol id="kit-events"></ol></aside>
+  </main>
+
+<script>
+  const WIDTHS = [320, 390, 768, 1280];
+  const params = new URLSearchParams(location.search);
+  const sections = [...document.querySelectorAll('[data-state]')];
+  const stateSel = document.getElementById('kit-state');
+  const frame = document.getElementById('kit-frame');
+
+  function log(name, props = {}) {
+    const li = document.createElement('li');
+    li.textContent = `${new Date().toLocaleTimeString()}  ${name}  ${JSON.stringify(props)}`;
+    document.getElementById('kit-events').prepend(li);
+    console.log('[event]', name, props);
+  }
+  window.log = log;
+
+  function setParam(key, value) {
+    params.set(key, value);
+    history.replaceState(null, '', `${location.pathname}?${params}`);
+  }
+
+  function showState(id) {
+    const target = sections.find((s) => s.dataset.state === id) || sections[0];
+    sections.forEach((s) => s.classList.toggle('is-active', s === target));
+    stateSel.value = target.dataset.state;
+    document.getElementById('kit-rule').textContent = target.dataset.rule ? `Rule: ${target.dataset.rule}` : '';
+    setParam('state', target.dataset.state);
+    log('state_shown', { state: target.dataset.state });
+  }
+
+  function setWidth(w) {
+    frame.style.width = `${w}px`;
+    document.querySelectorAll('#kit-widths button').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.w) === w)));
+    setParam('w', w);
+  }
+
+  sections.forEach((s) => stateSel.add(new Option(s.dataset.label || s.dataset.state, s.dataset.state)));
+  stateSel.addEventListener('change', () => showState(stateSel.value));
+  WIDTHS.forEach((w) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = w; b.dataset.w = w;
+    b.addEventListener('click', () => setWidth(w));
+    document.getElementById('kit-widths').append(b);
+  });
+  document.getElementById('kit-clear').addEventListener('click', () => { document.getElementById('kit-events').textContent = ''; });
+
+  setWidth(Number(params.get('w')) || 390);
+  showState(params.get('state') || sections[0].dataset.state);
+</script>
+</body>
+</html>

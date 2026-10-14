@@ -9,10 +9,11 @@ This document provides universal AI instructions for systematic software develop
 ### Phase 1: Product Discovery
 **Goal**: Define WHAT to build and WHY
 
+- **Prototype first for UI or unclear work** (`/playbook:explore`): ground every named action in the code (file:line; label anything new as NEW), render divergent options instead of describing them, converge on a clickable prototype, and write the PRD from it. The founder picks from rendered options in a decision queue; options stay local, never in a PR.
 - Clarify user needs and business goals
 - Identify constraints and success criteria
-- Document requirements with acceptance criteria
-- Output: Product Requirements Document
+- Document requirements with acceptance criteria; open calls as "Decisions for the founder" (default, alternative, consequence, status confirmed or assumed)
+- Output: Prototype (when UI or unclear) and Product Requirements Document
 
 ### Phase 2: Solution Planning
 **Goal**: Design HOW to build it
@@ -28,6 +29,7 @@ This document provides universal AI instructions for systematic software develop
 - Break work into specific tasks
 - Execute tasks systematically
 - Maintain quality throughout
+- QA round before close-out (`/playbook:qa-round`): agents test journeys, hostile input and the real device first; the founder gets a short, pre-tested guide
 - Output: Working software + Tasks Document
 
 ### Phase 4: Retrospective

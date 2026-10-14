@@ -68,18 +68,26 @@ export function setup() {
   }
 }
 
-function listIphones() {
+function listDevices() {
   const json = JSON.parse(sh('xcrun', ['simctl', 'list', 'devices', 'available', '-j']));
   return Object.entries(json.devices)
     .filter(([runtime]) => runtime.includes('SimRuntime.iOS'))
     .sort(([a], [b]) => b.localeCompare(a, undefined, { numeric: true }))
-    .flatMap(([runtime, list]) => list.filter((d) => d.name.startsWith('iPhone')).map((d) => ({ ...d, runtime })));
+    .flatMap(([runtime, list]) => list.filter((d) => /^iP(hone|ad)/.test(d.name)).map((d) => ({ ...d, runtime })));
 }
 
-/** Boots (if needed) and returns the device: IOS_SIM_DEVICE by name or UDID, else an already-booted iPhone, else the plain newest iPhone. */
+function listIphones() {
+  return listDevices().filter((d) => d.name.startsWith('iPhone'));
+}
+
+/**
+ * Boots (if needed) and returns the device: IOS_SIM_DEVICE by name or UDID (an
+ * iPhone or an iPad, e.g. "iPad mini (A17 Pro)"), else an already-booted
+ * iPhone, else the plain newest iPhone.
+ */
 export function bootDevice() {
-  const all = listIphones();
   const want = process.env.IOS_SIM_DEVICE;
+  const all = want ? listDevices() : listIphones();
   const device = want
     ? all.find((d) => d.name === want || d.udid === want)
     : all.find((d) => d.state === 'Booted') || all.find((d) => /^iPhone \d+$/.test(d.name)) || all[0];
@@ -242,6 +250,75 @@ export class Sim {
       }
       await n.tapXPath(key);
     });
+  }
+
+  /** The element's client rect in CSS px (layout viewport coordinates), or null. */
+  rect(css) {
+    return this.exec((s) => {
+      const el = document.querySelector(s);
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return { x: r.x, y: r.y, width: r.width, height: r.height, top: r.top, bottom: r.bottom, left: r.left, right: r.right };
+    }, css);
+  }
+
+  /**
+   * Where client (0, 0) sits on screen, in points. Safari's WebView element
+   * spans the whole screen, toolbars included, so its frame is not the
+   * content's origin. A fixed marker at client (0, 0) is
+   * looked up in the accessibility tree instead. Measured per call: the
+   * toolbar can change between gestures.
+   */
+  async contentOrigin() {
+    await this.exec(() => {
+      const m = document.createElement('div');
+      m.id = '__ios_sim_origin';
+      m.setAttribute('role', 'button');
+      m.setAttribute('aria-label', 'ios-sim-origin');
+      m.style.cssText = `position:fixed;left:0;top:0;width:12px;height:12px;z-index:2147483647;opacity:0.01;pointer-events:none`;
+      document.body.appendChild(m);
+    });
+    try {
+      return await this.native(async () => {
+        const el = (await this.#call('POST', '/elements', { using: 'xpath', value: '//*[@name="ios-sim-origin"]' }))[0];
+        if (!el) throw new Error('contentOrigin: marker not in the accessibility tree');
+        const r = await this.#call('GET', `/element/${el[ELEMENT]}/rect`);
+        return { x: r.x, y: r.y };
+      });
+    } finally {
+      await this.exec(() => document.getElementById('__ios_sim_origin')?.remove());
+    }
+  }
+
+  /**
+   * A real one-finger touch drag (XCTest), from one point to another. `hold` is the press
+   * before moving; `duration` the move itself: about 600 ms reads as a slow
+   * drag, under 120 ms as a flick. Points are client coordinates (the space
+   * getBoundingClientRect reports), mapped to the screen through
+   * contentOrigin(), 1:1 at the default zoom. Pass `origin` (a previous
+   * contentOrigin()) to skip measuring it, so the finger goes down sooner.
+   */
+  async drag(from, to, { duration = 600, hold = 120, steps = 1, origin } = {}) {
+    const frame = origin || (await this.contentOrigin());
+    const pt = (p) => ({ x: Math.round(frame.x + p.x), y: Math.round(frame.y + p.y) });
+    const a = pt(from);
+    const b = pt(to);
+    const moves = [];
+    for (let i = 1; i <= steps; i++) {
+      moves.push({ type: 'pointerMove', duration: Math.round(duration / steps), x: Math.round(a.x + ((b.x - a.x) * i) / steps), y: Math.round(a.y + ((b.y - a.y) * i) / steps) });
+    }
+    await this.native(() =>
+      this.#call('POST', '/actions', {
+        actions: [
+          {
+            type: 'pointer',
+            id: 'finger1',
+            parameters: { pointerType: 'touch' },
+            actions: [{ type: 'pointerMove', duration: 0, x: a.x, y: a.y }, { type: 'pointerDown', button: 0 }, { type: 'pause', duration: hold }, ...moves, { type: 'pointerUp', button: 0 }],
+          },
+        ],
+      })
+    );
   }
 
   /** Blurs whatever has focus and waits for the keyboard to go away. */

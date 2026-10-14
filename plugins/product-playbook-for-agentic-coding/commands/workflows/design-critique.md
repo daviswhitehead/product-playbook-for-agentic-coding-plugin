@@ -233,6 +233,7 @@ For P0/P1 items from mockups, include regeneration recommendation:
 - **Actionable Output**: Every observation should inform design decisions
 - **Capture Everything**: Document insights even if they seem minor
 - **Question Assumptions**: Challenge "the way it's always been done"
+- **Stay Local**: Options, critiques and screenshots are reviewed as local files, never as a PR; only the chosen option is committed, inside the real change PR (founder rule, 2026-10-13: a PR opened only to show options "wasted CI")
 
 ## Next Steps
 

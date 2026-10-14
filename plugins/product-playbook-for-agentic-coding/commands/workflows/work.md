@@ -264,6 +264,8 @@ If a reasonable reviewer could look at a correct, well-built implementation and 
 static mock, two side-by-side variants — and put it in front of the user **before**
 building it out. Then implement whatever they pick.
 
+**Feature-sized taste work goes to `/playbook:explore` instead.** If the subjective part is bigger than one treatment (a new surface or flow, more than one screen, or several open look-and-feel calls at once), a screenshot here is too small a loop. Stop and run `/playbook:explore <project-dir>`: grounding brief, rendered options, a clickable prototype, founder picks through the decisions queue, then a PRD from the prototype. Resume this task once the direction is approved.
+
 **Do NOT** substitute your own verification for their judgment here. Automated checks,
 browser automation, and self-review confirm the change *works*; none of them can
 confirm it is *wanted*. On subjective work those two questions are independent, and
@@ -515,7 +517,7 @@ Before marking task complete, verify:
 
 When the **last task in the project** is complete, and before any PR is cut from the integration branch and marked ready:
 
-1. **QA round closed** on the integration branch (tasks template Task N.4, `resources/templates/qa-round.md`): agent rows passed with evidence, device-specific behaviour checked on a real device or simulator, no founder row left `open`.
+1. **QA round closed** on the integration branch (tasks template Task N.4, `/playbook:qa-round`): agent rows passed with evidence, device-specific behaviour checked on a real device or simulator, no founder row left `open`.
 2. **Deterministic lane, locally, for what you touched**: the fast gate (`ci:local` or equivalent) plus every test the change can affect: specs for the changed surfaces, and any test referencing a changed selector, copy string or contract (Step 5.5 1b). The agent-activity-ux retro (2026-04-24) caught a 4-commit fix-forward cascade after a testID rename that the fast gate missed; the touched-test set exists to catch exactly that.
 3. **The full suite runs once, in CI, at ready.** Don't duplicate it on the laptop when CI runs it: local full runs compete for one machine across workspaces and double the wait. Run the full suite locally (under the machine's heavy lock) only when the project's CLAUDE.md requires it, when CI doesn't run that suite, or when reproducing a CI failure.
 4. **Live-model lane once per agent-behaviour change set** (evals at full tier), not per PR, and not for frontend-only PRs.

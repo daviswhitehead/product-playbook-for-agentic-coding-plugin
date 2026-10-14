@@ -38,6 +38,7 @@ matters more than template completeness.
 | **Size** | [Small / Medium / Large] |
 | **Date** | [Date] |
 | **Owner** | [Name/Role] |
+| **Prototype** | [`prototype/index.html` vN, if written from a prototype (`--from-prototype`); each requirement links the state that shows it] |
 
 ### Summary
 
@@ -310,10 +311,14 @@ matters more than template completeness.
      This documents the thinking process, not just the outputs. Agents should populate
      this as they make choices, and it prevents re-litigating settled questions. -->
 
-| Decision | Options Considered | Choice | Rationale | Date |
-|----------|-------------------|--------|-----------|------|
-| [Decision 1] | [Options] | [Choice] | [Why] | [Date] |
-| [Decision 2] | [Options] | [Choice] | [Why] | [Date] |
+<!-- Dated per round: one block per review round (founder markup, critique, queue answers), newest last.
+     For a project run through /playbook:explore, the full round log is decision-log.md; link it here. -->
+
+**Round [n] ([YYYY-MM-DD], [source: markup | critique | queue | live])**
+
+| Decision | Options Considered | Choice | Rationale | Decided by |
+|----------|-------------------|--------|-----------|------------|
+| [Decision 1] | [Options] | [Choice] | [Why] | [founder: "<quote>" / agent default] |
 
 ### Decision Rights
 
@@ -329,18 +334,19 @@ matters more than template completeness.
 
 ---
 
-## Open Questions
+## Decisions for the founder
 
-<!-- Adapt format: Use a table for structured tracking, or a simple bulleted list
-     for more conversational questions. Both work—choose what fits the project.
-     For agentic engineering, questions that block implementation should be clearly
-     flagged so agents treat them as blockers. -->
+<!-- Replaces bare "Open Questions". Every open call is framed so the founder can approve a batch in
+     one line because the costly items are named: a default, the alternative, and what changes.
+     Status is `confirmed` ONLY with his quoted words and a date; anything else is `assumed`,
+     including defaults inside a batch "sounds good" he did not weigh one by one.
+     Blocking = implementation cannot start without it. A fact to look up is not a decision:
+     find it in the code (or the grounding brief) instead of asking. -->
 
-**[Question 1]**
-
-**[Question 2]**
-
-**[Question 3]**
+| # | Decision | Default | Alternative | Consequence | Blocking? | Status |
+|---|----------|---------|-------------|-------------|-----------|--------|
+| F1 | [the call, in one line] | [what we do unless told otherwise] | [the main other option] | [what changes for users / cost / what becomes hard to undo] | yes / no | assumed |
+| F2 | [...] | [...] | [...] | [...] | no | confirmed: "[his words]" ([YYYY-MM-DD]) |
 
 ---
 
@@ -425,7 +431,7 @@ matters more than template completeness.
 - [ ] **Edge cases covered:** Scenarios include error states and edge cases
 
 ### Decision Completeness
-- [ ] **No open blockers:** All "Open Questions" are either resolved or marked as non-blocking
+- [ ] **Every founder decision has a status:** Each row in "Decisions for the founder" has a default, an alternative, a consequence and a status (`confirmed` with quoted words and a date, or `assumed`); no blocking row is still `assumed` at approval
 - [ ] **Key decisions logged:** Major decisions are documented with rationale
 - [ ] **Assumptions are validatable:** Each assumption has a validation method
 
