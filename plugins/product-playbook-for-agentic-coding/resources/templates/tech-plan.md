@@ -179,6 +179,15 @@ A test that can't name its risk is cost without coverage: each E2E test adds wal
 ### API Contracts
 [Key API contracts and interfaces]
 
+## Untrusted Inputs & Executing Paths
+*(REQUIRED whenever the feature reads email, web pages, feeds, or user text. Otherwise write "None: no untrusted text is read.")*
+
+| Untrusted input | Steps that can execute code or file work for an executing agent | Gate between them |
+|-----------------|------------------------------------------------------------------|-------------------|
+| [e.g. inbound email body] | [e.g. agent that edits the repo and runs tests] | [e.g. LLM picks one of N enum actions; code validates and applies] |
+
+**Default design: the LLM decides, deterministic code acts.** The LLM chooses from a closed set of structured options; deterministic code applies the change and opens a draft PR; no LLM with a shell ever sees untrusted text. Sanitizers and allowlists are a second layer, not the gate. *(chef-chopsky, 2026-10-11 → 10-17: 7 security-review rounds across two features each patched sanitizers and allowlists, until the executor was restructured so no LLM had Bash.)*
+
 ## Technical Risks
 
 **Risk 1: [Description]**

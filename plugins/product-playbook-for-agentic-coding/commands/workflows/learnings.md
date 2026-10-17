@@ -64,7 +64,7 @@ Before proceeding, consider what tools are available:
 1. **Branch is merged.** If the original PR was squash-merged, the local branch still exists but commits to it won't reach the target. Detect: `gh pr list --head $(git branch --show-current) --state merged --limit 1`. If a merged PR comes back, ask the user before committing:
    > "Current branch `<name>` was merged via PR #<n>. Commits will be local-only. Branch off `<target>` first?"
 
-2. **Branch was switched by another agent (parallel-agent workspaces — Conductor, git worktrees).** If multiple agents share a working directory, your session's branch may have been switched while you were sleeping/awaiting tools. Detect: compare `git branch --show-current` against the branch your session has been working on (last push target, PR head being monitored). If it's unfamiliar, stash any unrelated uncommitted changes (`git stash push -m "other-agent-WIP" <paths>`) and create a fresh branch off the target before continuing. Restore the stash after.
+2. **Branch was switched by another agent (parallel-agent workspaces — Conductor, git worktrees).** If multiple agents share a working directory, your session's branch may have been switched while you were sleeping/awaiting tools. Detect: compare `git branch --show-current` against the branch your session has been working on (last push target, PR head being monitored). If it's unfamiliar, leave the other agent's uncommitted changes where they are and continue in a new worktree off the target. Don't `git stash` them: the stash stack is shared by every session (see `autonomous-execution`, *Conductor mode*).
 
 3. **Work hiding in a stash.** A branch can have every commit pushed yet still have uncommitted work in a `git stash` that's lost when the worktree/branch is archived. Before treating the branch as "everything captured," run `git stash list` and check for entries tagged to it (`On <branch>:` / `WIP on <branch>:`). For each: compare against `HEAD` (diff `HEAD <stash>` per file, not `<base>..<stash>` — the base may be rebased away); if superseded, drop it; if unique/uncertain, salvage to a pushed branch before dropping. Leave other branches' stashes alone.
 
@@ -388,6 +388,10 @@ The finding was false and would have shipped a wrong rule into a command doc.)*
      1. Create the missing tests now, then continue learnings
      2. Document as a gap and continue"
      ```
+
+#### Pre-Check C: The Last Mile of Actuators
+
+For every issue and PR the project's agents filed, verify the downstream actuator actually delivered: a PR exists, it merged, and it deployed. Query each one (`gh issue view`, `gh pr view --json state,mergedAt`, the deploy log); a label or a commit on a local branch is not delivery. A selector reading **0 candidates while matching issues are still open** is a stranded-work signal, not "nothing to do". *(chef-chopsky, 2026-10-1x: the delivery agent implemented and committed a security patch, never pushed it, and a `delivery:attempted` label then excluded the issue forever. The next run selected 0 candidates and the report read clean.)*
 
 These pre-checks prevent two common patterns: (1) projects skip validation and move directly to learnings/closure, and (2) retrospectives produce vague insights because no one checked what actually shipped vs what was planned.
 

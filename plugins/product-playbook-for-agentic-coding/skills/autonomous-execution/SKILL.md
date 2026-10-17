@@ -106,6 +106,7 @@ Work stops when a session stops: a usage-limit window, exhausted credits, a cras
 
 ## Reaching the Founder (one channel, verified first)
 
+- **Try it before handing it off.** Before writing the founder a walkthrough, attempt the step yourself (CLI, API, or browser automation through his signed-in browser). Only passwords and 2FA, payments, legal identity and founder-reserved changes go to him, and you read back the state after he acts (`/playbook:work`, *Founder Handoffs*). *(chef-chopsky, 2026-10-11 → 10-17: five "can you do this for me?" asks in one project, all agent-doable.)*
 - **Verify before asking.** Before any question reaches the founder, check the claim yourself: installed tools, current limits and quotas, prior answers in the transcript and project docs. *(A lead once asked the founder to install a tool he had confirmed installed six days earlier; five PRs waited about ten hours.)*
 - **Queue, don't block.** Questions go into `decisions-queue.md` (template `resources/templates/decisions-queue.md`) with your recommendation, whether it is reversible, and what it blocks; each row also gets a decision line in `<project>/decisions.jsonl` (id `W-<n>`; shape, `images` and the stand-in hook in `resources/templates/decision-line.md`). Then keep working on unblocked items. The queue goes out as **one daily packet**; a live interrupt is only for a production or spend outage.
 - **Unattended runs may advance discovery to the next founder gate, and no further.** For a project in discovery (a `discovery:` line in `project-state.md`), run one stage of `/playbook:explore <project-dir> --unattended`; it ingests answers, stops at once if a blocking row is still open, and otherwise runs one stage, leaves its questions in `decisions-queue.md` (plus `discovery/decisions.jsonl`) and ends with `NEXT:`. Taste picks are never defaulted by an agent before 48 h, and costly or founder-only ones never; discovery is committed locally, never pushed or opened as a PR.
@@ -218,6 +219,7 @@ Flakiness is handled by the portfolio, not by re-running: a test that fails with
 | Quality gate failure (can't fix) | Stop, seek help |
 | Ambiguous requirements | Verify against the PRD/REVIEW.md first; if still open, queue it and continue elsewhere |
 | Same tool fails 2+ times | Switch strategy, don't brute-force |
+| Security review finds new issues in the same component twice | Stop patching sanitizers and allowlists; restructure the component (tech plan § *Untrusted Inputs & Executing Paths*) |
 | Unsure about platform capability | Say "I'm not sure, let me verify" — don't state as fact |
 
 ### Pause and Evaluate
@@ -293,6 +295,10 @@ One conductor session directing N subagents, each in its own worktree with full 
   A lock dir older than ~25 min means its owner died: remove it and take it. Light work (reading, editing, one small test file, `gh` calls) takes no lock.
 - **Local runs only the tests a change touches** when CI runs the full suite; the laptop is not a second CI. Review servers run from their own worktree, never one a suite is rebuilding.
 - **Write the rules once** in a brief file every agent reads first (where to work, secrets, hooks, the lock, delivery steps); task prompts carry only the task. Rules repeated per prompt drift.
+- **The brief also carries three rules from repeat incidents** (chef-chopsky, 2026-10-11 → 10-17):
+  - **Two security-review rounds with new findings in one component → restructure, don't patch.** This is "after 2 failed attempts, switch strategies" applied to security. *(Seven review rounds across two features patched sanitizers and allowlists until the executor was rebuilt so no LLM had Bash.)*
+  - **Never `git stash` in a shared or parallel workspace.** The stash stack is shared by every worktree and session. Set work aside with a WIP commit or a new worktree. *(`git stash push -- <file>` on an already-committed file creates no stash, so the captured SHA was empty, and `git stash apply $SHA` then applied another session's `stash@{0}`.)*
+  - **Before adding a gate, block, or "skip if missing" behavior, check the founder's recorded preferences** (taste file, CLAUDE.md, agent memory). *(An agent made founder notes a gate for blog posts, "no notes → no posts"; the founder corrected it to additive, matching his recorded "metrics steer, never block" rule.)*
 - **Delegate building from the first mockup round, and verify it yourself.** Option sheets, renders, prototypes and components are built by sub-agents with a written brief; the conductor holds the plan, opens every screenshot itself before anything reaches the founder, and banks judgment calls in `decisions-queue.md` instead of asking mid-task. In one project the mockups and prototype were built in the main agent, and the cost of discovery could never be measured.
 - **Record main-agent and sub-agent tokens per stage** in `project-state.md` (its cost table): sub-agent tokens from each sub-agent result's usage, main-agent tokens from the harness (`/cost`, or the scheduler's measured run cost). Mark each figure measured or estimated, and write `unknown`, never `0`.
 - **Packets carry `pending manager review`.** Subagents write the review verdict as pending; the conductor flips it to approved only after its own review, and the merge step refuses while any verdict is pending. A subagent never self-approves.

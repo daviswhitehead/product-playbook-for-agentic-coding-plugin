@@ -318,6 +318,9 @@ Ensure all sections are filled with complexity matching project size:
 - Component Inventory (existing components/tokens per surface, plus the new-components table — empty is the good default; see Step 3.5)
 - Review board link (Step 3.6): every touched component tagged new / extended / reused / replaced, every rule's edge state drawn, open problems as options A–D
 
+**Required for any feature that reads email, web pages, feeds, or user text** (any size):
+- Untrusted Inputs & Executing Paths: each untrusted input, every step that can execute code or file work for an executing agent, and the gate between them. Default design: the LLM chooses from a closed set of structured options, deterministic code applies the change and opens a draft PR, and no LLM with a shell ever sees untrusted text (chef-chopsky, 2026-10-1x: 7 security-review rounds of sanitizer patches ended only when the executor lost Bash)
+
 **For Medium and Large Projects**:
 - Integration Approach
 - Design System Architecture (if applicable)
@@ -339,6 +342,7 @@ Review the document:
 - [ ] Technology stack is appropriate and justified
 - [ ] Integration points are identified
 - [ ] Technical risks are assessed with mitigation
+- [ ] **Untrusted text**: Untrusted Inputs & Executing Paths filled in; no LLM with a shell sees untrusted text
 - [ ] **UI surfaces**: Component Inventory done — existing components/tokens named per surface, and every proposed new component has a rationale an existing one couldn't satisfy (Step 3.5)
 - [ ] **UI surfaces**: Review board built (Step 3.6) — every touched component tagged, every stated rule has a drawn edge state, open problems rendered as options A–D
 - [ ] Spikes answered for every question the plan would otherwise assume (template `spike.md`)
