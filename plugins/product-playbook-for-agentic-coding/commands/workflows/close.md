@@ -45,7 +45,7 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    **(b) Branch was changed by another agent (parallel-agent workspaces — Conductor, git worktrees, etc.).** If multiple agents share a working directory, the current branch may have been switched while you were sleeping/waiting on tools. Detection:
    - `git branch --show-current` — does it match the branch *your* session has been working on? Compare against the branch you last pushed to, or the PR head you've been monitoring.
    - If unfamiliar, ask the user before committing anywhere: it likely belongs to another agent's in-flight work.
-   - Stash any unrelated uncommitted changes (they may be the other agent's WIP) before switching back: `git stash push -m "other-agent-WIP" <paths>`. Restore after your work completes.
+   - Leave unrelated uncommitted changes alone (they may be the other agent's WIP) and do your work in a new worktree off your branch instead of switching back. Don't `git stash` them: the stash stack is shared by every session, and an empty `git stash push` makes a later `git stash apply` land another session's `stash@{0}` (chef-chopsky, 2026-10-1x).
 
    **(c) The target branch is checked out by another worktree.** The remedy for (a) and (b) is "branch off the target" — but in a multi-worktree repo the target itself is frequently *held* by another worktree, and git refuses to check it out twice:
 

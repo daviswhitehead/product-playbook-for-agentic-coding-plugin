@@ -64,7 +64,7 @@ Before proceeding, consider what tools are available:
 1. **Branch is merged.** If the original PR was squash-merged, the local branch still exists but commits to it won't reach the target. Detect: `gh pr list --head $(git branch --show-current) --state merged --limit 1`. If a merged PR comes back, ask the user before committing:
    > "Current branch `<name>` was merged via PR #<n>. Commits will be local-only. Branch off `<target>` first?"
 
-2. **Branch was switched by another agent (parallel-agent workspaces — Conductor, git worktrees).** If multiple agents share a working directory, your session's branch may have been switched while you were sleeping/awaiting tools. Detect: compare `git branch --show-current` against the branch your session has been working on (last push target, PR head being monitored). If it's unfamiliar, stash any unrelated uncommitted changes (`git stash push -m "other-agent-WIP" <paths>`) and create a fresh branch off the target before continuing. Restore the stash after.
+2. **Branch was switched by another agent (parallel-agent workspaces — Conductor, git worktrees).** If multiple agents share a working directory, your session's branch may have been switched while you were sleeping/awaiting tools. Detect: compare `git branch --show-current` against the branch your session has been working on (last push target, PR head being monitored). If it's unfamiliar, leave the other agent's uncommitted changes where they are and continue in a new worktree off the target. Don't `git stash` them: the stash stack is shared by every session (see `autonomous-execution`, *Conductor mode*).
 
 3. **Work hiding in a stash.** A branch can have every commit pushed yet still have uncommitted work in a `git stash` that's lost when the worktree/branch is archived. Before treating the branch as "everything captured," run `git stash list` and check for entries tagged to it (`On <branch>:` / `WIP on <branch>:`). For each: compare against `HEAD` (diff `HEAD <stash>` per file, not `<base>..<stash>` — the base may be rebased away); if superseded, drop it; if unique/uncertain, salvage to a pushed branch before dropping. Leave other branches' stashes alone.
 
@@ -262,6 +262,29 @@ Before writing "yes", **run the pre-registered fix against the current occurrenc
 
 Answering "no" out loud is the high-value move: it's the difference between a fix aimed at the real cause and one aimed at the last three incidents. Note the family/mechanism split explicitly in the addendum so the next reader inherits the distinction rather than re-deriving it.
 
+#### Read the linked issue's history before naming it as "the fix"
+
+A finding often ends with "the structural fix is #N". Before writing that, read #N's latest
+comments (`gh issue view N --json comments --jq '.comments[-3:][].body'`). A long-open fix
+issue has usually been tried, and its own thread may record why it failed. Repeating it as
+"the fix" sends the next session after a remedy already disproven.
+
+*(chef-chopsky, 2026-10-17: a retro draft called OpenAI auto-recharge (#566) "the structural
+fix" for a sixth credit outage. #566's last comment said auto-recharge was **on** during the
+9/29 outage, and the org still froze when dev evals used up the monthly reload cap. The real
+fix it records, a separate dev org, still hadn't landed. Caught only because the issue was
+read before being escalated.)*
+
+#### Check the live state of everything the project shipped
+
+Before writing findings, query the current state of each shipped artifact: did the scheduled
+jobs actually run (read their published output), did filed issues produce PRs, did merged
+fixes deploy? A retro written from the session's memory reports what was *built*, so a
+broken last mile stays invisible. (Pre-Check C covers actuators; this extends it to every
+artifact.) *(chef-chopsky, 2026-10-17: reading the live reports during the retro found a
+security patch stranded on the cron host for 3 days and confirmed that DKIM survives Gmail
+forwarding. Neither would have appeared in a memory-only retro.)*
+
 #### Verify the incident's causal claim against a timeline before writing it down
 
 An addendum's core sentence is almost always causal — *"X caused Y"* — and it gets written
@@ -388,6 +411,10 @@ The finding was false and would have shipped a wrong rule into a command doc.)*
      1. Create the missing tests now, then continue learnings
      2. Document as a gap and continue"
      ```
+
+#### Pre-Check C: The Last Mile of Actuators
+
+For every issue and PR the project's agents filed, verify the downstream actuator actually delivered: a PR exists, it merged, and it deployed. Query each one (`gh issue view`, `gh pr view --json state,mergedAt`, the deploy log); a label or a commit on a local branch is not delivery. A selector reading **0 candidates while matching issues are still open** is a stranded-work signal, not "nothing to do". *(chef-chopsky, 2026-10-1x: the delivery agent implemented and committed a security patch, never pushed it, and a `delivery:attempted` label then excluded the issue forever. The next run selected 0 candidates and the report read clean.)*
 
 These pre-checks prevent two common patterns: (1) projects skip validation and move directly to learnings/closure, and (2) retrospectives produce vague insights because no one checked what actually shipped vs what was planned.
 

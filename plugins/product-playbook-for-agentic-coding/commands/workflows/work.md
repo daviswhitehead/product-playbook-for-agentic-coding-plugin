@@ -624,6 +624,14 @@ When using external tools (APIs, MCP servers, search tools):
 
 **Do NOT make 15 API calls to a tool that clearly has a 10-result cap.**
 
+### Founder Handoffs: Try It First, Then Read Back the Result
+
+**Before writing a step-by-step walkthrough for the founder, try the step yourself**: the service's CLI or API, or browser automation through the founder's signed-in browser. Hand off only what truly needs the human: passwords and 2FA, payments, legal identity, and changes the Decision Rights reserve for the founder. *(chef-chopsky, 2026-10-11 → 10-17: the founder asked "can you do this for me?" five times in one project, and each was agent-doable: a cloud network allowlist edit, a Google Cloud service account + Search Console user + key into the secrets manager, a secrets-manager config value, PR merges, and committing generated files.)*
+
+When a step does go to the founder:
+- **Read back the state right after he does it.** Query the API, CLI or page and confirm the result; "done" is a claim, not evidence.
+- **Put foot-gun warnings in the artifact's name**, not only in prose (e.g. `forward-filter--DO-NOT-tick-apply-to-existing.xml`). *(chef-chopsky, 2026-10-1x: the founder imported a Gmail forwarding-filter file with "apply to existing" ticked, which archives but never forwards. A real production-outage alert was silently archived; the warning existed only in a chat message.)*
+
 
 
 ## Branch Hygiene Checks
