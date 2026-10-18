@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.32.2] - 2026-10-17
+
+### Changed
+- **Capability-first founder handoffs** (`/playbook:work` *Founder Handoffs*, `autonomous-execution` *Reaching the Founder*): try a step yourself (CLI, API, the founder's signed-in browser) before writing him a walkthrough; hand off only passwords/2FA, payments, legal identity and founder-reserved changes; read back the state after he acts; put foot-gun warnings in artifact names. Five "can you do this for me?" asks in one project were all agent-doable, and a filter-import foot-gun warned only in chat silently archived a production-outage alert.
+- **"LLM decides, deterministic code acts"** (tech-plan template + `/playbook:tech-plan`): a required *Untrusted Inputs & Executing Paths* section for any feature that reads email, web pages, feeds or user text. Seven security-review rounds patched sanitizers until the executor lost Bash.
+- **Conductor brief rules** (`autonomous-execution`): restructure after two security rounds with new findings in one component; never `git stash` in shared workspaces (an empty stash push made `git stash apply` land another session's `stash@{0}`; the stash advice in `close.md` and `learnings.md` now says use a worktree); check recorded founder preferences before adding a gate.
+- **Actuator last-mile pre-check** (`/playbook:learnings` Pre-Check C): verify every agent-filed issue/PR reached PR → merge → deploy; 0 candidates with matching issues open means stranded work, not a clean run.
+- **Retro honesty checks** (`/playbook:learnings`): read a linked issue's latest comments before naming it "the fix" (a draft nearly re-prescribed OpenAI auto-recharge, which its own issue recorded as tried and failed); query the live state of every shipped artifact before writing findings (reading live reports found a security patch stranded for 3 days).
+
 ## [0.32.1] - 2026-10-14
 
 ### Changed
