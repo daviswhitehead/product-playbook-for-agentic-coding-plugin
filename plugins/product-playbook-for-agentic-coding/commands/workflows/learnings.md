@@ -262,6 +262,29 @@ Before writing "yes", **run the pre-registered fix against the current occurrenc
 
 Answering "no" out loud is the high-value move: it's the difference between a fix aimed at the real cause and one aimed at the last three incidents. Note the family/mechanism split explicitly in the addendum so the next reader inherits the distinction rather than re-deriving it.
 
+#### Read the linked issue's history before naming it as "the fix"
+
+A finding often ends with "the structural fix is #N". Before writing that, read #N's latest
+comments (`gh issue view N --json comments --jq '.comments[-3:][].body'`). A long-open fix
+issue has usually been tried, and its own thread may record why it failed. Repeating it as
+"the fix" sends the next session after a remedy already disproven.
+
+*(chef-chopsky, 2026-10-17: a retro draft called OpenAI auto-recharge (#566) "the structural
+fix" for a sixth credit outage. #566's last comment said auto-recharge was **on** during the
+9/29 outage, and the org still froze when dev evals used up the monthly reload cap. The real
+fix it records, a separate dev org, still hadn't landed. Caught only because the issue was
+read before being escalated.)*
+
+#### Check the live state of everything the project shipped
+
+Before writing findings, query the current state of each shipped artifact: did the scheduled
+jobs actually run (read their published output), did filed issues produce PRs, did merged
+fixes deploy? A retro written from the session's memory reports what was *built*, so a
+broken last mile stays invisible. (Pre-Check C covers actuators; this extends it to every
+artifact.) *(chef-chopsky, 2026-10-17: reading the live reports during the retro found a
+security patch stranded on the cron host for 3 days and confirmed that DKIM survives Gmail
+forwarding. Neither would have appeared in a memory-only retro.)*
+
 #### Verify the incident's causal claim against a timeline before writing it down
 
 An addendum's core sentence is almost always causal — *"X caused Y"* — and it gets written
