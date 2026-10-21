@@ -420,6 +420,8 @@ These pre-checks prevent two common patterns: (1) projects skip validation and m
 
 ### Step 1: Identify Trigger Type and Output
 
+**If the invocation already carries the user's feedback** (ARGUMENTS text such as "some initial feedback from me: …"), do not re-ask for it later: it is Step 10 Part B input *and* a candidate systemic finding for Step 9.1b. Quote it in the learnings doc, answer it with an artifact (a seeded backlog, a filed lane proposal, a template edit), not a note. (2026-10-21, chef-chopsky: the founder's "a backlog of low-judgement autonomous work the workforce runs overnight" became `projects/to-do/autonomous-backlog/`, a label on 14 issues and a lane proposal in the same retro.)
+
 Ask the user:
 ```
 What type of learning moment is this?
@@ -495,7 +497,7 @@ If work will continue in a future session, also capture:
 
 #### For Project Completion Learnings
 
-**Start from the delivery ledger.** Read `delivery-ledger.md` in the project dir (written by `/playbook:close-project` Step 2b). If it's missing, produce it now: run the project's ledger generator if it has one (check CLAUDE.md, `package.json`, `scripts/`, `workflows/` for "ledger"), otherwise assemble the same table by hand (calendar buckets: agents / CI only / founder wait / usage-limit stop / idle; founder turns; PRs planned → shipped; CI minutes; dollars by category; re-runs by cause; values marked M or E, `unknown` rather than `0`). Put it next to the **previous closed project's** ledger and ask, for the biggest bucket and every metric that got worse: *what caused it, and which upstream decision would have prevented it?* The answers usually trace to a few root causes (decision rights decided per PR, state that lived only in a chat, shared budgets, re-proving everything on every head, PR shape, QA after merge) and belong in Step 9.1b. Copy the comparison table into the learnings doc.
+**Start from the delivery ledger.** (If the project's generator fails on a transient GitHub 5xx, retry once after ~20 s before hand-assembling; one retry succeeded on 2026-10-21.) Read `delivery-ledger.md` in the project dir (written by `/playbook:close-project` Step 2b). If it's missing, produce it now: run the project's ledger generator if it has one (check CLAUDE.md, `package.json`, `scripts/`, `workflows/` for "ledger"), otherwise assemble the same table by hand (calendar buckets: agents / CI only / founder wait / usage-limit stop / idle; founder turns; PRs planned → shipped; CI minutes; dollars by category; re-runs by cause; values marked M or E, `unknown` rather than `0`). Put it next to the **previous closed project's** ledger and ask, for the biggest bucket and every metric that got worse: *what caused it, and which upstream decision would have prevented it?* The answers usually trace to a few root causes (decision rights decided per PR, state that lived only in a chat, shared budgets, re-proving everything on every head, PR shape, QA after merge) and belong in Step 9.1b. Copy the comparison table into the learnings doc.
 
 **If a gap analysis was produced in Pre-Check A**, use it to generate specific, targeted questions instead of generic ones. The gap analysis transforms vague retrospective prompts into concrete questions grounded in what actually happened.
 
@@ -1214,7 +1216,8 @@ When there is no human to ask (or the user hands you the gates: "I trust your ju
    self-critique harder: where did the user redirect you *earlier in the session*? Those
    redirections are the same signal Part B fishes for, and they already happened. Mine
    the session, don't skip the step.
-5. **Say plainly in the final summary which gates were auto-answered**, so the human can
+5. **A founder who is present but says "wrap up with /playbook:learnings" has delegated the gates, not left.** Answer them in writing in the first message, run to completion, and list them again at the end; do not stop at Step 1 to ask the trigger type.
+6. **Say plainly in the final summary which gates were auto-answered**, so the human can
    revisit any of them. When the user delegated rather than being absent, they are still there to redirect, so
    state the answered gates in your first message rather than only in the final one. An autonomous run that reads identically to a facilitated one is
    hiding the decisions it made on someone's behalf.
