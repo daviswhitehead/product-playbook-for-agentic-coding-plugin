@@ -55,8 +55,16 @@ done
 # Excludes done/ itself (historical references there are fine) and .git.
 stale=0
 for tray in in-progress to-do; do
-  hits=$(grep -rl --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=done \
-           "projects/${tray}/${NAME}" . 2>/dev/null | head -20 || true)
+  # Tracked files only: gitignored scratch (.tmp/, .context/), build output
+  # (dist/) and the agent's own notes are not "living references" and forced
+  # edits to files outside git (chef-chopsky, 2026-10-29). Falls back to grep
+  # outside a git checkout.
+  if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    hits=$(git grep -l -- "projects/${tray}/${NAME}" -- . ':(exclude)projects/done' 2>/dev/null | head -20 || true)
+  else
+    hits=$(grep -rl --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=done \
+             "projects/${tray}/${NAME}" . 2>/dev/null | head -20 || true)
+  fi
   if [ -n "$hits" ]; then
     fail "living references to projects/${tray}/${NAME}:"
     while IFS= read -r hit; do
