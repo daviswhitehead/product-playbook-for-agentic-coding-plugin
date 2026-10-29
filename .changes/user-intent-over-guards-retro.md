@@ -11,4 +11,4 @@ bump: patch
 - **learnings command, Part A0** — when the repo has no taste ledger file, record the tally in the learnings doc and name creating the ledger as an action item instead of inventing one.
 
 ### Fixed
-- **`verify-close-project.sh`** — the "living references" check reads tracked files only (`git grep`), so gitignored scratch (`.tmp/`, `.context/`) and build output (`dist/`) no longer block a close-out; negative-tested against an injected tracked reference.
+- **`verify-close-project.sh`** — the "living references" check reads git-visible files only (`git grep --untracked`: tracked and untracked, never gitignored), so scratch (`.tmp/`, `.context/`) and build output (`dist/`) no longer block a close-out; negative-tested against an injected tracked reference.
