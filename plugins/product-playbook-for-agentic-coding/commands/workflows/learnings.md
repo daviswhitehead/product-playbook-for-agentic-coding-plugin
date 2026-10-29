@@ -1126,7 +1126,7 @@ If a checkpoint from this session exists, append this retro's outputs to its **D
 4. **Emit ledger rows.** Find the ledger path the way `resources/personas/founder.md` finds taste sources (a `ledger:` path in CLAUDE.md/AGENTS.md or the taste file; default `docs/foundations/taste-ledger.jsonl`; schema in `resources/templates/founder-taste.md`). Append one row per decision, never editing earlier rows, and run the ledger's guard if the project has one. If a scheduler already emitted rows for these decisions (for example a stand-in scorer), append only the missing ids.
 5. **Propose principle edits** in the taste file when a row supports or contradicts a principle, with the row ids as receipts. The founder merges profile edits.
 
-When the project had no founder decisions (a solo refactor), say so in one line and skip.
+When the project had no founder decisions (a solo refactor), say so in one line and skip. **When the repo has no taste ledger file yet** (no `ledger:` pointer and no `docs/foundations/taste-ledger.jsonl`), do not invent one in the retro: record the tally table in the learnings doc, say the ledger is absent, and name creating it as a one-line action item (chef-chopsky 2026-10-29).
 
 **Chat-session retros run A0 too when the founder made calls that session.** A taste ledger's main limit is how many rows it has, and a session's calls are lost if only project retros record them. Use the light form: list the session's explicit picks, mark agreement, append the rows (with answer-key entries if the ledger has a blind test), and report the tally in one line. (2026-10-14: six calls in one build session became rows `pfd-009` to `pfd-014`; both misses were the same call, which a project retro weeks later would have flattened.)
 

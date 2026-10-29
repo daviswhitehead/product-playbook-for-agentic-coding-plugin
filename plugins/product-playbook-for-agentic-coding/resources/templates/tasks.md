@@ -69,7 +69,7 @@
 
 **Estimated Effort**: [Time estimate]
 
-**Proof**: [unit test / replay dry-run / real-model run / browser journey / consuming query] — [cost: $0 · seconds | ~$N · N min]. Paid proof runs once at phase end unless this task says why not.
+**Proof**: [unit test / replay dry-run / real-model run / browser journey / consuming query] — [cost: $0 · seconds | ~$N · N min]. Paid proof runs once at phase end unless this task says why not. For a model-behaviour change (prompt, tool schema, policy), iterate on a **scoped real-model run of the touched scenarios** (`--ids=…`, cents) and run the full tier once at ready-for-review: a full run reads "189/193" with no attribution, a scoped run names the bug (chef-chopsky 2026-10-27: four agent bugs for ≈ $2.50 before the PR was cut).
 
 **Ships in**: [PR N from the tech plan's PR Strategy table — lane: frontend/agent/workflows-only/docs-only/mixed · gate: autonomous/founder]
 
@@ -109,6 +109,7 @@
 - [ ] Run each "Dry-Run Query" above against production
 - [ ] Confirm every metric returns a non-null real number (not "no data," not `null`, not "unable to measure")
 - [ ] If any metric is unmeasurable: STOP. Fix the instrumentation, re-run the dry-run, and only then proceed to the gate review.
+- [ ] **The dry-run's tooling left its rows in place until the consuming query read them.** A replay that cleans up its own chat/rows before the check runs manufactures false misses (chef-chopsky 2026-10-29: 3 "silent" trips were the rows the replay had just deleted). Give the script a `--keep-rows` mode, run the query, then clean up; and make the check treat harness-deleted rows as absent, never as a miss.
 
 **Watch window** (for time-based gates — "watch metric X for N hours/days"):
 - State the window as the **evidence it is waiting for**, not just a duration: `[N hours] OR [the evidence: e.g. "one full token-refresh cycle past the last pre-change session + ≥K post-change logins with 0 error events"] — whichever arrives first`
