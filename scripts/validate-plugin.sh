@@ -403,6 +403,17 @@ done < "$COVERAGE_TMP"
 
 echo ""
 
+# Positional parameters in skill text: the loader replaces $0, $1, ... with the
+# invocation's arguments before the agent reads the file, so an awk field reference
+# silently becomes a word of the arguments. Use $NF or a named variable instead.
+echo "Checking for positional parameters in awk one-liners..."
+POSITIONAL=$(grep -rnE 'awk .*\$[0-9]' "$PLUGIN_DIR/commands" "$PLUGIN_DIR/skills" --include='*.md' || true)
+if [ -n "$POSITIONAL" ]; then
+    while IFS= read -r line; do
+        error "Positional parameter in awk is rewritten by skill arguments: ${line%%:*} (line $(echo "$line" | cut -d: -f2))"
+    done <<< "$POSITIONAL"
+fi
+
 # Summary
 echo "=========================================="
 echo "Validation Summary"

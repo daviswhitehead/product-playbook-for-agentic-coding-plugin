@@ -246,6 +246,12 @@ You are facilitating an end-of-session close-out. Run each phase in order. Skip 
    session's clock read `08:31 EDT` — the same morning, unknowable which was newer. The
    dated archive was the right call; guessing the timezone was not.)*
 
+   **A small session doesn't take `latest.md` from a larger one.** The session-start summary
+   reads `latest.md` first, so a one-commit session writing there displaces a multi-day
+   handoff that is still the best starting point. When the session shipped one small change
+   and other workspaces have live work, write the dated file and leave `latest.md` alone.
+   *(chef-chopsky, 2026-10-31: a one-commit nav removal left the 10-29 handoff in place.)*
+
 5. Write to `docs/checkpoints/latest.md` using the session-checkpoint format:
 
 ```markdown
@@ -551,7 +557,7 @@ for sha in $(gh pr view <N> --json commits -q '.commits[].oid'); do
     gh api "repos/<owner>/<repo>/actions/runs/$rid/jobs?filter=all&per_page=100" \
       --jq '[.jobs[] | select(.completed_at!=null and .conclusion!="skipped") | ((.completed_at|fromdateiso8601)-(.started_at|fromdateiso8601))] | add // 0'
   done
-done | awk '{s+=$1} END {printf "%.0f job-min\n", s/60}'
+done | awk '{s+=$NF} END {printf "%.0f job-min\n", s/60}'
 ```
 
 **Count by the session's own SHAs, never by a date window.** `gh run list --created ">=<today>"` also counts every other session's runs in a shared repo. The loop above misses push-to-`main` runs for merges and releases you pushed. Add those by commit (`gh run list --commit <merge-or-release-sha>`). *(This plugin, 2026-10-07: a date-window count reported 18 runs, and the session "corrected" a correct earlier figure of 11 to it. 7 were other sessions' runs. The true figure was 12.)*

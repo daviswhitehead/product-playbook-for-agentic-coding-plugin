@@ -295,7 +295,7 @@ Post it immediately before `gh pr merge`. If you find an already-merged PR missi
 > **Better, fix it at the repo level**: with `delete_branch_on_merge: true` (Settings → General → "Automatically delete head branches") GitHub deletes the head branch on every merge and this failure mode disappears — including for web-UI merges. Check with `gh repo view --json deleteBranchOnMerge`. A repo with it `false` silently accumulates merged branches; audit with:
 >
 > ```bash
-> for b in $(git ls-remote --heads origin | awk '{print $2}' | sed 's|refs/heads/||'); do
+> for b in $(git ls-remote --heads origin | awk '{print $NF}' | sed 's|refs/heads/||'); do
 >   gh pr list --head "$b" --state merged --limit 1 --json number --jq ".[0].number" | grep -q . && echo "stale: $b"
 > done
 > ```

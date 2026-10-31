@@ -470,6 +470,8 @@ B. **Standard retrospective** — ~15 minutes
 
 3. If no session files are found, fall back to standard retrospective automatically.
 
+**An aborted turn's transcript can hide what happened.** "[48 messages elided]" before an interruption reads as work done. Before reporting on a turn the user cut off, read the session JSONL (`~/.claude/projects/<dir>/<session>.jsonl`): it separates real tool calls from heartbeats, and `subtype: "api_error"` lines carry the error's fields. (chef-chopsky, 2026-10-31: 48 elided messages were 34 rate-limit heartbeats and bookkeeping; the investigation the user asked for had never started, and the log held the answer.)
+
 **SpecStory thin, current session long → offer "standard, mined from this session".** When session files are missing or sparse but the session running this retro is long (a multi-day conductor run, many redirections), offer it as option C: you read your own transcript for redirections, recoveries and blind spots directly — no deep-analysis agent. Record `analysis-depth: standard` plus a "mined from this session" findings table. (2026-10-06 workforce-simplification retro: its three highest-value findings — an 8-agent wave cascading into disk/Docker/session-limit failures, proof runs committing runtime state, a merge gate stricter than its written policy — surfaced only this way. They were operational; a design-level retro never asks about them.)
 
 Set `deep_retrospective = true` if the user selects A (or accepts the default) and proceed to Step 3.5 after Step 3.
