@@ -96,8 +96,8 @@ Use the template at `resources/templates/product-requirements-v2.md` as your sta
 2. **Scenarios Must Be Concrete:**
    ```
    Scenario 1: Sarah, the power user
-   Sarah opens the app at 8am before her meeting. She [specific action].
-   The system [specific response]. She sees [specific outcome].
+   Sarah opens the app at 8am before a meeting and [specific action].
+   The system [specific response]. Sarah sees [specific outcome].
    ```
 
 3. **Technical Context Must Be Complete:**

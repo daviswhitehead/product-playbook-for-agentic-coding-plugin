@@ -176,6 +176,9 @@ A test that can't name its risk is cost without coverage: each E2E test adds wal
 - **Integration Type**: [API, SDK, etc.]
 - **Data Flow**: [How data flows]
 
+### Client Surfaces
+Where the user will actually use or operate this (apps, devices, agent harness — e.g. desktop IDE, a phone app). Mark each **confirmed by the user** or **assumed**. For every capability the plan depends on (repo access, running code, secrets, git push, notifications), and for any surface newer than the model's knowledge, verify with a live check before building on it — an assumed surface is a plan risk, not a fact.
+
 ### API Contracts
 [Key API contracts and interfaces]
 

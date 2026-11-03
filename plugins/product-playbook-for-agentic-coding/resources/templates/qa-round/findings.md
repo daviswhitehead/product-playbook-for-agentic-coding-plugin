@@ -4,7 +4,7 @@
      tracker: every check and every finding, with its owner and status. Runs on the INTEGRATION BRANCH,
      before PRs open, whenever it can; a round over merged PRs works the same way. Agents pass every row
      they can first (three passes: user journeys, adversarial, real device); the founder gets only rows
-     that need irreducible taste, his real account, or what no agent can see.
+     that need irreducible taste, the founder's real account, or what no agent can see.
      /playbook:close-project (verify-close-project.sh) reads this file: it refuses while any row's Status
      is `open` or `fail`, or while the Close-out lines below are unfilled. Delete this comment. -->
 
@@ -33,7 +33,7 @@
 
 | Founder correction | Rule / check / template that should have caught it | Edit made this round |
 |--------------------|-----------------------------------------------------|----------------------|
-| [his words] | [path] | [commit, or "none: <why>"] |
+| [the founder's words] | [path] | [commit, or "none: <why>"] |
 
 ## Close-out
 
@@ -42,5 +42,5 @@
 
 - **Findings:** every row above is pass, fixed, filed or decided.
 - **Taste ledger:** [rows <ids> appended to <ledger path>, or "none: <why>"]
-- **Repeated corrections → rules:** [<correction he made twice> → <rule, check or guard path>, or "none: <why>"]
+- **Repeated corrections → rules:** [<correction the founder made twice> → <rule, check or guard path>, or "none: <why>"]
 - **After-deploy guide:** [testing-guide-after-deploy.md, "Production, after deploy" line filled on <date>]

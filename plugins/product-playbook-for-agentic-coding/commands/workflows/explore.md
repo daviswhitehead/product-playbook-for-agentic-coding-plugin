@@ -12,7 +12,7 @@ You are the conductor of a discovery loop: ground in the real product, show opti
 
 ## Why this exists
 
-On the project that set this pattern (96 founder decisions, 2.7 days from idea to approved spec), the agent's recommendation matched the founder's pick 7 of 7 times on product scope but 3 of 11 on visual taste and 0 of 4 on interaction design. The project still went well because every option was drawn: he picked in seconds and wrong guesses cost minutes. One rule sat in the proposal's prose through three review rounds and was rejected the moment it was drawn. So: render, let the founder pick, fold the pick in, repeat. Do not predict taste you can show.
+On the project that set this pattern (96 founder decisions, 2.7 days from idea to approved spec), the agent's recommendation matched the founder's pick 7 of 7 times on product scope but 3 of 11 on visual taste and 0 of 4 on interaction design. The project still went well because every option was drawn: the founder picked in seconds and wrong guesses cost minutes. One rule sat in the proposal's prose through three review rounds and was rejected the moment it was drawn. So: render, let the founder pick, fold the pick in, repeat. Do not predict taste you can show.
 
 ## Arguments
 
@@ -28,7 +28,7 @@ On the project that set this pattern (96 founder decisions, 2.7 days from idea t
 | `decisions-queue.md` | Template `resources/templates/decisions-queue.md`, columns unchanged. Rows go in **Open** with ids `D<NN>-<n>` (`NN` = stage number, e.g. `D02-3`). The recommendation cell names the options (A/B/C...) and links screenshots under `discovery/` by absolute local path. |
 | `discovery/decisions.jsonl` | One line per decision, appended when the row is queued (shape below). |
 | `discovery/<NN>-<stage>/` | One folder per stage (`01-frame`, `02-options`, `03-prototype`, `04-prd`, `05-plan`), each with a `stage-summary.md` (template `resources/templates/stage-summary.md`, at most 40 lines). |
-| `decision-log.md` | Template `resources/templates/decision-log.md`: every founder round, dated, with his words. |
+| `decision-log.md` | Template `resources/templates/decision-log.md`: every founder round, dated, with the founder's words. |
 
 The `discovery:` line is machine-parsed by a single regex. Keep the key order and single spaces exactly; values are `stage` = last completed stage or `none`; `next` = `frame`, `options`, `prototype`, `prd`, `plan` or `done`; `gate` = `open` or `waiting-founder`; `round` = stage runs so far; `budget_spent_usd` = cumulative dollars, two decimals:
 
@@ -38,16 +38,16 @@ discovery: stage=options next=prototype gate=waiting-founder round=2 budget_spen
 
 Each decisions.jsonl line follows `resources/templates/decision-line.md` (shape, enums, ids, settling, stand-in hook), with ids `D<NN>-<n>` and `stage` = this stage's name. `blocking: true` means the next stage cannot start. List the screenshots of every rendered option in `images`.
 
-**Never read or write `discovery/.stand-in/`.** A scheduler may run a shadow stand-in that predicts the founder's picks there. If your recommendation saw its prediction, the packet would anchor him and the score would mean nothing.
+**Never read or write `discovery/.stand-in/`.** A scheduler may run a shadow stand-in that predicts the founder's picks there. If your recommendation saw its prediction, the packet would anchor the founder and the score would mean nothing.
 
 ## Step 0: Orient and ingest answers (every run, before anything expensive)
 
 1. Read the `discovery:` line, `decisions-queue.md` and `decisions.jsonl`. No `discovery:` line yet: create `project-state.md` and `decisions-queue.md` from their templates, add `discovery: stage=none next=frame gate=open round=0 budget_spent_usd=0.00`, create an empty `discovery/decisions.jsonl`.
 2. Refuse to run on the default branch. Interactive: create the local branch `discovery/<slug>`. Unattended: end with `NEXT: blocked: explore needs the local discovery/<slug> branch` (the scheduler owns branches and worktrees).
 3. **Ingest founder answers**, from any of:
-   - **The queue.** A row moved to Decided (by him, or transcribed from a Slack reply by the scheduler). Copy his words into the jsonl `answer`, the date into `answered`, and any short reason after the pick ("B, simpler") into `why` (`why_basis: stated`). Never ask him for one.
-   - **Inline markup** in any doc under the project: `<-- NOTE: ... -->` and `<-- QUESTION: ... -->`. Follow the markup-rounds rules in `/playbook:refine-doc`: apply each NOTE everywhere it bears (every option sheet, the prototype, the PRD), answer each QUESTION in place directly under it and keep it open until he confirms. A NOTE that names a decision id or sits in its section and picks an option answers that row. When you answer a QUESTION about an open row, set the row's `Default on` to today + 48 h; the default is for silence, not for a question.
-   - Log the round in `decision-log.md` (date, his words verbatim, what changed where).
+   - **The queue.** A row moved to Decided (by the founder, or transcribed from a Slack reply by the scheduler). Copy their words into the jsonl `answer`, the date into `answered`, and any short reason after the pick ("B, simpler") into `why` (`why_basis: stated`). Never ask them for one.
+   - **Inline markup** in any doc under the project: `<-- NOTE: ... -->` and `<-- QUESTION: ... -->`. Follow the markup-rounds rules in `/playbook:refine-doc`: apply each NOTE everywhere it bears (every option sheet, the prototype, the PRD), answer each QUESTION in place directly under it and keep it open until the founder confirms. A NOTE that names a decision id or sits in its section and picks an option answers that row. When you answer a QUESTION about an open row, set the row's `Default on` to today + 48 h; the default is for silence, not for a question.
+   - Log the round in `decision-log.md` (date, the founder's words verbatim, what changed where).
 4. **Apply 48-hour defaults.** A row is reversible when its `reversibility` is `cheap` or `moderate` and it is not founder-only (spend, data-writing migrations, auth, secrets, the project's scope itself, or anything the project's decision rights reserve). A reversible row is past default when today is on or after its `Default on` date (asked + 2 days). Move it to Decided with How = `approved by default after 48 h`; set the jsonl `answer` to `default after 48 h`. `costly` and founder-only rows never default (`Default on: never`).
 5. **Gate check (unattended).** The current gate is every `blocking` row still open. If any remains, commit what ingestion changed (if anything), end with `NEXT: waiting on founder: D02-1, D02-3`, and stop. Spend nothing else.
 6. Otherwise set `gate=open` and run the stage in `next=` (or `--stage`). If `next=done`, end with `NEXT: discovery done; REVIEW.md awaits founder approval (/playbook:review)`.
@@ -115,7 +115,7 @@ Run it on everything in the stage's queue and docs. Put the result in the stage 
 
 ## Step 2: Write the packet
 
-- `stage-summary.md` (template, at most 40 lines): what was done, the decisions with recommendation and default, up to four screenshots, the pre-flight list, the cost line. Link every artifact by its absolute local path (and a `file://` link), not a repo URL. Plain words: the founder reads it on a phone. The first lines carry what was done and what he must decide, because a scheduler posts them.
+- `stage-summary.md` (template, at most 40 lines): what was done, the decisions with recommendation and default, up to four screenshots, the pre-flight list, the cost line. Link every artifact by its absolute local path (and a `file://` link), not a repo URL. Plain words: the founder reads it on a phone. The first lines carry what was done and what they must decide, because a scheduler posts them.
 - Append the queue rows and the matching jsonl lines.
 
 ## Step 3: Record and stop
@@ -128,7 +128,7 @@ The scheduler, not explore, posts the morning packet (screenshots inline, the st
 
 ## Interactive mode differences
 
-Same stages, same files. You may ask live (show the screenshots, then ask), and continue to the next stage once he answers. Still queue every question and log every answer: the queue and the jsonl are how his taste gets measured.
+Same stages, same files. You may ask live (show the screenshots, then ask), and continue to the next stage once the founder answers. Still queue every question and log every answer: the queue and the jsonl are how their taste gets measured.
 
 ## Related
 

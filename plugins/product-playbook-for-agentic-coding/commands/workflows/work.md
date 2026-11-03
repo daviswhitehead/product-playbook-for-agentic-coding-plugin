@@ -290,7 +290,7 @@ more diligently the agent works, the more a rejection costs.
 
 **Grounding case** (chef-chopsky, 2026-08-15): a card-differentiation task was
 implemented, unit-tested, browser-verified in light and dark, documented, and opened as
-a PR before the founder saw a single rendered pixel. He then disliked the result. The
+a PR before the founder saw a single rendered pixel. They then disliked the result. The
 same founder had already named the correct practice in an April retrospective —
 *"having the agent do its own UX critique, take screenshots, and make prototypes to
 show me options"* — but it was recorded as an observation rather than a step, so it
@@ -464,7 +464,7 @@ If automated checks or manual walkthrough reveal issues:
 
 ### Step 5.6: Present to User for Review
 
-**Under an approved Decision Rights block, don't stop per task.** Record the result in `project-state.md`, put anything that needs the founder in `decisions-queue.md` (verified first, with your recommendation, as a `W-<n>` row with its decision line in `<project>/decisions.jsonl`; shape and stand-in hook in `resources/templates/decision-line.md`), and continue. When he answers, fill the line's `answer`; a short reason after the pick ("B, simpler") is its `why` (`why_basis: stated`). Never ask him for one. The founder sees the work in the daily packet and on the integration branch's review and QA round. Present per task only when there is no delegation contract.
+**Under an approved Decision Rights block, don't stop per task.** Record the result in `project-state.md`, put anything that needs the founder in `decisions-queue.md` (verified first, with your recommendation, as a `W-<n>` row with its decision line in `<project>/decisions.jsonl`; shape and stand-in hook in `resources/templates/decision-line.md`), and continue. When the founder answers, fill the line's `answer`; a short reason after the pick ("B, simpler") is its `why` (`why_basis: stated`). Never ask them for one. The founder sees the work in the daily packet and on the integration branch's review and QA round. Present per task only when there is no delegation contract.
 
 After autonomous pre-review passes, present the work concisely:
 
@@ -629,7 +629,7 @@ When using external tools (APIs, MCP servers, search tools):
 **Before writing a step-by-step walkthrough for the founder, try the step yourself**: the service's CLI or API, or browser automation through the founder's signed-in browser. Hand off only what truly needs the human: passwords and 2FA, payments, legal identity, and changes the Decision Rights reserve for the founder. *(chef-chopsky, 2026-10-11 → 10-17: the founder asked "can you do this for me?" five times in one project, and each was agent-doable: a cloud network allowlist edit, a Google Cloud service account + Search Console user + key into the secrets manager, a secrets-manager config value, PR merges, and committing generated files.)*
 
 When a step does go to the founder:
-- **Read back the state right after he does it.** Query the API, CLI or page and confirm the result; "done" is a claim, not evidence.
+- **Read back the state right after the founder does it.** Query the API, CLI or page and confirm the result; "done" is a claim, not evidence.
 - **Put foot-gun warnings in the artifact's name**, not only in prose (e.g. `forward-filter--DO-NOT-tick-apply-to-existing.xml`). *(chef-chopsky, 2026-10-1x: the founder imported a Gmail forwarding-filter file with "apply to existing" ticked, which archives but never forwards. A real production-outage alert was silently archived; the warning existed only in a chat message.)*
 
 

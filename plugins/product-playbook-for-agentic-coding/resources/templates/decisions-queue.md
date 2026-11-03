@@ -8,7 +8,7 @@
      `#` is the decision id. Every row also gets a decision line in decisions.jsonl when it is added, and
      its `answer` when it moves to Decided (shape, ids, files and stand-in hook: the playbook's
      resources/templates/decision-line.md). Delivery rows are `W-<n>`; explore, review and QA rows keep
-     their own ids. Rendered options list their screenshots in the line's `images`. He may answer with a
+     their own ids. Rendered options list their screenshots in the line's `images`. The founder may answer with a
      reason after the pick ("B, simpler"): record it as `why` (`why_basis: stated`); never ask for one. -->
 
 **Decision rights:** [link to the approved block] · **Packet sent:** [date/time of last send]

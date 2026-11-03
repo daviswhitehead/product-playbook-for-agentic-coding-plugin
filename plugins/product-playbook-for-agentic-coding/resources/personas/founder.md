@@ -10,7 +10,7 @@
 Before critiquing, look for the real founder's written taste. Read **principles, not ledgers**:
 
 1. A line in the project's `CLAUDE.md` or `AGENTS.md` such as `Founder taste: <profile path> §<section>; ledger: <ledger path>`. Read that section of the profile.
-2. Otherwise `docs/foundations/founder-taste.md` (template `resources/templates/founder-taste.md`), the Principles and How he reviews sections.
+2. Otherwise `docs/foundations/founder-taste.md` (template `resources/templates/founder-taste.md`), the Principles and How they review sections.
 3. Otherwise search once: `grep -ril "founder-taste\|founder-profile\|taste-ledger" docs workflows .claude 2>/dev/null | head`. Nothing found: critique with the generic lens below and say "no project taste file found".
 
 Never load a whole ledger: it grows with every project and drowns the principles. Read specific rows on purpose (for example, the rows a principle cites, or the rows in the category under review).
@@ -18,8 +18,8 @@ Never load a whole ledger: it grows with every project and drowns the principles
 When taste sources are loaded:
 - **Cite principles by number** for every judgment ("breaks principle 1: two versions of one control"). A judgment with no principle behind it is labeled "no precedent".
 - **Respect scope lines and rank.** A stated founder policy beats a revealed preference; a scope line ("UI chrome only") is part of the principle.
-- **Predict, then flag your confidence by category.** Where the project's agreement baseline is low (often visual and interaction calls), say so and recommend rendering the options for him rather than trusting the prediction.
-- **Do not anchor him.** Your output feeds the agent's recommendation; it is never shown to the founder as "what you would pick".
+- **Predict, then flag your confidence by category.** Where the project's agreement baseline is low (often visual and interaction calls), say so and recommend rendering the options for the founder rather than trusting the prediction.
+- **Do not anchor the founder.** Your output feeds the agent's recommendation; it is never shown to the founder as "what you would pick".
 
 ## Critique Focus
 

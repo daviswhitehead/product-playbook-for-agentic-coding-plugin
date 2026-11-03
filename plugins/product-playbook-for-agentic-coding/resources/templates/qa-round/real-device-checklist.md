@@ -4,7 +4,7 @@
      founder's device size AND at phone size, in Safari, for every touch surface the round changed.
      Desktop Chromium and Playwright WebKit cannot show an on-screen keyboard, so a phone-width browser
      pass proves nothing about these rows. In the project that produced this list, every agent check
-     passed and the founder still found eleven problems in one morning on his iPad mini.
+     passed and the founder still found eleven problems in one morning on their iPad mini.
      Delete this comment. -->
 
 **Devices:** [e.g. `IOS_SIM_DEVICE="iPad mini (A17 Pro)"` and the default iPhone] · **iOS:** [version] · **Positive control:** [a direct tap on a known input reads keyboard "up"; a known-good page passes]

@@ -293,7 +293,7 @@ Rules for that table:
 
 ### Step 3.6: Review Board (any plan with a UI surface)
 
-The component inventory says what the plan will use; the review board **shows** it. Build one page the founder can scan in minutes (a Storybook story, or a static HTML page if the project has no Storybook) with **every component the plan touches, in every planned state**, rendered from real components where they exist. In the founding project his sharpest feedback (remove a container, cut the hovers, "a page must never show only the overflow button") came from this board, not from the docs or the prototype.
+The component inventory says what the plan will use; the review board **shows** it. Build one page the founder can scan in minutes (a Storybook story, or a static HTML page if the project has no Storybook) with **every component the plan touches, in every planned state**, rendered from real components where they exist. In the founding project the founder's sharpest feedback (remove a container, cut the hovers, "a page must never show only the overflow button") came from this board, not from the docs or the prototype.
 
 1. **Tag every component** on the board: **new**, **extended**, **reused** (unchanged) or **replaced**, matching the Step 3.5 tables. Tag planned versus reproduced-from-code versus shipped once delivery starts.
 2. **Draw every stated behavior rule's edge state.** For each rule in the PRD or the decisions ("disabled at the limit says why", "never only one action", "empty state"), the board shows the state where the rule bites. A rule that is only written down is not reviewed: one survived three prose rounds and was rejected the moment it was drawn.

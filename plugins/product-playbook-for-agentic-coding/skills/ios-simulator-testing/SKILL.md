@@ -43,7 +43,7 @@ ios-sim.sh stop                         # shut the simulator down
 
 Output goes to `.context/ios-sim/out/` if `.context` exists, else `ios-sim-out/` (override with `IOS_SIM_OUT`). The Simulator shares the Mac's loopback, so `http://localhost:<port>` reaches a local dev server.
 
-**Pick the device with `IOS_SIM_DEVICE`** (a name or UDID from `xcrun simctl list devices available`; iPhones and iPads both work). Without it, the newest plain iPhone. If the founder reviews on an iPad, every keyboard and gesture check runs twice: at his device and at phone size.
+**Pick the device with `IOS_SIM_DEVICE`** (a name or UDID from `xcrun simctl list devices available`; iPhones and iPads both work). Without it, the newest plain iPhone. If the founder reviews on an iPad, every keyboard and gesture check runs twice: at the founder's device and at phone size.
 
 ```bash
 IOS_SIM_DEVICE="iPad mini (A17 Pro)" ios-sim.sh selftest

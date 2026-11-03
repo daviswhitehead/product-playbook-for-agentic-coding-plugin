@@ -239,7 +239,7 @@ Every PR — **especially autonomously merged ones** — gets a proof-of-complet
 2. **Evidence it works** — test output summary, link to the green full-CI run, SQL/API verification results where schema/data changed, screenshots for UI changes.
 3. **What was consciously deferred or overridden** — with a pointer to where each item is tracked (issue, tasks doc, follow-up PR). "Nothing deferred" is a valid entry; silence is not.
 
-**Decisions in the packet.** If the comment, or the approval request it supports, asks the founder to decide anything, give each an id `P<pr>-<n>` with options and a recommendation, and append its decision line to the project's `decisions.jsonl` before posting (`stage: packet`, screenshots in `images`; shape, files and stand-in hook in `resources/templates/decision-line.md`). When he answers ("P42-1 B, simpler"), fill `answer`, `answered` and the stated `why`; never ask him for a reason.
+**Decisions in the packet.** If the comment, or the approval request it supports, asks the founder to decide anything, give each an id `P<pr>-<n>` with options and a recommendation, and append its decision line to the project's `decisions.jsonl` before posting (`stage: packet`, screenshots in `images`; shape, files and stand-in hook in `resources/templates/decision-line.md`). When the founder answers ("P42-1 B, simpler"), fill `answer`, `answered` and the stated `why`; never ask them for a reason.
 
 Post it immediately before `gh pr merge`. If you find an already-merged PR missing one (e.g., during close-out), post it retroactively. Other workflows reference this section as "proof-of-completion comment (`/playbook:monitor-pr` Step 4)".
 

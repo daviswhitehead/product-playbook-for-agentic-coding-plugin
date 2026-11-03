@@ -2,7 +2,7 @@
 
 <!-- discovery/<NN>-<stage>/stage-summary.md, written by /playbook:explore. At most 40 lines.
      The founder reads it on a phone, and a scheduler posts its first lines, so the top says what was
-     done and what he must decide. Plain words, no jargon, no internal ids without a description.
+     done and what they must decide. Plain words, no jargon, no internal ids without a description.
      Delete this comment. -->
 
 **Done:** [one or two sentences: what this stage produced, in the founder's terms]

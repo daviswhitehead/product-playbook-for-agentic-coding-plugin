@@ -12,10 +12,10 @@
 ## How to read this
 
 - Principles come from the founder's decisions, not from interviews. Each cites ledger row ids that **support** it and rows that **contradict** it. A principle with no receipts is an opinion: mark it tentative.
-- Tag each line **[F]** (he stated it) or **[R]** (revealed by his decisions; ranks below [F]). Where a principle conflicts with a stated founder policy or a later dated decision, those win.
+- Tag each line **[F]** (the founder stated it) or **[R]** (revealed by their decisions; ranks below [F]). Where a principle conflicts with a stated founder policy or a later dated decision, those win.
 - A principle from one project is **provisional** until a second project replicates it.
 - Each principle has a **scope** line saying where it stops (for example "UI chrome only; never weakens safety behavior").
-- Baseline: how often the agent's recommendation matched his explicit pick, by category. Where it is low (often visual and interaction calls), render options; don't predict.
+- Baseline: how often the agent's recommendation matched the founder's explicit pick, by category. Where it is low (often visual and interaction calls), render options; don't predict.
 
 ## Principles
 
@@ -25,11 +25,11 @@
 **Tentative (1 or 2 rows, or mixed)**
 - [Principle]. [ids].
 
-## How he reviews
+## How they review
 
-- **Devices:** [e.g. iPad mini in Safari, plus desktop. Name what he does NOT test on.]
+- **Devices:** [e.g. iPad mini in Safari, plus desktop. Name what they do NOT test on.]
 - **Format:** [e.g. marks up docs inline with `<-- NOTE: -->` / `<-- QUESTION: -->`; decides visual questions from pictures, not prose; answers option codes like "B2 and D1".]
-- **Words he has banned:** [e.g. jargon, a brand shortening]
+- **Words they have banned:** [e.g. jargon, a brand shortening]
 
 ## Agreement baseline
 
@@ -44,12 +44,12 @@
 | Field | Values |
 |-------|--------|
 | `id` | `<project prefix>-<nnn>`, never reused |
-| `project`, `date`, `ref`, `source` | project folder; day he settled it; pointer inside the project (e.g. `D02-3`); file, PR or thread it came from |
-| `question`, `options`, `recommended`, `decided`, `why` | as presented; `recommended` is null if the agent only asked; quote his words in `decided` and `why` where possible |
+| `project`, `date`, `ref`, `source` | project folder; day the founder settled it; pointer inside the project (e.g. `D02-3`); file, PR or thread it came from |
+| `question`, `options`, `recommended`, `decided`, `why` | as presented; `recommended` is null if the agent only asked; quote the founder's words in `decided` and `why` where possible |
 | `agreement` | `match`, `override`, `founder-idea`, `accepted` (approved in a batch; not `match`), `unreviewed`, `no-recommendation`, `dropped` |
 | `category` | `visual-taste`, `interaction-design`, `copy-naming`, `product-scope`, `information-architecture`, `technical`, `process`, `risk-safety` |
 | `reversibility` | `cheap`, `moderate`, `costly` |
-| `shown_as` | `rendered` (drawn when he decided), `prose` |
+| `shown_as` | `rendered` (drawn when the founder decided), `prose` |
 | `why_basis` | `stated`, `inferred`, `none` |
 | `decider` | `proxy` (an informed stand-in could have decided from the docs and principles), `founder` |
 | `blind_testable` | true only for `match` or `override` with 2+ options and a recommendation |

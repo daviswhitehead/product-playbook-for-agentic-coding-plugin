@@ -32,7 +32,7 @@ Produce a clean handoff: the project moves out of the active tray, the planning 
 Before any other step, open the project's latest `qa/round-<n>/` (highest `n`). It must have:
 1. **Every finding fixed, filed or decided** in `findings.md` (no row `open` or `fail`).
 2. **The founder's answers appended to the taste ledger** (`findings.md` Close-out: "Taste ledger" filled, or `none: <why>`).
-3. **Any correction he made twice turned into a rule, check or guard** (Close-out: "Repeated corrections → rules" filled, or `none: <why>`).
+3. **Any correction the founder made twice turned into a rule, check or guard** (Close-out: "Repeated corrections → rules" filled, or `none: <why>`).
 4. **The after-deploy guide's "Production, after deploy" line filled** (`testing-guide-after-deploy.md`: date, deployed sha, who re-ran it, result).
 
 Missing any one: **stop the close** and report the list; finish it with `/playbook:qa-round <project> --apply-markup` or `--after-deploy`. A project with no QA round folder (no user-facing change) skips this step and says so. Step 7's script asserts the same four things after the move.
