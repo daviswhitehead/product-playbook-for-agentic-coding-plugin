@@ -8,7 +8,7 @@
        - at most 10 steps (the guard warns above that).
      Each step is concrete: the page, the exact control label, numbered sub-steps when there is more
      than one action, and the screen to expect. Never "test X" or "verify Y works". Name the device of
-     each section: use his real device (from the founder taste file), not a guess. Delete this comment. -->
+     each section: use the founder's real device (from the founder taste file), not a guess. Delete this comment. -->
 
 *[date]. Each step says what to do, what you should see, and how an agent already tested it. Everything here works on [the integration branch at <local URL> | production] today. After-deploy checks come separately, after the deploy.*
 
@@ -21,4 +21,4 @@
 
 ## Not in this guide, and why
 
-- [Steps an agent fully covered, with the evidence, so he knows they were not skipped.]
+- [Steps an agent fully covered, with the evidence, so the founder knows they were not skipped.]

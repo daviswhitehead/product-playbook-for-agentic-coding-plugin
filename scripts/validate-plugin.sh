@@ -403,6 +403,25 @@ done < "$COVERAGE_TMP"
 
 echo ""
 
+# 10. Gender-neutral wording in plugin prose
+# WHY: commands, skills and templates are prompts. When they called "the founder" he/his/him
+# (~80 times), agents carried it over and wrote "he/him" about real users in their design
+# docs, though no user had stated pronouns. Use "the founder"/"the user" or they/them.
+echo "Checking for gendered pronouns in plugin markdown..."
+echo "-------------------------------------------"
+
+PRONOUN_HITS="$(grep -rnwiE --include='*.md' 'he|him|his|himself|she|her|hers|herself' plugins 2>/dev/null || true)"
+if [ -n "$PRONOUN_HITS" ]; then
+    while IFS= read -r hit; do
+        error "Gendered pronoun: $hit"
+    done <<< "$PRONOUN_HITS"
+    echo "  Write \"the founder\" / \"the user\", or they/them/their (mind verb agreement: \"he picks\" -> \"they pick\")."
+else
+    success "No gendered pronouns in plugins/**/*.md"
+fi
+
+echo ""
+
 # Summary
 echo "=========================================="
 echo "Validation Summary"

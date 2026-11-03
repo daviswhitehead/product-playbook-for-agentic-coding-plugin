@@ -338,15 +338,15 @@ matters more than template completeness.
 
 <!-- Replaces bare "Open Questions". Every open call is framed so the founder can approve a batch in
      one line because the costly items are named: a default, the alternative, and what changes.
-     Status is `confirmed` ONLY with his quoted words and a date; anything else is `assumed`,
-     including defaults inside a batch "sounds good" he did not weigh one by one.
+     Status is `confirmed` ONLY with the founder's quoted words and a date; anything else is `assumed`,
+     including defaults inside a batch "sounds good" the founder did not weigh one by one.
      Blocking = implementation cannot start without it. A fact to look up is not a decision:
      find it in the code (or the grounding brief) instead of asking. -->
 
 | # | Decision | Default | Alternative | Consequence | Blocking? | Status |
 |---|----------|---------|-------------|-------------|-----------|--------|
 | F1 | [the call, in one line] | [what we do unless told otherwise] | [the main other option] | [what changes for users / cost / what becomes hard to undo] | yes / no | assumed |
-| F2 | [...] | [...] | [...] | [...] | no | confirmed: "[his words]" ([YYYY-MM-DD]) |
+| F2 | [...] | [...] | [...] | [...] | no | confirmed: "[the founder's words]" ([YYYY-MM-DD]) |
 
 ---
 

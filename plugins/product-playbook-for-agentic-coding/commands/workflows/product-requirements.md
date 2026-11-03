@@ -127,7 +127,7 @@ Write the PRD from an approved clickable prototype (usually `<project>/prototype
 2. **One requirement per behavior the prototype shows.** Each requirement links the prototype state or screenshot that shows it (`prototype/index.html?state=limit`, `discovery/03-prototype/shots/limit.png`). Each rule drawn as a state becomes an acceptance criterion.
 3. **Anything the prototype does not show** (error paths, data rules, analytics, limits, copy not yet written) is a **Decision for the founder** with status `assumed`, never silently decided.
 4. **Facts come from the grounding brief** (file:line). An action or field not in the brief is either labeled NEW or removed.
-5. **Status honesty**: a decision is `confirmed` only with his quoted words and a date from the decision log or queue. A batch "sounds good" confirms the batch, not each default inside it: those stay `assumed` and are listed for the approval packet.
+5. **Status honesty**: a decision is `confirmed` only with the founder's quoted words and a date from the decision log or queue. A batch "sounds good" confirms the batch, not each default inside it: those stay `assumed` and are listed for the approval packet.
 
 Parse the arguments to determine mode:
 - If `--from-prototype <path>` is provided → From-Prototype Mode (Autonomous if `--autonomous` is also present)
@@ -215,7 +215,7 @@ Use the template at `resources/templates/product-requirements-v2.md` as a starti
 - Document all integration points and data requirements
 - Capture decisions with rationale in Decision Log
 - Include forecast confidence assessments where projections appear
-- Put every open call in **Decisions for the founder** (default, alternative, consequence, status `confirmed` with his quoted words, or `assumed`)
+- Put every open call in **Decisions for the founder** (default, alternative, consequence, status `confirmed` with the founder's quoted words, or `assumed`)
 
 ### Step 4: Validate Completeness
 
