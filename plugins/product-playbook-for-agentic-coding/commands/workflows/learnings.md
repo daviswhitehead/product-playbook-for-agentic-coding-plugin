@@ -189,6 +189,8 @@ Unimplemented improvement ideas from prior retrospectives:
 - [Idea] (from [date] learnings) — still relevant? [y/n]
 ```
 
+6. **Check for a parallel retro on the same project.** In a multi-session project another session may already have written one: `gh pr list --state open --search "learnings in:title"` and `git ls-remote origin 'refs/heads/learnings/*'`. If one exists, scope this retro to the window it does not cover, link it instead of restating it, and stay out of the files it edits (often `CLAUDE.md`, which is size-budgeted). Two retros editing the same rule file conflict, and two rules for one incident drift apart. *(chef-chopsky, 2026-11-05: the rollout retro found the overnight-build retro already open as a draft (#1604) with a `CLAUDE.md` edit; it took the later window and kept to `.claude/rules/` and docs.)*
+
 **"Implemented" means MERGED, not written.** When checking whether a prior fix landed, verify it reached the default branch — `git merge-base --is-ancestor <sha> origin/<default>` or `gh pr view` on its PR — not merely that a commit or file exists. The staging-migration-drift fix (chef-chopsky, 2026-04-10 `a675b6ca`) was fully implemented on a workspace branch that never merged; six manual repair incidents followed while every retrospective would have scored it "implemented." A fix on an unmerged branch is an unimplemented fix.
 
 **Why this matters**: Without this search, the same problems get documented repeatedly across retrospectives without escalation. A pattern that appears in 3 retrospectives needs a systemic fix, not a 4th documentation entry.
