@@ -430,3 +430,7 @@
 ---
 
 *This document focuses on Execution - breaking down exactly what needs to get done.*
+
+## [HUMAN] tasks that touch production data
+
+A founder-gated task that mutates production data (a backfill, a re-extraction, a bulk retire or delete, a flag or allowlist flip) states, in the task itself: the exact command, the dry-run step and what number the founder reads before saying go, the review-mode flag and what it leaves for review, and the rollback. "Run X, then the founder reviews Y" is not enough: if the mode that produces something to review is also the irreversible one, say so, and make the founder's go the only path to it. (chef-chopsky 2026-10-31: a task named `--keep-rows`, the script defined it as "retire nothing", and the agent chose retire mode to give the founder something to review.)
