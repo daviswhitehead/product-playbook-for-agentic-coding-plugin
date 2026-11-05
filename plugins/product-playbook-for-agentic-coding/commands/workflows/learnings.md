@@ -1153,6 +1153,8 @@ Present your self-assessment honestly (lead with the Part A0 tally when there is
 Do you have additional observations about the process?"
 ```
 
+**A blind spot found after the session ended is still this session's finding.** When another session (a takeover after a usage limit, the next day's wrap-up) discovers that something this session did was wrong, the retro for *this* session owns it as a first-class insight with the decision that caused it, and links the other session's doc for the fix. Citing the other doc alone records the symptom where the cause was not. (chef-chopsky 2026-11-05: a re-extraction this session ran in retire mode was diagnosed by the takeover session; the cause, resolving an ambiguous flag toward the destructive option after a blanket "proceed", belonged in this session's retro and became the CLAUDE.md rule.)
+
 **Part B: User input**
 
 Ask the user:
